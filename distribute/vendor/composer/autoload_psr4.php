@@ -7,5 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'KP\\WPFieldFramework\\' => array($vendorDir . '/kevinpirnie/kpt-wpfieldframework/src'),
-    'KP\\Support\\' => array($baseDir . '/src'),
+    'KP\\Support\\' => array($baseDir . '/source/src'),
 );

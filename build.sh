@@ -40,6 +40,8 @@ echo "# Working on Templates"
 ( cd "${SRC}" && find . -type f \
     \( -name '*.php' -o -name 'readme.txt' -o -name 'LICENSE' \) \
     -not -path './assets/*' \
+    -not -path './vendor/*' \
+    -not -path './node_modules/*' \
     -exec cp --parents {} "${DIST}/" \; )
 
 # composer.json ships too, the github updater needs it
@@ -71,7 +73,8 @@ wp i18n make-pot "${SRC}" "${DIST}/languages/${SLUG}.pot" \
 
 # and drop the vendor tree in
 echo "# Working on Vendor"
-cp -R "${ROOT}/vendor" "${DIST}/vendor"
+mkdir -p "${DIST}/vendor"
+cp -R "${ROOT}/vendor/." "${DIST}/vendor/"
 
 # copy up to the production path if we've been told to
 if [ "${SHOULD_COPY}" = "true" ]; then
