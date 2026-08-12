@@ -1,0 +1,701 @@
+/**
+ * KP Support - Portal styles
+ *
+ * Deliberately self contained and low specificity so themes can override it
+ * without fighting. Everything hangs off the custom properties at the top.
+ *
+ * @package KP Support
+ * @author  Kevin Pirnie <me@kpirnie.com>
+ * @since   1.0.0
+ */
+
+.kpts-portal {
+    --kpts-bg: #ffffff;
+    --kpts-bg-alt: #f6f7f7;
+    --kpts-border: #dcdcde;
+    --kpts-text: #1d2327;
+    --kpts-muted: #646970;
+    --kpts-accent: #2271b1;
+    --kpts-accent-text: #ffffff;
+    --kpts-internal: #fcf3d4;
+    --kpts-internal-border: #dba617;
+    --kpts-radius: 6px;
+
+    color: var(--kpts-text);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.kpts-portal *,
+.kpts-portal *::before,
+.kpts-portal *::after {
+    box-sizing: border-box;
+}
+
+/* ---------- notices ---------- */
+
+.kpts-notice {
+    padding: 12px 16px;
+    border-radius: var(--kpts-radius);
+    border-left: 4px solid var(--kpts-accent);
+    background: var(--kpts-bg-alt);
+    margin: 0 0 16px;
+}
+
+.kpts-notice-error {
+    border-left-color: #d63638;
+    background: #fcf0f1;
+}
+
+.kpts-notice-success {
+    border-left-color: #00a32a;
+    background: #edfaef;
+}
+
+/* ---------- buttons ---------- */
+
+.kpts-button {
+    display: inline-block;
+    padding: 9px 18px;
+    border: 1px solid var(--kpts-accent);
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-accent);
+    color: var(--kpts-accent-text);
+    font-size: 14px;
+    line-height: 1.3;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.kpts-button:hover,
+.kpts-button:focus {
+    filter: brightness(1.1);
+    color: var(--kpts-accent-text);
+}
+
+.kpts-button[disabled] {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.kpts-button-secondary {
+    background: transparent;
+    color: var(--kpts-accent);
+}
+
+.kpts-link {
+    color: var(--kpts-accent);
+    font-size: 14px;
+}
+
+/* ---------- badges and tags ---------- */
+
+.kpts-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #6c757d;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.kpts-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    background: var(--kpts-bg-alt);
+    color: var(--kpts-muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.kpts-tag-agent {
+    background: var(--kpts-accent);
+    color: #fff;
+}
+
+.kpts-tag-internal {
+    background: var(--kpts-internal-border);
+    color: #1d2327;
+}
+
+/* ---------- list view ---------- */
+
+.kpts-list-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.kpts-list-header h2 {
+    margin: 0;
+}
+
+.kpts-list-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.kpts-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-bg-alt);
+    margin-bottom: 18px;
+}
+
+.kpts-filters input[type="search"] {
+    flex: 1 1 200px;
+    min-width: 0;
+}
+
+.kpts-ticket-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    overflow: hidden;
+}
+
+.kpts-ticket-row + .kpts-ticket-row {
+    border-top: 1px solid var(--kpts-border);
+}
+
+.kpts-ticket-link {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.kpts-ticket-link:hover,
+.kpts-ticket-link:focus {
+    background: var(--kpts-bg-alt);
+}
+
+.kpts-ticket-row-main {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.kpts-ticket-number {
+    display: inline-block;
+    color: var(--kpts-muted);
+    font-size: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    margin-right: 8px;
+}
+
+.kpts-ticket-title {
+    font-weight: 600;
+}
+
+.kpts-ticket-sub {
+    display: block;
+    color: var(--kpts-muted);
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.kpts-ticket-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.kpts-priority-label,
+.kpts-assignee {
+    color: var(--kpts-muted);
+    font-size: 13px;
+}
+
+.kpts-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 18px;
+}
+
+.kpts-pagination .page-numbers {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    text-decoration: none;
+}
+
+.kpts-pagination .page-numbers.current {
+    background: var(--kpts-accent);
+    border-color: var(--kpts-accent);
+    color: var(--kpts-accent-text);
+}
+
+.kpts-empty {
+    padding: 32px;
+    border: 1px dashed var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    color: var(--kpts-muted);
+    text-align: center;
+}
+
+/* ---------- single ticket ---------- */
+
+.kpts-back {
+    margin-bottom: 12px;
+}
+
+.kpts-ticket-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--kpts-border);
+    margin-bottom: 20px;
+}
+
+.kpts-ticket-subject {
+    margin: 4px 0 0;
+}
+
+.kpts-ticket-badges {
+    display: flex;
+    gap: 8px;
+}
+
+.kpts-ticket-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.kpts-ticket-main {
+    flex: 1 1 460px;
+    min-width: 0;
+}
+
+.kpts-ticket-sidebar {
+    flex: 0 1 280px;
+    min-width: 0;
+}
+
+.kpts-panel {
+    padding: 16px;
+    border: 1px solid var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-bg-alt);
+    margin-bottom: 16px;
+}
+
+.kpts-panel h3 {
+    margin: 0 0 12px;
+    font-size: 15px;
+}
+
+.kpts-panel select {
+    width: 100%;
+}
+
+.kpts-detail-list {
+    margin: 0;
+}
+
+.kpts-detail-list dt {
+    color: var(--kpts-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.kpts-detail-list dd {
+    margin: 0 0 10px;
+}
+
+.kpts-agent-feedback {
+    padding: 8px 10px;
+    border-radius: var(--kpts-radius);
+    background: #edfaef;
+    font-size: 13px;
+}
+
+/* ---------- the conversation ---------- */
+
+.kpts-original-message {
+    padding: 16px;
+    border: 1px solid var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-bg);
+    margin-bottom: 20px;
+}
+
+.kpts-replies {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.kpts-replies-nested {
+    margin-left: 24px;
+    padding-left: 16px;
+    border-left: 2px solid var(--kpts-border);
+}
+
+.kpts-reply {
+    margin-bottom: 14px;
+}
+
+.kpts-reply-inner {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-bg);
+}
+
+.kpts-reply-internal > .kpts-reply-inner {
+    background: var(--kpts-internal);
+    border-color: var(--kpts-internal-border);
+}
+
+.kpts-reply-agent > .kpts-reply-inner {
+    border-left: 3px solid var(--kpts-accent);
+}
+
+.kpts-reply-new > .kpts-reply-inner {
+    animation: kpts-flash 2s ease-out;
+}
+
+@keyframes kpts-flash {
+    from {
+        background: #e6f2fb;
+    }
+}
+
+.kpts-reply-avatar {
+    flex: 0 0 auto;
+}
+
+.kpts-reply-avatar img {
+    display: block;
+    border-radius: 50%;
+}
+
+.kpts-reply-main {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.kpts-reply-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.kpts-reply-author {
+    font-weight: 600;
+}
+
+.kpts-reply-date {
+    color: var(--kpts-muted);
+    font-size: 12px;
+}
+
+.kpts-reply-content {
+    overflow-wrap: break-word;
+}
+
+.kpts-reply-content p:first-child {
+    margin-top: 0;
+}
+
+.kpts-reply-content p:last-child {
+    margin-bottom: 0;
+}
+
+.kpts-reply-content pre {
+    overflow-x: auto;
+    padding: 10px;
+    border-radius: 4px;
+    background: var(--kpts-bg-alt);
+}
+
+.kpts-reply-actions {
+    margin-top: 8px;
+}
+
+.kpts-reply-to {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--kpts-accent);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.kpts-no-replies {
+    padding: 20px;
+    color: var(--kpts-muted);
+    text-align: center;
+}
+
+/* ---------- attachments ---------- */
+
+.kpts-attachments {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 0;
+    padding: 0;
+}
+
+.kpts-attachment a {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 5px 10px;
+    border: 1px solid var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-bg-alt);
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.kpts-attachment-size {
+    color: var(--kpts-muted);
+    font-size: 12px;
+}
+
+/* ---------- the reply box ---------- */
+
+.kpts-reply-form {
+    padding: 16px;
+    border: 1px solid var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-bg-alt);
+    margin-top: 20px;
+}
+
+.kpts-reply-form textarea {
+    width: 100%;
+    resize: vertical;
+}
+
+.kpts-replying-to {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-bg);
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.kpts-cancel-reply {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--kpts-accent);
+    cursor: pointer;
+}
+
+.kpts-reply-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.kpts-reply-toolbar .kpts-button {
+    margin-left: auto;
+}
+
+.kpts-internal-toggle,
+.kpts-file-label {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.kpts-file-help {
+    color: var(--kpts-muted);
+    font-size: 12px;
+    margin: 8px 0 0;
+}
+
+.kpts-file-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0 0;
+    padding: 0;
+}
+
+.kpts-file-item {
+    padding: 3px 9px;
+    border: 1px solid var(--kpts-border);
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-bg);
+    font-size: 12px;
+}
+
+.kpts-reply-error,
+.kpts-form-error {
+    padding: 10px 12px;
+    border-radius: var(--kpts-radius);
+    border-left: 4px solid #d63638;
+    background: #fcf0f1;
+    margin-top: 10px;
+}
+
+/* ---------- forms ---------- */
+
+.kpts-field {
+    margin: 0 0 16px;
+}
+
+.kpts-field label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.kpts-field-inline label {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-weight: 400;
+}
+
+.kpts-field input[type="text"],
+.kpts-field input[type="email"],
+.kpts-field input[type="password"],
+.kpts-field select,
+.kpts-field textarea {
+    width: 100%;
+}
+
+.kpts-field-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.kpts-field-row .kpts-field {
+    flex: 1 1 200px;
+    min-width: 0;
+}
+
+.kpts-required {
+    color: #d63638;
+}
+
+.kpts-help {
+    color: var(--kpts-muted);
+    font-size: 13px;
+}
+
+.kpts-form-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+/* the honeypot, kept out of sight of real people */
+.kpts-hp {
+    position: absolute !important;
+    left: -9999px !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+}
+
+/* ---------- tabs ---------- */
+
+.kpts-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--kpts-border);
+    margin-bottom: 20px;
+}
+
+.kpts-tab {
+    padding: 10px 18px;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: none;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.kpts-tab.is-active {
+    border-bottom-color: var(--kpts-accent);
+    font-weight: 600;
+}
+
+.kpts-tab-panel {
+    display: none;
+    max-width: 520px;
+}
+
+.kpts-tab-panel.is-active {
+    display: block;
+}
+
+/* with no tabs rendered at all, the single panel always shows */
+.kpts-portal-auth:not(:has(.kpts-tabs)) .kpts-tab-panel {
+    display: block;
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 782px) {
+
+    .kpts-ticket-layout {
+        flex-direction: column;
+    }
+
+    .kpts-ticket-sidebar {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
+    .kpts-replies-nested {
+        margin-left: 10px;
+        padding-left: 10px;
+    }
+
+    .kpts-reply-toolbar .kpts-button {
+        margin-left: 0;
+        width: 100%;
+    }
+}

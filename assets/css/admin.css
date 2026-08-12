@@ -1,0 +1,77 @@
+/**
+ * KP Support - Admin styles
+ *
+ * Just the bits the wp-admin ticket screens need on top of the portal styles,
+ * which get loaded alongside this.
+ *
+ * @package KP Support
+ * @author  Kevin Pirnie <me@kpirnie.com>
+ * @since   1.0.0
+ */
+
+/* the badges in the ticket list table */
+.kpts-badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: #6c757d;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+/* keep our list table columns from sprawling */
+.column-kpts_number {
+    width: 100px;
+}
+
+.column-kpts_status,
+.column-kpts_priority {
+    width: 110px;
+}
+
+.column-kpts_replies {
+    width: 70px;
+    text-align: center;
+}
+
+.column-kpts_activity {
+    width: 130px;
+}
+
+/* the conversation metabox reuses the portal styles, so give it the same shell */
+#kpts_conversation .inside {
+    padding: 0;
+    margin: 0;
+}
+
+#kpts_conversation .kpts-thread {
+    --kpts-bg: #ffffff;
+    --kpts-bg-alt: #f6f7f7;
+    --kpts-border: #dcdcde;
+    --kpts-text: #1d2327;
+    --kpts-muted: #646970;
+    --kpts-accent: #2271b1;
+    --kpts-accent-text: #ffffff;
+    --kpts-internal: #fcf3d4;
+    --kpts-internal-border: #dba617;
+    --kpts-radius: 6px;
+
+    padding: 16px;
+}
+
+#kpts_conversation .kpts-replies-root {
+    max-height: 620px;
+    overflow-y: auto;
+}
+
+#kpts_conversation .kpts-reply-form textarea {
+    width: 100%;
+}
+
+/* the details box off to the side */
+#kpts_details select {
+    max-width: 100%;
+}
