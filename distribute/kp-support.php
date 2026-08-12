@@ -14,8 +14,8 @@
  * Requires PHP:      8.2
  * Author:            Kevin Pirnie
  * Author URI:        https://kevinpirnie.com/
- * License:           GPL-3.0-or-later
- * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
+ * License:           MIT
+ * License URI:       https://opensource.org/licenses/MIT
  * Text Domain:       kp-support
  * Domain Path:       /languages
  *
