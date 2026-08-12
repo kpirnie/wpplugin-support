@@ -213,7 +213,7 @@ if (! class_exists('\KP\Support\Modules\Portal')) {
             );
 
             // work out what ticket we're looking at, if any
-            $ticket_id = isset($_GET['kpts_ticket']) ? absint(wp_unslash($_GET['kpts_ticket'])) : 0;
+            $ticket_id = isset($_GET['kpts_ticket']) ? absint(wp_unslash($_GET['kpts_ticket'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, public portal routing
 
             // hand the script everything it needs
             wp_localize_script('kpts-portal', 'kptsPortal', array(
@@ -298,9 +298,9 @@ if (! class_exists('\KP\Support\Modules\Portal')) {
             }
 
             // work out which view we're on, the query string wins over the attribute
-            $view = isset($_GET['kpts_view'])
+            $view = isset($_GET['kpts_view']) // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, public portal routing
                 ? sanitize_key(wp_unslash($_GET['kpts_view']))
-                : sanitize_key((string) $atts['view']);
+                : '';
 
             // and route it
             return match ($view) {
@@ -326,18 +326,18 @@ if (! class_exists('\KP\Support\Modules\Portal')) {
             $is_agent = Access::isAgent($user_id);
 
             // agents get the whole queue, customers get their own tickets
-            $agent_view = $is_agent && (! isset($_GET['kpts_mine']) || (string) $_GET['kpts_mine'] !== '1');
+            $agent_view = $is_agent && (! isset($_GET['kpts_mine']) || (string) $_GET['kpts_mine'] !== '1'); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput -- read only, compared as a literal string
 
             // pull the filters off the query string
             $query = Ticket::query(array(
                 'user_id'     => $user_id,
                 'agent_view'  => $agent_view,
-                'status'      => isset($_GET['kpts_status']) ? absint(wp_unslash($_GET['kpts_status'])) : 0,
-                'department'  => isset($_GET['kpts_department']) ? absint(wp_unslash($_GET['kpts_department'])) : 0,
-                'priority'    => isset($_GET['kpts_priority']) ? absint(wp_unslash($_GET['kpts_priority'])) : 0,
-                'search'      => isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($_GET['kpts_search'])) : '',
-                'paged'       => isset($_GET['kpts_paged']) ? absint(wp_unslash($_GET['kpts_paged'])) : 1,
-                'show_closed' => ! isset($_GET['kpts_open']) || (string) $_GET['kpts_open'] !== '1',
+                'status'      => isset($_GET['kpts_status']) ? absint(wp_unslash($_GET['kpts_status'])) : 0, // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only list filter
+                'department'  => isset($_GET['kpts_department']) ? absint(wp_unslash($_GET['kpts_department'])) : 0, // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only list filter
+                'priority'    => isset($_GET['kpts_priority']) ? absint(wp_unslash($_GET['kpts_priority'])) : 0, // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only list filter
+                'search'      => isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($_GET['kpts_search'])) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only list filter
+                'paged'       => isset($_GET['kpts_paged']) ? absint(wp_unslash($_GET['kpts_paged'])) : 1, // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only list filter
+                'show_closed' => ! isset($_GET['kpts_open']) || (string) $_GET['kpts_open'] !== '1', // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput -- read only, compared as a literal string
             ));
 
             // and render it
@@ -383,7 +383,7 @@ if (! class_exists('\KP\Support\Modules\Portal')) {
         {
 
             // what ticket did they ask for
-            $ticket_id = isset($_GET['kpts_ticket']) ? absint(wp_unslash($_GET['kpts_ticket'])) : 0;
+            $ticket_id = isset($_GET['kpts_ticket']) ? absint(wp_unslash($_GET['kpts_ticket'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, public portal routing
 
             // and this is the gate, they have to actually be allowed on it
             if (! Access::canViewTicket($ticket_id)) {

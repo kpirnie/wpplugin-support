@@ -137,32 +137,40 @@ if (! class_exists('\KP\Support\Modules\Attachments')) {
                 return;
             }
 
+            // we need the filesystem api to write any of these
+            $fs = self::filesystem();
+            if ($fs === null) {
+                return;
+            }
+
             // block direct web access on apache
             $htaccess = $dir . '/.htaccess';
             if (! file_exists($htaccess)) {
-                file_put_contents(
+                $fs->put_contents(
                     $htaccess,
                     "# KP Support - these files are served through PHP only\n"
                         . "<IfModule mod_authz_core.c>\n\tRequire all denied\n</IfModule>\n"
-                        . "<IfModule !mod_authz_core.c>\n\tOrder allow,deny\n\tDeny from all\n</IfModule>\n"
+                        . "<IfModule !mod_authz_core.c>\n\tOrder allow,deny\n\tDeny from all\n</IfModule>\n",
+                    FS_CHMOD_FILE
                 );
             }
 
             // and on IIS
             $webconfig = $dir . '/web.config';
             if (! file_exists($webconfig)) {
-                file_put_contents(
+                $fs->put_contents(
                     $webconfig,
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<configuration>\n\t<system.webServer>\n"
                         . "\t\t<authorization>\n\t\t\t<deny users=\"*\" />\n\t\t</authorization>\n"
-                        . "\t</system.webServer>\n</configuration>\n"
+                        . "\t</system.webServer>\n</configuration>\n",
+                    FS_CHMOD_FILE
                 );
             }
 
             // stop directory listings anywhere the above doesn't apply
             $index = $dir . '/index.php';
             if (! file_exists($index)) {
-                file_put_contents($index, "<?php\n// Silence is golden.\n");
+                $fs->put_contents($index, "<?php\n// Silence is golden.\n", FS_CHMOD_FILE);
             }
         }
 
@@ -538,13 +546,13 @@ if (! class_exists('\KP\Support\Modules\Attachments')) {
         {
 
             // nothing to do unless they're asking for a file
-            if (empty($_GET['kpts_file']) || empty($_GET['kpts_ticket'])) {
+            if (empty($_GET['kpts_file']) || empty($_GET['kpts_ticket'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
                 return;
             }
 
             // clean up what came in, the key is ours so it's strictly alphanumeric
-            $key = preg_replace('/[^A-Za-z0-9]/', '', wp_unslash($_GET['kpts_file']));
-            $ticket_id = absint(wp_unslash($_GET['kpts_ticket']));
+            $key = preg_replace('/[^A-Za-z0-9]/', '', wp_unslash($_GET['kpts_file'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, stripped to alphanumerics
+            $ticket_id = absint(wp_unslash($_GET['kpts_ticket'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
 
             // both have to be real
             if ($key === '' || $ticket_id < 1) {

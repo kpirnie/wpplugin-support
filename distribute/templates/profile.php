@@ -9,7 +9,7 @@
  * @author      Kevin Pirnie <me@kpirnie.com>
  * @since       1.0.0
  *
- * @var \WP_User $user The user whose profile we're showing.
+ * @var \WP_User $kpts_user The user whose profile we're showing.
  */
 
 declare(strict_types=1);
@@ -21,7 +21,7 @@ use KP\Support\Modules\Accounts;
 defined('ABSPATH') || die('No direct script access allowed');
 
 // we need a real user
-if (! isset($user) || ! $user instanceof \WP_User || $user->ID < 1) {
+if (! isset($kpts_user) || ! $kpts_user instanceof \WP_User || $kpts_user->ID < 1) {
     return;
 }
 ?>
@@ -46,7 +46,7 @@ if (! isset($user) || ! $user instanceof \WP_User || $user->ID < 1) {
                 <input type="text"
                        id="kpts-profile-first"
                        name="kpts_first_name"
-                       value="<?php echo esc_attr($user->first_name); ?>"
+                       value="<?php echo esc_attr($kpts_user->first_name); ?>"
                        autocomplete="given-name" />
             </p>
 
@@ -55,7 +55,7 @@ if (! isset($user) || ! $user instanceof \WP_User || $user->ID < 1) {
                 <input type="text"
                        id="kpts-profile-last"
                        name="kpts_last_name"
-                       value="<?php echo esc_attr($user->last_name); ?>"
+                       value="<?php echo esc_attr($kpts_user->last_name); ?>"
                        autocomplete="family-name" />
             </p>
         </div>
@@ -65,7 +65,7 @@ if (! isset($user) || ! $user instanceof \WP_User || $user->ID < 1) {
             <input type="email"
                    id="kpts-profile-email"
                    name="kpts_email"
-                   value="<?php echo esc_attr($user->user_email); ?>"
+                   value="<?php echo esc_attr($kpts_user->user_email); ?>"
                    autocomplete="email"
                    required />
         </p>

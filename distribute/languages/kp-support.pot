@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-12T19:17:27+00:00\n"
+"POT-Creation-Date: 2026-08-12T19:45:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: kp-support\n"
@@ -278,80 +278,80 @@ msgstr ""
 msgid "You are not allowed to reply to this ticket."
 msgstr ""
 
-#: src/Modules/Ajax.php:256
+#: src/Modules/Ajax.php:254
 #: src/Modules/Portal.php:364
 msgid "You are not allowed to open tickets."
 msgstr ""
 
-#: src/Modules/Ajax.php:274
+#: src/Modules/Ajax.php:272
 msgid "Please choose a department."
 msgstr ""
 
-#: src/Modules/Ajax.php:282
+#: src/Modules/Ajax.php:280
 msgid "Please choose a category."
 msgstr ""
 
-#: src/Modules/Ajax.php:348
+#: src/Modules/Ajax.php:346
 msgid "You are not allowed to update this ticket."
 msgstr ""
 
-#: src/Modules/Ajax.php:390
+#: src/Modules/Ajax.php:388
 msgid "Ticket updated."
 msgstr ""
 
 #. translators: %d: maximum number of files
-#: src/Modules/Attachments.php:290
+#: src/Modules/Attachments.php:298
 #, php-format
 msgid "You can only attach up to %d files."
 msgstr ""
 
-#: src/Modules/Attachments.php:375
+#: src/Modules/Attachments.php:383
 msgid "That file failed to upload. Please try again."
 msgstr ""
 
-#: src/Modules/Attachments.php:381
+#: src/Modules/Attachments.php:389
 msgid "That upload could not be verified."
 msgstr ""
 
 #. translators: %s: human readable maximum file size
-#: src/Modules/Attachments.php:392
+#: src/Modules/Attachments.php:400
 #, php-format
 msgid "Files must be smaller than %s."
 msgstr ""
 
-#: src/Modules/Attachments.php:401
+#: src/Modules/Attachments.php:409
 msgid "That file name could not be used."
 msgstr ""
 
-#: src/Modules/Attachments.php:411
+#: src/Modules/Attachments.php:419
 msgid "That file type is not allowed."
 msgstr ""
 
 #. translators: %s: the rejected file extension
-#: src/Modules/Attachments.php:420
+#: src/Modules/Attachments.php:428
 #, php-format
 msgid "Files of type \"%s\" are not allowed."
 msgstr ""
 
-#: src/Modules/Attachments.php:430
+#: src/Modules/Attachments.php:438
 msgid "The attachment directory could not be created."
 msgstr ""
 
-#: src/Modules/Attachments.php:441
-#: src/Modules/Attachments.php:446
+#: src/Modules/Attachments.php:449
+#: src/Modules/Attachments.php:454
 msgid "That file could not be saved."
 msgstr ""
 
-#: src/Modules/Attachments.php:551
-#: src/Modules/Attachments.php:562
-#: src/Modules/Attachments.php:586
-#: src/Modules/Attachments.php:591
-#: src/Modules/Attachments.php:600
+#: src/Modules/Attachments.php:559
+#: src/Modules/Attachments.php:570
+#: src/Modules/Attachments.php:594
+#: src/Modules/Attachments.php:599
+#: src/Modules/Attachments.php:608
 msgid "That file could not be found."
 msgstr ""
 
-#: src/Modules/Attachments.php:556
-#: src/Modules/Attachments.php:571
+#: src/Modules/Attachments.php:564
+#: src/Modules/Attachments.php:579
 msgid "You are not allowed to access that file."
 msgstr ""
 

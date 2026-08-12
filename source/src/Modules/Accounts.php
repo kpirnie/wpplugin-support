@@ -63,12 +63,12 @@ if (! class_exists('\KP\Support\Modules\Accounts')) {
         {
 
             // nothing posted, nothing to do
-            if (empty($_POST['kpts_action'])) {
+            if (empty($_POST['kpts_action'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- each handler verifies its own nonce before acting
                 return;
             }
 
             // what are they trying to do
-            $action = sanitize_key(wp_unslash($_POST['kpts_action']));
+            $action = sanitize_key(wp_unslash($_POST['kpts_action'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- each handler verifies its own nonce before acting
 
             // and hand it off
             match ($action) {
@@ -531,12 +531,12 @@ if (! class_exists('\KP\Support\Modules\Accounts')) {
             foreach (array('error', 'success') as $_type) {
 
                 // nothing of this type
-                if (empty($_GET['kpts_' . $_type])) {
+                if (empty($_GET['kpts_' . $_type])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, resolved against a known code list
                     continue;
                 }
 
                 // pull the code and look it up, this is why we only ever pass codes
-                $code = sanitize_key(wp_unslash($_GET['kpts_' . $_type]));
+                $code = sanitize_key(wp_unslash($_GET['kpts_' . $_type])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, resolved against a known code list
                 $message = self::message($_type, $code);
 
                 // if we don't recognize it, show nothing at all

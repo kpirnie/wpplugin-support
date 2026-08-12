@@ -75,3 +75,121 @@
 #kpts_details select {
     max-width: 100%;
 }
+
+/* ==========================================================================
+   Settings screen
+   The field framework leaves its inputs unconstrained, which lets them run the
+   full width of the screen, so cap them here rather than touching the framework.
+   ========================================================================== */
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-field {
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-field:last-child {
+    border-bottom: 0;
+}
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__label {
+    flex: 0 0 220px;
+    padding-top: 6px;
+}
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input {
+    flex: 0 1 640px;
+    min-width: 0;
+    max-width: 640px;
+}
+
+/* every control fills its own column instead of the whole screen */
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input input[type="text"],
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input input[type="email"],
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input input[type="url"],
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input input[type="password"],
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input select,
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input textarea {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* except the ones that only ever hold a handful of characters */
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input input[type="number"] {
+    width: 110px;
+    max-width: 110px;
+}
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input input[type="color"] {
+    width: 60px;
+    max-width: 60px;
+    padding: 2px;
+}
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input textarea {
+    min-height: 160px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-field__input .description {
+    max-width: 100%;
+    font-style: normal;
+}
+
+/* the section heading above each group of fields */
+.kpts_ticket_page_kp-support-settings .kp-wsf-tab-content > h2,
+.kpts_ticket_page_kp-support-settings .kp-wsf-heading {
+    margin: 0 0 20px;
+    padding-bottom: 10px;
+    font-size: 15px;
+    border-bottom: 1px solid #dcdcde;
+}
+
+/* give the whole thing a card to sit on so it isn't floating on grey */
+.kpts_ticket_page_kp-support-settings .kp-wsf-tab-content {
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+}
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-tabs-horizontal .kp-wsf-tab-nav {
+    margin-bottom: 0;
+}
+
+/* pull the save button clear of the last field */
+.kpts_ticket_page_kp-support-settings .submit,
+.kpts_ticket_page_kp-support-settings p.submit {
+    margin: 24px 0 0;
+    padding: 0;
+}
+
+/* the export and import panel below the tabs */
+.kpts_ticket_page_kp-support-settings .kp-wsf-export-import {
+    margin-top: 24px;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+}
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-export-import-columns {
+    gap: 32px;
+}
+
+/* narrow screens drop the two column field layout */
+@media screen and (max-width: 782px) {
+
+    .kpts_ticket_page_kp-support-settings .kp-wsf-field__label,
+    .kpts_ticket_page_kp-support-settings .kp-wsf-field__input {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+}
+
+.kpts_ticket_page_kp-support-settings .kp-wsf-tab-nav {
+    margin-bottom: 0;
+}

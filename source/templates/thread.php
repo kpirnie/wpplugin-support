@@ -12,11 +12,11 @@
  * @author      Kevin Pirnie <me@kpirnie.com>
  * @since       1.0.0
  *
- * @var int                              $ticket_id    The ticket id.
- * @var array<int, array<string, mixed>> $replies      The threaded replies.
- * @var bool                             $can_reply    Whether they can post a reply.
- * @var bool                             $can_internal Whether they can post internal notes.
- * @var string                           $context      Either portal or admin.
+ * @var int                              $kpts_ticket_id    The ticket id.
+ * @var array<int, array<string, mixed>> $kpts_replies      The threaded replies.
+ * @var bool                             $kpts_can_reply    Whether they can post a reply.
+ * @var bool                             $kpts_can_internal Whether they can post internal notes.
+ * @var string                           $kpts_context      Either portal or admin.
  */
 
 declare(strict_types=1);
@@ -29,42 +29,42 @@ use KP\Support\Modules\Attachments;
 defined('ABSPATH') || die('No direct script access allowed');
 
 // tidy up what we were handed
-$ticket_id = isset($ticket_id) ? (int) $ticket_id : 0;
-$replies = isset($replies) && is_array($replies) ? $replies : array();
-$can_reply = ! empty($can_reply);
-$can_internal = ! empty($can_internal);
-$context = isset($context) ? (string) $context : 'portal';
+$kpts_ticket_id = isset($kpts_ticket_id) ? (int) $kpts_ticket_id : 0;
+$kpts_replies = isset($kpts_replies) && is_array($kpts_replies) ? $kpts_replies : array();
+$kpts_can_reply = ! empty($kpts_can_reply);
+$kpts_can_internal = ! empty($kpts_can_internal);
+$kpts_context = isset($kpts_context) ? (string) $kpts_context : 'portal';
 
 // work out the newest reply we're rendering, the poller picks up from here
-$latest = '';
-$flat = Replies::forTicket($ticket_id, $can_internal);
-foreach ($flat as $_reply) {
-    if ($_reply->comment_date_gmt > $latest) {
-        $latest = $_reply->comment_date_gmt;
+$kpts_latest = '';
+$kpts_flat = Replies::forTicket($kpts_ticket_id, $kpts_can_internal);
+foreach ($kpts_flat as $_kpts_reply) {
+    if ($_kpts_reply->comment_date_gmt > $kpts_latest) {
+        $kpts_latest = $_kpts_reply->comment_date_gmt;
     }
 }
 
 // are attachments even switched on
-$allow_files = (bool) Plugin::opt('allow_attachments', true);
+$kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
 ?>
-<div class="kpts-thread kpts-context-<?php echo esc_attr($context); ?>"
-     data-ticket-id="<?php echo esc_attr((string) $ticket_id); ?>"
-     data-latest="<?php echo esc_attr($latest); ?>">
+<div class="kpts-thread kpts-context-<?php echo esc_attr($kpts_context); ?>"
+     data-ticket-id="<?php echo esc_attr((string) $kpts_ticket_id); ?>"
+     data-latest="<?php echo esc_attr($kpts_latest); ?>">
 
     <ul class="kpts-replies kpts-replies-root">
-        <?php if (empty($replies)) : ?>
+        <?php if (empty($kpts_replies)) : ?>
             <li class="kpts-no-replies"><?php esc_html_e('No replies yet.', 'kp-support'); ?></li>
         <?php else : ?>
             <?php
             // render the whole tree
-            foreach ($replies as $_node) {
-                echo Replies::renderNode($_node, $ticket_id, 0); // phpcs:ignore WordPress.Security.EscapeOutput -- the reply template escapes its own output
+            foreach ($kpts_replies as $_kpts_node) {
+                echo Replies::renderNode($_kpts_node, $kpts_ticket_id, 0); // phpcs:ignore WordPress.Security.EscapeOutput -- the reply template escapes its own output
             }
             ?>
         <?php endif; ?>
     </ul>
 
-    <?php if ($can_reply) : ?>
+    <?php if ($kpts_can_reply) : ?>
         <form class="kpts-reply-form" method="post" enctype="multipart/form-data">
 
             <div class="kpts-replying-to" hidden>
@@ -74,10 +74,10 @@ $allow_files = (bool) Plugin::opt('allow_attachments', true);
 
             <input type="hidden" name="parent" class="kpts-reply-parent" value="0" />
 
-            <label class="screen-reader-text" for="kpts-reply-content-<?php echo esc_attr((string) $ticket_id); ?>">
+            <label class="screen-reader-text" for="kpts-reply-content-<?php echo esc_attr((string) $kpts_ticket_id); ?>">
                 <?php esc_html_e('Your reply', 'kp-support'); ?>
             </label>
-            <textarea id="kpts-reply-content-<?php echo esc_attr((string) $ticket_id); ?>"
+            <textarea id="kpts-reply-content-<?php echo esc_attr((string) $kpts_ticket_id); ?>"
                       class="kpts-reply-content-input"
                       name="content"
                       rows="4"
@@ -85,14 +85,14 @@ $allow_files = (bool) Plugin::opt('allow_attachments', true);
 
             <div class="kpts-reply-toolbar">
 
-                <?php if ($allow_files) : ?>
+                <?php if ($kpts_allow_files) : ?>
                     <label class="kpts-file-label">
                         <input type="file" class="kpts-file-input" name="kpts_files[]" multiple />
                         <span><?php esc_html_e('Attach files', 'kp-support'); ?></span>
                     </label>
                 <?php endif; ?>
 
-                <?php if ($can_internal) : ?>
+                <?php if ($kpts_can_internal) : ?>
                     <label class="kpts-internal-toggle">
                         <input type="checkbox" class="kpts-internal-input" name="internal" value="1" />
                         <span><?php esc_html_e('Internal note (customers will not see this)', 'kp-support'); ?></span>
@@ -104,7 +104,7 @@ $allow_files = (bool) Plugin::opt('allow_attachments', true);
                 </button>
             </div>
 
-            <?php if ($allow_files) : ?>
+            <?php if ($kpts_allow_files) : ?>
                 <ul class="kpts-file-list"></ul>
                 <p class="kpts-file-help">
                     <?php

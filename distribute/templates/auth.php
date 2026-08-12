@@ -9,9 +9,9 @@
  * @author      Kevin Pirnie <me@kpirnie.com>
  * @since       1.0.0
  *
- * @var bool   $allow_registration Whether registration is open.
- * @var string $default_tab        Which tab to show first.
- * @var string $redirect           Where to send them afterwards.
+ * @var bool   $kpts_allow_registration Whether registration is open.
+ * @var string $kpts_default_tab        Which tab to show first.
+ * @var string $kpts_redirect           Where to send them afterwards.
  */
 
 declare(strict_types=1);
@@ -22,28 +22,28 @@ use KP\Support\Modules\Accounts;
 defined('ABSPATH') || die('No direct script access allowed');
 
 // tidy up what we were handed
-$allow_registration = ! empty($allow_registration);
-$default_tab = (isset($default_tab) && $default_tab === 'register') ? 'register' : 'login';
+$kpts_allow_registration = ! empty($kpts_allow_registration);
+$kpts_default_tab = (isset($kpts_default_tab) && $kpts_default_tab === 'register') ? 'register' : 'login';
 
 // if registration is closed we can only ever show the login
-if (! $allow_registration) {
-    $default_tab = 'login';
+if (! $kpts_allow_registration) {
+    $kpts_default_tab = 'login';
 }
 ?>
 <div class="kpts-portal kpts-portal-auth">
 
     <?php echo Accounts::renderMessages(); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in renderMessages() ?>
 
-    <?php if ($allow_registration) : ?>
+    <?php if ($kpts_allow_registration) : ?>
         <div class="kpts-tabs" role="tablist">
             <button type="button"
-                    class="kpts-tab <?php echo ($default_tab === 'login') ? 'is-active' : ''; ?>"
+                    class="kpts-tab <?php echo ($kpts_default_tab === 'login') ? 'is-active' : ''; ?>"
                     data-tab="login"
                     role="tab">
                 <?php esc_html_e('Log In', 'kp-support'); ?>
             </button>
             <button type="button"
-                    class="kpts-tab <?php echo ($default_tab === 'register') ? 'is-active' : ''; ?>"
+                    class="kpts-tab <?php echo ($kpts_default_tab === 'register') ? 'is-active' : ''; ?>"
                     data-tab="register"
                     role="tab">
                 <?php esc_html_e('Create An Account', 'kp-support'); ?>
@@ -51,7 +51,7 @@ if (! $allow_registration) {
         </div>
     <?php endif; ?>
 
-    <div class="kpts-tab-panel kpts-panel-login <?php echo ($default_tab === 'login') ? 'is-active' : ''; ?>" data-panel="login">
+    <div class="kpts-tab-panel kpts-panel-login <?php echo ($kpts_default_tab === 'login') ? 'is-active' : ''; ?>" data-panel="login">
 
         <h2><?php esc_html_e('Log In', 'kp-support'); ?></h2>
 
@@ -86,8 +86,8 @@ if (! $allow_registration) {
         </form>
     </div>
 
-    <?php if ($allow_registration) : ?>
-        <div class="kpts-tab-panel kpts-panel-register <?php echo ($default_tab === 'register') ? 'is-active' : ''; ?>" data-panel="register">
+    <?php if ($kpts_allow_registration) : ?>
+        <div class="kpts-tab-panel kpts-panel-register <?php echo ($kpts_default_tab === 'register') ? 'is-active' : ''; ?>" data-panel="register">
 
             <h2><?php esc_html_e('Create An Account', 'kp-support'); ?></h2>
 

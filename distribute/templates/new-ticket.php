@@ -9,9 +9,9 @@
  * @author      Kevin Pirnie <me@kpirnie.com>
  * @since       1.0.0
  *
- * @var array<int, \WP_Term> $departments The available departments.
- * @var array<int, \WP_Term> $categories  The available categories.
- * @var array<int, \WP_Term> $priorities  The available priorities.
+ * @var array<int, \WP_Term> $kpts_departments The available departments.
+ * @var array<int, \WP_Term> $kpts_categories  The available categories.
+ * @var array<int, \WP_Term> $kpts_priorities  The available priorities.
  */
 
 declare(strict_types=1);
@@ -25,14 +25,14 @@ use KP\Support\Modules\Attachments;
 defined('ABSPATH') || die('No direct script access allowed');
 
 // tidy up what we were handed
-$departments = isset($departments) && is_array($departments) ? $departments : array();
-$categories = isset($categories) && is_array($categories) ? $categories : array();
-$priorities = isset($priorities) && is_array($priorities) ? $priorities : array();
+$kpts_departments = isset($kpts_departments) && is_array($kpts_departments) ? $kpts_departments : array();
+$kpts_categories = isset($kpts_categories) && is_array($kpts_categories) ? $kpts_categories : array();
+$kpts_priorities = isset($kpts_priorities) && is_array($kpts_priorities) ? $kpts_priorities : array();
 
 // what's required, and whether files are switched on
-$require_department = (bool) Plugin::opt('require_department', true);
-$require_category = (bool) Plugin::opt('require_category', false);
-$allow_files = (bool) Plugin::opt('allow_attachments', true);
+$kpts_require_department = (bool) Plugin::opt('require_department', true);
+$kpts_require_category = (bool) Plugin::opt('require_category', false);
+$kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
 ?>
 <div class="kpts-portal kpts-portal-new">
 
@@ -55,48 +55,48 @@ $allow_files = (bool) Plugin::opt('allow_attachments', true);
 
         <div class="kpts-field-row">
 
-            <?php if (! empty($departments)) : ?>
+            <?php if (! empty($kpts_departments)) : ?>
                 <p class="kpts-field">
                     <label for="kpts-department">
                         <?php esc_html_e('Department', 'kp-support'); ?>
-                        <?php if ($require_department) : ?><span class="kpts-required">*</span><?php endif; ?>
+                        <?php if ($kpts_require_department) : ?><span class="kpts-required">*</span><?php endif; ?>
                     </label>
-                    <select id="kpts-department" name="department" <?php echo $require_department ? 'required' : ''; ?>>
+                    <select id="kpts-department" name="department" <?php echo $kpts_require_department ? 'required' : ''; ?>>
                         <option value=""><?php esc_html_e('Choose a department...', 'kp-support'); ?></option>
-                        <?php foreach ($departments as $_term) : ?>
-                            <option value="<?php echo esc_attr((string) $_term->term_id); ?>">
-                                <?php echo esc_html($_term->name); ?>
+                        <?php foreach ($kpts_departments as $_kpts_term) : ?>
+                            <option value="<?php echo esc_attr((string) $_kpts_term->term_id); ?>">
+                                <?php echo esc_html($_kpts_term->name); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                 </p>
             <?php endif; ?>
 
-            <?php if (! empty($categories)) : ?>
+            <?php if (! empty($kpts_categories)) : ?>
                 <p class="kpts-field">
                     <label for="kpts-category">
                         <?php esc_html_e('Category', 'kp-support'); ?>
-                        <?php if ($require_category) : ?><span class="kpts-required">*</span><?php endif; ?>
+                        <?php if ($kpts_require_category) : ?><span class="kpts-required">*</span><?php endif; ?>
                     </label>
-                    <select id="kpts-category" name="category" <?php echo $require_category ? 'required' : ''; ?>>
+                    <select id="kpts-category" name="category" <?php echo $kpts_require_category ? 'required' : ''; ?>>
                         <option value=""><?php esc_html_e('Choose a category...', 'kp-support'); ?></option>
-                        <?php foreach ($categories as $_term) : ?>
-                            <option value="<?php echo esc_attr((string) $_term->term_id); ?>">
-                                <?php echo esc_html($_term->name); ?>
+                        <?php foreach ($kpts_categories as $_kpts_term) : ?>
+                            <option value="<?php echo esc_attr((string) $_kpts_term->term_id); ?>">
+                                <?php echo esc_html($_kpts_term->name); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                 </p>
             <?php endif; ?>
 
-            <?php if (! empty($priorities)) : ?>
+            <?php if (! empty($kpts_priorities)) : ?>
                 <p class="kpts-field">
                     <label for="kpts-priority"><?php esc_html_e('Priority', 'kp-support'); ?></label>
                     <select id="kpts-priority" name="priority">
-                        <?php foreach ($priorities as $_term) : ?>
-                            <option value="<?php echo esc_attr((string) $_term->term_id); ?>"
-                                <?php selected($_term->slug, 'normal'); ?>>
-                                <?php echo esc_html($_term->name); ?>
+                        <?php foreach ($kpts_priorities as $_kpts_term) : ?>
+                            <option value="<?php echo esc_attr((string) $_kpts_term->term_id); ?>"
+                                <?php selected($_kpts_term->slug, 'normal'); ?>>
+                                <?php echo esc_html($_kpts_term->name); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -112,7 +112,7 @@ $allow_files = (bool) Plugin::opt('allow_attachments', true);
                       placeholder="<?php esc_attr_e('Tell us as much as you can about what is going on...', 'kp-support'); ?>"></textarea>
         </p>
 
-        <?php if ($allow_files) : ?>
+        <?php if ($kpts_allow_files) : ?>
             <p class="kpts-field">
                 <label class="kpts-file-label">
                     <input type="file" class="kpts-file-input" name="kpts_files[]" multiple />

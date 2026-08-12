@@ -98,7 +98,7 @@ if (! class_exists('\KP\Support\Modules\Ajax')) {
         {
 
             // what ticket did they ask about
-            $ticket_id = isset($_POST['ticket_id']) ? absint(wp_unslash($_POST['ticket_id'])) : 0;
+            $ticket_id = isset($_POST['ticket_id']) ? absint(wp_unslash($_POST['ticket_id'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer before any handler reaches this
 
             // they have to be allowed on it, and this covers the ticket being real
             if (! Access::canViewTicket($ticket_id)) {
@@ -138,10 +138,8 @@ if (! class_exists('\KP\Support\Modules\Ajax')) {
 
             // pull the reply itself, kses runs inside Replies::add
             $content = wp_unslash($_POST['content'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized with wp_kses in Replies::add()
-            $parent = isset($_POST['parent']) ? absint(wp_unslash($_POST['parent'])) : 0;
-
-            // work out whether they asked for it to be internal, and whether they may
-            $internal = ! empty($_POST['internal']) && Access::canReplyInternal($ticket_id);
+            $parent = isset($_POST['parent']) ? absint(wp_unslash($_POST['parent'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+            $internal = ! empty($_POST['internal']) && Access::canReplyInternal($ticket_id); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
 
             // take whatever files came along with it
             $attachments = Attachments::processUploads('kpts_files', get_current_user_id());
@@ -200,7 +198,7 @@ if (! class_exists('\KP\Support\Modules\Ajax')) {
             $ticket_id = $this->requireTicket();
 
             // what's the last thing they've seen
-            $since = isset($_POST['since']) ? sanitize_text_field(wp_unslash($_POST['since'])) : '';
+            $since = isset($_POST['since']) ? sanitize_text_field(wp_unslash($_POST['since'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
 
             // it has to look like a real GMT datetime, otherwise we ignore it
             if ($since !== '' && ! preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $since)) {
@@ -259,11 +257,11 @@ if (! class_exists('\KP\Support\Modules\Ajax')) {
             }
 
             // pull what they filled in
-            $subject = sanitize_text_field(wp_unslash($_POST['subject'] ?? ''));
-            $message = wp_unslash($_POST['message'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized with wp_kses just below
-            $department = isset($_POST['department']) ? absint(wp_unslash($_POST['department'])) : 0;
-            $category = isset($_POST['category']) ? absint(wp_unslash($_POST['category'])) : 0;
-            $priority = isset($_POST['priority']) ? absint(wp_unslash($_POST['priority'])) : 0;
+            $subject = sanitize_text_field(wp_unslash($_POST['subject'] ?? '')); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+            $message = wp_unslash($_POST['message'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput, WordPress.Security.NonceVerification.Missing -- sanitized with wp_kses just below, nonce checked in verifyRequest()
+            $department = isset($_POST['department']) ? absint(wp_unslash($_POST['department'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+            $category = isset($_POST['category']) ? absint(wp_unslash($_POST['category'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+            $priority = isset($_POST['priority']) ? absint(wp_unslash($_POST['priority'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
 
             // clean the body down to the tags we allow
             $message = wp_kses($message, Replies::allowedTags());
@@ -362,12 +360,12 @@ if (! class_exists('\KP\Support\Modules\Ajax')) {
             foreach ($taxonomies as $_key => $_taxonomy) {
 
                 // skip anything they didn't send
-                if (! isset($_POST[$_key])) {
+                if (! isset($_POST[$_key])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
                     continue;
                 }
 
                 // cast it down
-                $term_id = absint(wp_unslash($_POST[$_key]));
+                $term_id = absint(wp_unslash($_POST[$_key])); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
 
                 // the status gets set through its own method so the hook fires
                 if ($_key === 'status') {
@@ -380,8 +378,8 @@ if (! class_exists('\KP\Support\Modules\Ajax')) {
             }
 
             // and the assignment, which needs its own capability
-            if (isset($_POST['assignee']) && current_user_can('kpts_assign_tickets')) {
-                Ticket::setAssignee($ticket_id, absint(wp_unslash($_POST['assignee'])));
+            if (isset($_POST['assignee']) && current_user_can('kpts_assign_tickets')) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+                Ticket::setAssignee($ticket_id, absint(wp_unslash($_POST['assignee']))); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
             }
 
             // hand back the current state

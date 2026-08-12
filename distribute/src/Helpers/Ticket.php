@@ -407,11 +407,12 @@ if (! class_exists('\KP\Support\Helpers\Ticket')) {
         public static function eligibleAgents(int $ticket_id): array
         {
 
-            // pull everybody in our agent-ish roles
+            // pull everybody who can actually work tickets, by capability rather than
+            // role, so administrators and custom roles land in the pool too
             $users = get_users(array(
-                'role__in' => array(\KP\Support\Modules\Roles::ROLE_AGENT, \KP\Support\Modules\Roles::ROLE_MANAGER),
-                'fields'   => 'ID',
-                'number'   => 200,
+                'capability__in' => array('edit_others_kpts_tickets'),
+                'fields'         => 'ID',
+                'number'         => 200,
             ));
 
             // narrow it to the ones who cover this ticket's department

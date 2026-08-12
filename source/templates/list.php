@@ -9,10 +9,10 @@
  * @author      Kevin Pirnie <me@kpirnie.com>
  * @since       1.0.0
  *
- * @var \WP_Query $query      The ticket query.
- * @var bool      $is_agent   Whether the viewer is an agent.
- * @var bool      $agent_view Whether we're showing the whole queue.
- * @var int       $user_id    The viewer's user id.
+ * @var \WP_Query $kpts_query      The ticket query.
+ * @var bool      $kpts_is_agent   Whether the viewer is an agent.
+ * @var bool      $kpts_agent_view Whether we're showing the whole queue.
+ * @var int       $kpts_user_id    The viewer's user id.
  */
 
 declare(strict_types=1);
@@ -27,18 +27,18 @@ use KP\Support\Modules\PostTypes;
 defined('ABSPATH') || die('No direct script access allowed');
 
 // we need a real query
-if (! isset($query) || ! $query instanceof \WP_Query) {
+if (! isset($kpts_query) || ! $kpts_query instanceof \WP_Query) {
     return;
 }
 
 // tidy up what we were handed
-$is_agent = ! empty($is_agent);
-$agent_view = ! empty($agent_view);
+$kpts_is_agent = ! empty($kpts_is_agent);
+$kpts_agent_view = ! empty($kpts_agent_view);
 
 // what's currently filtered
-$current_status = isset($_GET['kpts_status']) ? absint(wp_unslash($_GET['kpts_status'])) : 0;
-$current_department = isset($_GET['kpts_department']) ? absint(wp_unslash($_GET['kpts_department'])) : 0;
-$current_search = isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($_GET['kpts_search'])) : '';
+$kpts_current_status = isset($_GET['kpts_status']) ? absint(wp_unslash($_GET['kpts_status'])) : 0;
+$kpts_current_department = isset($_GET['kpts_department']) ? absint(wp_unslash($_GET['kpts_department'])) : 0;
+$kpts_current_search = isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($_GET['kpts_search'])) : '';
 ?>
 <div class="kpts-portal kpts-portal-list">
 
@@ -47,13 +47,13 @@ $current_search = isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($
 
     <div class="kpts-list-header">
         <h2>
-            <?php echo $agent_view ? esc_html__('All Tickets', 'kp-support') : esc_html__('My Tickets', 'kp-support'); ?>
+            <?php echo $kpts_agent_view ? esc_html__('All Tickets', 'kp-support') : esc_html__('My Tickets', 'kp-support'); ?>
         </h2>
         <div class="kpts-list-actions">
-            <?php if ($is_agent) : ?>
+            <?php if ($kpts_is_agent) : ?>
                 <a class="kpts-button kpts-button-secondary"
-                    href="<?php echo esc_url($agent_view ? add_query_arg('kpts_mine', '1', Portal::url()) : Portal::url()); ?>">
-                    <?php echo $agent_view ? esc_html__('Only Mine', 'kp-support') : esc_html__('All Tickets', 'kp-support'); ?>
+                    href="<?php echo esc_url($kpts_agent_view ? add_query_arg('kpts_mine', '1', Portal::url()) : Portal::url()); ?>">
+                    <?php echo $kpts_agent_view ? esc_html__('Only Mine', 'kp-support') : esc_html__('All Tickets', 'kp-support'); ?>
                 </a>
             <?php endif; ?>
             <a class="kpts-button" href="<?php echo esc_url(Portal::viewUrl('new')); ?>">
@@ -78,49 +78,49 @@ $current_search = isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($
         <input type="search"
             id="kpts-search"
             name="kpts_search"
-            value="<?php echo esc_attr($current_search); ?>"
+            value="<?php echo esc_attr($kpts_current_search); ?>"
             placeholder="<?php esc_attr_e('Search tickets...', 'kp-support'); ?>" />
 
         <label class="screen-reader-text" for="kpts-filter-status"><?php esc_html_e('Filter by status', 'kp-support'); ?></label>
         <select id="kpts-filter-status" name="kpts_status">
             <option value="0"><?php esc_html_e('All statuses', 'kp-support'); ?></option>
-            <?php foreach (PostTypes::terms(PostTypes::TAX_STATUS) as $_term) : ?>
-                <option value="<?php echo esc_attr((string) $_term->term_id); ?>" <?php selected($current_status, (int) $_term->term_id); ?>>
-                    <?php echo esc_html($_term->name); ?>
+            <?php foreach (PostTypes::terms(PostTypes::TAX_STATUS) as $_kpts_term) : ?>
+                <option value="<?php echo esc_attr((string) $_kpts_term->term_id); ?>" <?php selected($kpts_current_status, (int) $_kpts_term->term_id); ?>>
+                    <?php echo esc_html($_kpts_term->name); ?>
                 </option>
             <?php endforeach; ?>
         </select>
 
-        <?php if ($is_agent) : ?>
+        <?php if ($kpts_is_agent) : ?>
             <label class="screen-reader-text" for="kpts-filter-department"><?php esc_html_e('Filter by department', 'kp-support'); ?></label>
             <select id="kpts-filter-department" name="kpts_department">
                 <option value="0"><?php esc_html_e('All departments', 'kp-support'); ?></option>
-                <?php foreach (PostTypes::terms(PostTypes::TAX_DEPARTMENT) as $_term) : ?>
-                    <option value="<?php echo esc_attr((string) $_term->term_id); ?>" <?php selected($current_department, (int) $_term->term_id); ?>>
-                        <?php echo esc_html($_term->name); ?>
+                <?php foreach (PostTypes::terms(PostTypes::TAX_DEPARTMENT) as $_kpts_term) : ?>
+                    <option value="<?php echo esc_attr((string) $_kpts_term->term_id); ?>" <?php selected($kpts_current_department, (int) $_kpts_term->term_id); ?>>
+                        <?php echo esc_html($_kpts_term->name); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
         <?php endif; ?>
 
-        <?php if ($agent_view) : ?>
+        <?php if ($kpts_agent_view) : ?>
             <input type="hidden" name="kpts_mine" value="0" />
         <?php endif; ?>
 
         <button type="submit" class="kpts-button kpts-button-secondary"><?php esc_html_e('Filter', 'kp-support'); ?></button>
     </form>
 
-    <?php if (! $query->have_posts()) : ?>
+    <?php if (! $kpts_query->have_posts()) : ?>
 
         <p class="kpts-empty"><?php esc_html_e('There are no tickets to show.', 'kp-support'); ?></p>
 
     <?php else : ?>
 
         <ul class="kpts-ticket-list">
-            <?php while ($query->have_posts()) : ?>
+            <?php while ($kpts_query->have_posts()) : ?>
                 <?php
                 // step into the post
-                $query->the_post();
+                $kpts_query->the_post();
 
                 // grab what we need about it
                 $kpts_id = get_the_ID();
@@ -144,7 +144,7 @@ $current_search = isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($
                             <span class="kpts-ticket-number"><?php echo esc_html(Ticket::number($kpts_id)); ?></span>
                             <span class="kpts-ticket-title"><?php echo esc_html(get_the_title()); ?></span>
                             <span class="kpts-ticket-sub">
-                                <?php if ($is_agent && $kpts_requester instanceof \WP_User) : ?>
+                                <?php if ($kpts_is_agent && $kpts_requester instanceof \WP_User) : ?>
                                     <?php echo esc_html($kpts_requester->display_name); ?> &middot;
                                 <?php endif; ?>
                                 <?php if ($kpts_department instanceof \WP_Term) : ?>
@@ -172,7 +172,7 @@ $current_search = isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($
                                     <?php echo esc_html($kpts_status->name); ?>
                                 </span>
                             <?php endif; ?>
-                            <?php if ($is_agent) : ?>
+                            <?php if ($kpts_is_agent) : ?>
                                 <span class="kpts-assignee">
                                     <?php
                                     echo ($kpts_assignee instanceof \WP_User)
@@ -189,14 +189,14 @@ $current_search = isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($
 
         <?php
         // and the pagination, if there's more than one page of them
-        if ($query->max_num_pages > 1) {
+        if ($kpts_query->max_num_pages > 1) {
 
             // build the links
             $kpts_links = paginate_links(array(
                 'base'      => add_query_arg('kpts_paged', '%#%', Portal::url()),
                 'format'    => '',
-                'current'   => max(1, (int) $query->get('paged')),
-                'total'     => (int) $query->max_num_pages,
+                'current'   => max(1, (int) $kpts_query->get('paged')),
+                'total'     => (int) $kpts_query->max_num_pages,
                 'prev_text' => __('&larr; Previous', 'kp-support'),
                 'next_text' => __('Next &rarr;', 'kp-support'),
                 'type'      => 'array',
@@ -205,8 +205,8 @@ $current_search = isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($
             // and render them out
             if (is_array($kpts_links)) {
                 echo '<nav class="kpts-pagination">';
-                foreach ($kpts_links as $_link) {
-                    echo wp_kses_post($_link);
+                foreach ($kpts_links as $_kpts_link) {
+                    echo wp_kses_post($_kpts_link);
                 }
                 echo '</nav>';
             }

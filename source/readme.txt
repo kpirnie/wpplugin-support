@@ -76,19 +76,52 @@ Polling, on an interval you configure, defaulting to ten seconds. It backs off w
 
 = How do I change the look of the portal? =
 
-Copy any file out of the plugin's `templates` directory into a `kp-support` directory in your theme and edit it there. The plugin picks up the theme's copy automatically.
+Every front-end template can be overridden by your theme. Copy any file out of the plugin's `templates` directory into a `kp-support` directory in your theme or child theme, and the plugin picks the theme's copy up automatically. See the Template Overrides section below for the full list and what each one is handed.
+
+= Can I turn the portal styles off? =
+
+The portal stylesheet loads on any page running one of the shortcodes. Dequeue the `kpts-portal` handle on `wp_enqueue_scripts` at a late priority if your theme styles the portal itself.
+
+== Template Overrides ==
+
+Drop a copy of any of these into `wp-content/themes/your-theme/kp-support/` and edit it there. A child theme's copy wins over the parent's, and either wins over the plugin's.
+
+* `auth.php` - the login and registration tabs
+* `list.php` - the ticket list, its filters and its pagination
+* `new-ticket.php` - the new ticket form
+* `profile.php` - the account profile form
+* `reply.php` - a single reply in the thread, rendered recursively for nested replies
+* `thread.php` - the reply list and the reply form, used by both the portal and wp-admin
+* `ticket.php` - the single ticket view, its meta panel and its management controls
+
+Every variable a template is handed is prefixed with `kpts_`, and each file documents its own in the docblock at the top. The full set:
+
+* `auth.php` - `$kpts_allow_registration`, `$kpts_default_tab`, `$kpts_redirect`
+* `list.php` - `$kpts_query`, `$kpts_is_agent`, `$kpts_agent_view`, `$kpts_user_id`
+* `new-ticket.php` - `$kpts_departments`, `$kpts_categories`, `$kpts_priorities`
+* `profile.php` - `$kpts_user`
+* `reply.php` - `$kpts_comment`, `$kpts_ticket_id`, `$kpts_depth`, `$kpts_children`
+* `thread.php` - `$kpts_ticket_id`, `$kpts_replies`, `$kpts_can_reply`, `$kpts_can_internal`, `$kpts_context`
+* `ticket.php` - `$kpts_ticket`, `$kpts_ticket_id`, `$kpts_replies`, `$kpts_can_reply`, `$kpts_can_internal`, `$kpts_can_manage`, `$kpts_statuses`, `$kpts_priorities`, `$kpts_departments`, `$kpts_agents`
+
+The class names in the markup and the CSS custom properties on the `.kpts-portal` wrapper are the supported styling surface. Keep the `kpts-` classes on the elements the scripts bind to - the reply form, the file input, the internal note toggle and the management selects - or the chat stops working.
 
 == Changelog ==
 
 = 1.0.13 =
-* Attachment uploads, downloads and deletion now go through the WordPress filesystem API
+* Restructured the repository into a source and distribute layout, built by build.sh
+* Stylesheets and scripts are now minified into the built plugin, and the translation template is generated at build time
+* Attachment uploads, downloads, deletion and directory hardening now go through the WordPress filesystem API
 * Attachment directory removal on uninstall now goes through the WordPress filesystem API
 * Dropped the explicit text domain load, translations now load just in time from the languages directory
 * Escaped the page id fallback field on the portal ticket list
 * Added translator comments to the reply-to strings in the admin and portal scripts
 * Sanitized the term sort order and colour values before saving
-* Prefixed the variables used in the uninstall routine and the front-end templates
-* Stylesheets and scripts are now minified, and the translation template is generated at build time
+* Prefixed the variables used in the uninstall routine and the front-end templates, template arguments now arrive prefixed with kpts_
+* Documented the theme template overrides and the variables each template receives
+* Fixed the assignable agent list, which was built from roles and so left out administrators and any custom role holding the ticket capabilities
+* Constrained the settings screen field widths, which were running the full width of the screen
+* Annotated the read-only request reads and the meta ordering queries that the coding standards flag
 * Tested up to WordPress 7.1
 * Tested up to PHP 8.5
 

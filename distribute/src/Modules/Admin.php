@@ -233,7 +233,7 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             foreach ($filters as $_taxonomy => $_label) {
 
                 // what's currently selected
-                $selected = isset($_GET[$_taxonomy]) ? sanitize_key(wp_unslash($_GET[$_taxonomy])) : '';
+                $selected = isset($_GET[$_taxonomy]) ? sanitize_key(wp_unslash($_GET[$_taxonomy])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only list table filter state
 
                 // open the select
                 printf('<select name="%1$s"><option value="">%2$s</option>', esc_attr($_taxonomy), esc_html($_label));
@@ -276,14 +276,14 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
 
             // default the ordering to most recently active
             if (($query->get('orderby') ?: '') === '') {
-                $query->set('meta_key', Ticket::META_LAST_ACTIVITY);
+                $query->set('meta_key', Ticket::META_LAST_ACTIVITY); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- ordering the ticket list by last activity requires it
                 $query->set('orderby', 'meta_value');
                 $query->set('order', 'DESC');
             }
 
             // if they clicked our activity column, sort on it
             if ($query->get('orderby') === 'kpts_activity') {
-                $query->set('meta_key', Ticket::META_LAST_ACTIVITY);
+                $query->set('meta_key', Ticket::META_LAST_ACTIVITY); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- ordering the ticket list by last activity requires it
                 $query->set('orderby', 'meta_value');
             }
 
@@ -498,8 +498,8 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             }
 
             // the assignment needs its own capability on top of that
-            if (isset($_POST['kpts_assignee']) && current_user_can('kpts_assign_tickets')) {
-                Ticket::setAssignee($post_id, absint(wp_unslash($_POST['kpts_assignee'])));
+            if (isset($_POST['kpts_assignee']) && current_user_can('kpts_assign_tickets')) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                Ticket::setAssignee($post_id, absint(wp_unslash($_POST['kpts_assignee']))); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
             }
 
             // a ticket opened straight from wp-admin has no requester yet, so the
@@ -571,7 +571,7 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             if (in_array($hook, array('post.php', 'post-new.php'), true)) {
 
                 // pull the ticket id off the request
-                $ticket_id = isset($_GET['post']) ? absint(wp_unslash($_GET['post'])) : 0;
+                $ticket_id = isset($_GET['post']) ? absint(wp_unslash($_GET['post'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, the edit screen post id
 
                 // load the script
                 wp_enqueue_script(

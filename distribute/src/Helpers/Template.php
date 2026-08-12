@@ -84,8 +84,14 @@ if (! class_exists('\KP\Support\Helpers\Template')) {
                 return;
             }
 
+            // prefix every key so the template's scope stays namespaced to us
+            $scoped = array();
+            foreach ($args as $_key => $_value) {
+                $scoped['kpts_' . $_key] = $_value;
+            }
+
             // pull the args into scope for the template, then load it
-            extract($args, EXTR_SKIP); // phpcs:ignore WordPress.PHP.DontExtract -- template arguments, keys are ours
+            extract($scoped, EXTR_SKIP); // phpcs:ignore WordPress.PHP.DontExtract -- template arguments, keys are ours and prefixed above
             include $file;
         }
 
