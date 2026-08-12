@@ -1,0 +1,1298 @@
+# Copyright (C) 2026 Kevin Pirnie
+# This file is distributed under the GPL-3.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: KP Support 1.0.13\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/kp-support\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-08-12T19:02:04+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: kp-support\n"
+
+#. Plugin Name of the plugin
+#: kp-support.php
+msgid "KP Support"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: kp-support.php
+msgid "https://kevinpirnie.com/"
+msgstr ""
+
+#. Description of the plugin
+#: kp-support.php
+msgid "A full-featured support ticket system with AJAX chat, threaded replies, departments, priorities, attachments, and a front-end customer portal."
+msgstr ""
+
+#. Author of the plugin
+#: kp-support.php
+msgid "Kevin Pirnie"
+msgstr ""
+
+#: src/Helpers/Ticket.php:104
+msgid "Please provide a subject for your ticket."
+msgstr ""
+
+#: src/Helpers/Ticket.php:110
+msgid "Please describe your issue."
+msgstr ""
+
+#: src/Helpers/Ticket.php:116
+msgid "You must be logged in to open a ticket."
+msgstr ""
+
+#: src/Modules/Accounts.php:492
+msgid "That request expired. Please try again."
+msgstr ""
+
+#: src/Modules/Accounts.php:493
+msgid "Please enter your email and password."
+msgstr ""
+
+#: src/Modules/Accounts.php:494
+msgid "That email or password was not correct."
+msgstr ""
+
+#: src/Modules/Accounts.php:495
+#: src/Modules/Portal.php:474
+msgid "Registration is currently closed."
+msgstr ""
+
+#: src/Modules/Accounts.php:496
+msgid "You already have an account and are logged in."
+msgstr ""
+
+#: src/Modules/Accounts.php:497
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: src/Modules/Accounts.php:498
+msgid "There is already an account using that email address."
+msgstr ""
+
+#: src/Modules/Accounts.php:499
+msgid "Those passwords did not match."
+msgstr ""
+
+#: src/Modules/Accounts.php:500
+msgid "Please use a password of at least 8 characters."
+msgstr ""
+
+#: src/Modules/Accounts.php:501
+msgid "Your account could not be created. Please try again."
+msgstr ""
+
+#: src/Modules/Accounts.php:502
+msgid "Your profile could not be updated. Please try again."
+msgstr ""
+
+#: src/Modules/Accounts.php:503
+msgid "Please log in first."
+msgstr ""
+
+#: src/Modules/Accounts.php:506
+msgid "Your account has been created. You can log in now."
+msgstr ""
+
+#: src/Modules/Accounts.php:507
+msgid "You are logged in."
+msgstr ""
+
+#: src/Modules/Accounts.php:508
+msgid "Your profile has been updated."
+msgstr ""
+
+#: src/Modules/Accounts.php:509
+msgid "Your ticket has been opened."
+msgstr ""
+
+#: src/Modules/Admin.php:80
+#: src/Modules/Admin.php:410
+msgid "Ticket"
+msgstr ""
+
+#: src/Modules/Admin.php:81
+#: src/Settings/Settings.php:443
+#: templates/new-ticket.php:51
+msgid "Subject"
+msgstr ""
+
+#: src/Modules/Admin.php:82
+#: src/Modules/Admin.php:414
+#: templates/ticket.php:165
+msgid "Requester"
+msgstr ""
+
+#: src/Modules/Admin.php:83
+#: src/Modules/PostTypes.php:209
+#: templates/ticket.php:184
+msgid "Status"
+msgstr ""
+
+#: src/Modules/Admin.php:84
+#: src/Modules/PostTypes.php:193
+#: templates/new-ticket.php:94
+#: templates/ticket.php:196
+msgid "Priority"
+msgstr ""
+
+#: src/Modules/Admin.php:85
+#: src/Modules/PostTypes.php:161
+#: templates/new-ticket.php:61
+#: templates/ticket.php:168
+#: templates/ticket.php:208
+msgid "Department"
+msgstr ""
+
+#: src/Modules/Admin.php:86
+#: src/Modules/Admin.php:423
+#: templates/ticket.php:222
+msgid "Assigned To"
+msgstr ""
+
+#: src/Modules/Admin.php:87
+msgid "Replies"
+msgstr ""
+
+#: src/Modules/Admin.php:88
+msgid "Last Activity"
+msgstr ""
+
+#: src/Modules/Admin.php:140
+#: src/Modules/Admin.php:425
+#: templates/list.php:180
+#: templates/ticket.php:224
+msgid "Unassigned"
+msgstr ""
+
+#: src/Modules/Admin.php:152
+msgid "ago"
+msgstr ""
+
+#: src/Modules/Admin.php:227
+#: templates/list.php:86
+msgid "All statuses"
+msgstr ""
+
+#: src/Modules/Admin.php:228
+msgid "All priorities"
+msgstr ""
+
+#: src/Modules/Admin.php:229
+#: templates/list.php:97
+msgid "All departments"
+msgstr ""
+
+#: src/Modules/Admin.php:328
+msgid "Conversation"
+msgstr ""
+
+#: src/Modules/Admin.php:338
+msgid "Ticket Details"
+msgstr ""
+
+#: src/Modules/Admin.php:362
+msgid "Save the ticket first to start the conversation."
+msgstr ""
+
+#: src/Modules/Admin.php:368
+msgid "You are not allowed to view this conversation."
+msgstr ""
+
+#: src/Modules/Admin.php:452
+msgid "Open in Portal"
+msgstr ""
+
+#: src/Modules/Admin.php:456
+msgid "Participants"
+msgstr ""
+
+#: src/Modules/Admin.php:594
+#: src/Modules/Portal.php:227
+msgid "Sending..."
+msgstr ""
+
+#: src/Modules/Admin.php:595
+#: src/Modules/Portal.php:228
+msgid "Your reply could not be sent. Please try again."
+msgstr ""
+
+#: src/Modules/Admin.php:596
+#: src/Modules/Portal.php:229
+#: src/Modules/Replies.php:211
+msgid "Please enter a reply."
+msgstr ""
+
+#: src/Modules/Admin.php:597
+#: src/Modules/Portal.php:230
+msgid "Too many files attached."
+msgstr ""
+
+#: src/Modules/Admin.php:598
+#: src/Modules/Portal.php:231
+msgid "One of those files is too large."
+msgstr ""
+
+#: src/Modules/Admin.php:599
+#: src/Modules/Portal.php:232
+msgid "Are you sure you want to close this ticket?"
+msgstr ""
+
+#: src/Modules/Admin.php:600
+#: src/Modules/Portal.php:233
+msgid "Loading..."
+msgstr ""
+
+#. translators: %s: the name of the person being replied to
+#: src/Modules/Admin.php:602
+#: src/Modules/Portal.php:235
+#, php-format
+msgid "Replying to %s"
+msgstr ""
+
+#: src/Modules/Admin.php:603
+#: src/Modules/Portal.php:236
+#: templates/thread.php:72
+msgid "Cancel"
+msgstr ""
+
+#: src/Modules/Ajax.php:76
+msgid "Your session expired. Please reload the page."
+msgstr ""
+
+#: src/Modules/Ajax.php:84
+msgid "Please log in to continue."
+msgstr ""
+
+#: src/Modules/Ajax.php:106
+msgid "You are not allowed to access that ticket."
+msgstr ""
+
+#: src/Modules/Ajax.php:134
+msgid "You are not allowed to reply to this ticket."
+msgstr ""
+
+#: src/Modules/Ajax.php:256
+#: src/Modules/Portal.php:364
+msgid "You are not allowed to open tickets."
+msgstr ""
+
+#: src/Modules/Ajax.php:274
+msgid "Please choose a department."
+msgstr ""
+
+#: src/Modules/Ajax.php:282
+msgid "Please choose a category."
+msgstr ""
+
+#: src/Modules/Ajax.php:348
+msgid "You are not allowed to update this ticket."
+msgstr ""
+
+#: src/Modules/Ajax.php:390
+msgid "Ticket updated."
+msgstr ""
+
+#. translators: %d: maximum number of files
+#: src/Modules/Attachments.php:290
+#, php-format
+msgid "You can only attach up to %d files."
+msgstr ""
+
+#: src/Modules/Attachments.php:375
+msgid "That file failed to upload. Please try again."
+msgstr ""
+
+#: src/Modules/Attachments.php:381
+msgid "That upload could not be verified."
+msgstr ""
+
+#. translators: %s: human readable maximum file size
+#: src/Modules/Attachments.php:392
+#, php-format
+msgid "Files must be smaller than %s."
+msgstr ""
+
+#: src/Modules/Attachments.php:401
+msgid "That file name could not be used."
+msgstr ""
+
+#: src/Modules/Attachments.php:411
+msgid "That file type is not allowed."
+msgstr ""
+
+#. translators: %s: the rejected file extension
+#: src/Modules/Attachments.php:420
+#, php-format
+msgid "Files of type \"%s\" are not allowed."
+msgstr ""
+
+#: src/Modules/Attachments.php:430
+msgid "The attachment directory could not be created."
+msgstr ""
+
+#: src/Modules/Attachments.php:441
+#: src/Modules/Attachments.php:446
+msgid "That file could not be saved."
+msgstr ""
+
+#: src/Modules/Attachments.php:551
+#: src/Modules/Attachments.php:562
+#: src/Modules/Attachments.php:586
+#: src/Modules/Attachments.php:591
+#: src/Modules/Attachments.php:600
+msgid "That file could not be found."
+msgstr ""
+
+#: src/Modules/Attachments.php:556
+#: src/Modules/Attachments.php:571
+msgid "You are not allowed to access that file."
+msgstr ""
+
+#: src/Modules/Notifications.php:91
+msgid "[{ticket_number}] We received your ticket: {ticket_subject}"
+msgstr ""
+
+#: src/Modules/Notifications.php:95
+msgid ""
+"Hi {customer_name},\n"
+"\n"
+"Thanks for getting in touch. We've received your ticket and someone will be with you shortly.\n"
+"\n"
+"<strong>{ticket_subject}</strong>\n"
+"\n"
+"{ticket_content}\n"
+"\n"
+"You can view and reply to your ticket here:\n"
+"{ticket_url}\n"
+"\n"
+"- {site_name}"
+msgstr ""
+
+#: src/Modules/Notifications.php:117
+msgid "[{ticket_number}] New ticket: {ticket_subject}"
+msgstr ""
+
+#: src/Modules/Notifications.php:121
+msgid ""
+"A new ticket has been opened by {customer_name}.\n"
+"\n"
+"<strong>{ticket_subject}</strong>\n"
+"Department: {department}\n"
+"Priority: {priority}\n"
+"\n"
+"{ticket_content}\n"
+"\n"
+"View the ticket:\n"
+"{ticket_url}"
+msgstr ""
+
+#: src/Modules/Notifications.php:176
+msgid "[{ticket_number}] Internal note from {reply_author}"
+msgstr ""
+
+#: src/Modules/Notifications.php:180
+msgid ""
+"<strong>This is an internal note. The customer cannot see it.</strong>\n"
+"\n"
+"{reply_author} wrote on {ticket_subject}:\n"
+"\n"
+"{reply_content}\n"
+"\n"
+"View the ticket:\n"
+"{ticket_url}"
+msgstr ""
+
+#: src/Modules/Notifications.php:192
+msgid "[{ticket_number}] New reply: {ticket_subject}"
+msgstr ""
+
+#: src/Modules/Notifications.php:196
+msgid ""
+"{reply_author} replied to {ticket_subject}:\n"
+"\n"
+"{reply_content}\n"
+"\n"
+"View and reply to the ticket:\n"
+"{ticket_url}\n"
+"\n"
+"- {site_name}"
+msgstr ""
+
+#: src/Modules/Notifications.php:270
+msgid "[{ticket_number}] Status updated: {status}"
+msgstr ""
+
+#: src/Modules/Notifications.php:274
+msgid ""
+"Hi {customer_name},\n"
+"\n"
+"The status of your ticket <strong>{ticket_subject}</strong> is now <strong>{status}</strong>.\n"
+"\n"
+"View your ticket:\n"
+"{ticket_url}\n"
+"\n"
+"- {site_name}"
+msgstr ""
+
+#: src/Modules/Notifications.php:311
+msgid "[{ticket_number}] Assigned to you: {ticket_subject}"
+msgstr ""
+
+#: src/Modules/Notifications.php:315
+msgid ""
+"A ticket has been assigned to you.\n"
+"\n"
+"<strong>{ticket_subject}</strong>\n"
+"From: {customer_name}\n"
+"Priority: {priority}\n"
+"Department: {department}\n"
+"\n"
+"View the ticket:\n"
+"{ticket_url}"
+msgstr ""
+
+#: src/Modules/Notifications.php:390
+msgid "there"
+msgstr ""
+
+#: src/Modules/Portal.php:162
+msgid "Support"
+msgstr ""
+
+#: src/Modules/Portal.php:390
+msgid "That ticket could not be found, or you are not allowed to view it."
+msgstr ""
+
+#: src/Modules/Portal.php:447
+#: src/Modules/Portal.php:469
+msgid "You are already logged in."
+msgstr ""
+
+#: src/Modules/PostTypes.php:100
+msgctxt "post type general name"
+msgid "Tickets"
+msgstr ""
+
+#: src/Modules/PostTypes.php:101
+msgctxt "post type singular name"
+msgid "Ticket"
+msgstr ""
+
+#: src/Modules/PostTypes.php:102
+msgctxt "admin menu"
+msgid "Support"
+msgstr ""
+
+#: src/Modules/PostTypes.php:103
+msgctxt "add new on admin bar"
+msgid "Ticket"
+msgstr ""
+
+#: src/Modules/PostTypes.php:104
+msgid "Add New"
+msgstr ""
+
+#: src/Modules/PostTypes.php:105
+msgid "Add New Ticket"
+msgstr ""
+
+#: src/Modules/PostTypes.php:106
+#: src/Settings/Settings.php:356
+msgid "New Ticket"
+msgstr ""
+
+#: src/Modules/PostTypes.php:107
+msgid "Edit Ticket"
+msgstr ""
+
+#: src/Modules/PostTypes.php:108
+msgid "View Ticket"
+msgstr ""
+
+#: src/Modules/PostTypes.php:109
+#: templates/list.php:50
+#: templates/list.php:56
+msgid "All Tickets"
+msgstr ""
+
+#: src/Modules/PostTypes.php:110
+msgid "Search Tickets"
+msgstr ""
+
+#: src/Modules/PostTypes.php:111
+msgid "No tickets found."
+msgstr ""
+
+#: src/Modules/PostTypes.php:112
+msgid "No tickets found in Trash."
+msgstr ""
+
+#: src/Modules/PostTypes.php:113
+msgid "Tickets list"
+msgstr ""
+
+#: src/Modules/PostTypes.php:114
+msgid "Tickets list navigation"
+msgstr ""
+
+#: src/Modules/PostTypes.php:160
+#: src/Modules/Roles.php:284
+msgid "Departments"
+msgstr ""
+
+#: src/Modules/PostTypes.php:176
+msgid "Ticket Categories"
+msgstr ""
+
+#: src/Modules/PostTypes.php:177
+#: templates/new-ticket.php:78
+#: templates/ticket.php:171
+msgid "Category"
+msgstr ""
+
+#: src/Modules/PostTypes.php:192
+msgid "Priorities"
+msgstr ""
+
+#: src/Modules/PostTypes.php:208
+msgid "Statuses"
+msgstr ""
+
+#. translators: %s: plural taxonomy label
+#: src/Modules/PostTypes.php:240
+#, php-format
+msgid "Search %s"
+msgstr ""
+
+#. translators: %s: plural taxonomy label
+#: src/Modules/PostTypes.php:245
+#, php-format
+msgid "All %s"
+msgstr ""
+
+#. translators: %s: singular taxonomy label
+#: src/Modules/PostTypes.php:250
+#, php-format
+msgid "Edit %s"
+msgstr ""
+
+#. translators: %s: singular taxonomy label
+#: src/Modules/PostTypes.php:255
+#, php-format
+msgid "Update %s"
+msgstr ""
+
+#. translators: %s: singular taxonomy label
+#: src/Modules/PostTypes.php:260
+#, php-format
+msgid "Add New %s"
+msgstr ""
+
+#. translators: %s: singular taxonomy label
+#: src/Modules/PostTypes.php:265
+#, php-format
+msgid "New %s Name"
+msgstr ""
+
+#. translators: %s: plural taxonomy label
+#: src/Modules/PostTypes.php:271
+#, php-format
+msgid "No %s found."
+msgstr ""
+
+#. translators: %s: plural taxonomy label
+#: src/Modules/PostTypes.php:276
+#, php-format
+msgid "Back to %s"
+msgstr ""
+
+#: src/Modules/PostTypes.php:297
+msgid "General Support"
+msgstr ""
+
+#: src/Modules/PostTypes.php:298
+msgid "Billing"
+msgstr ""
+
+#: src/Modules/PostTypes.php:299
+msgid "Technical"
+msgstr ""
+
+#: src/Modules/PostTypes.php:300
+msgid "Sales"
+msgstr ""
+
+#: src/Modules/PostTypes.php:310
+msgid "Question"
+msgstr ""
+
+#: src/Modules/PostTypes.php:311
+msgid "Bug Report"
+msgstr ""
+
+#: src/Modules/PostTypes.php:312
+msgid "Feature Request"
+msgstr ""
+
+#: src/Modules/PostTypes.php:313
+msgid "Other"
+msgstr ""
+
+#: src/Modules/PostTypes.php:323
+msgid "Low"
+msgstr ""
+
+#: src/Modules/PostTypes.php:324
+msgid "Normal"
+msgstr ""
+
+#: src/Modules/PostTypes.php:325
+msgid "High"
+msgstr ""
+
+#: src/Modules/PostTypes.php:326
+msgid "Urgent"
+msgstr ""
+
+#: src/Modules/PostTypes.php:344
+msgid "New"
+msgstr ""
+
+#: src/Modules/PostTypes.php:345
+msgid "Open"
+msgstr ""
+
+#: src/Modules/PostTypes.php:346
+msgid "Pending Customer"
+msgstr ""
+
+#: src/Modules/PostTypes.php:347
+msgid "On Hold"
+msgstr ""
+
+#: src/Modules/PostTypes.php:348
+msgid "Resolved"
+msgstr ""
+
+#: src/Modules/PostTypes.php:349
+msgid "Closed"
+msgstr ""
+
+#: src/Modules/Replies.php:197
+msgid "That ticket could not be found."
+msgstr ""
+
+#: src/Modules/Replies.php:203
+msgid "You must be logged in to reply."
+msgstr ""
+
+#: src/Modules/Replies.php:254
+msgid "Your reply could not be saved. Please try again."
+msgstr ""
+
+#: src/Modules/Roles.php:133
+msgid "Support Customer"
+msgstr ""
+
+#: src/Modules/Roles.php:134
+msgid "Support Agent"
+msgstr ""
+
+#: src/Modules/Roles.php:135
+msgid "Support Manager"
+msgstr ""
+
+#: src/Modules/Roles.php:278
+msgid "Support Agent Settings"
+msgstr ""
+
+#: src/Modules/Roles.php:285
+msgid "Which departments this agent handles. Leave everything unselected to give them access to all departments."
+msgstr ""
+
+#: src/Modules/Roles.php:291
+msgid "Reply Signature"
+msgstr ""
+
+#: src/Modules/Roles.php:292
+msgid "Appended to the bottom of this agent's public replies."
+msgstr ""
+
+#: src/Modules/TermFields.php:88
+#: src/Modules/TermFields.php:140
+#: src/Modules/TermFields.php:230
+msgid "Colour"
+msgstr ""
+
+#: src/Modules/TermFields.php:90
+#: src/Modules/TermFields.php:143
+msgid "Used for the badge shown on tickets."
+msgstr ""
+
+#: src/Modules/TermFields.php:93
+#: src/Modules/TermFields.php:147
+msgid "Sort Order"
+msgstr ""
+
+#: src/Modules/TermFields.php:95
+#: src/Modules/TermFields.php:150
+msgid "Lower numbers come first in dropdowns."
+msgstr ""
+
+#: src/Modules/TermFields.php:105
+#: src/Modules/TermFields.php:163
+msgid "Tickets in this status count as closed"
+msgstr ""
+
+#: src/Modules/TermFields.php:159
+msgid "Closed State"
+msgstr ""
+
+#: src/Plugin.php:167
+msgid "KP Support cannot be network activated. Please activate it on each individual site instead."
+msgstr ""
+
+#: src/Plugin.php:168
+msgid "Network Activation Not Supported"
+msgstr ""
+
+#: src/Plugin.php:302
+msgid "KP Support:"
+msgstr ""
+
+#: src/Plugin.php:303
+msgid "the KPT WP Field Framework could not be found. Install the plugin dependencies with:"
+msgstr ""
+
+#: src/Settings/Settings.php:69
+msgid "Support Settings"
+msgstr ""
+
+#: src/Settings/Settings.php:70
+msgid "Settings"
+msgstr ""
+
+#: src/Settings/Settings.php:78
+msgid "General"
+msgstr ""
+
+#: src/Settings/Settings.php:80
+msgid "Portal"
+msgstr ""
+
+#: src/Settings/Settings.php:85
+msgid "Tickets"
+msgstr ""
+
+#: src/Settings/Settings.php:87
+msgid "Ticket Handling"
+msgstr ""
+
+#: src/Settings/Settings.php:92
+msgid "Chat &amp; Files"
+msgstr ""
+
+#: src/Settings/Settings.php:94
+msgid "Chat and Attachments"
+msgstr ""
+
+#: src/Settings/Settings.php:99
+msgid "Notifications"
+msgstr ""
+
+#: src/Settings/Settings.php:101
+msgid "Email Notifications"
+msgstr ""
+
+#: src/Settings/Settings.php:106
+#: src/Settings/Settings.php:108
+msgid "Email Templates"
+msgstr ""
+
+#: src/Settings/Settings.php:109
+msgid "Leave any of these empty to use the built in default."
+msgstr ""
+
+#: src/Settings/Settings.php:114
+msgid "Accounts"
+msgstr ""
+
+#: src/Settings/Settings.php:116
+msgid "Registration and Login"
+msgstr ""
+
+#: src/Settings/Settings.php:139
+msgid "Portal Page"
+msgstr ""
+
+#: src/Settings/Settings.php:140
+msgid "The page containing the [kp_support] shortcode. Ticket links in emails point here."
+msgstr ""
+
+#: src/Settings/Settings.php:145
+msgid "Ticket Number Prefix"
+msgstr ""
+
+#: src/Settings/Settings.php:146
+msgid "Shown in front of every ticket number."
+msgstr ""
+
+#: src/Settings/Settings.php:152
+msgid "Tickets Per Page"
+msgstr ""
+
+#: src/Settings/Settings.php:153
+msgid "How many tickets to show in the portal list at a time."
+msgstr ""
+
+#: src/Settings/Settings.php:161
+msgid "Keep Customers Out Of The Dashboard"
+msgstr ""
+
+#: src/Settings/Settings.php:162
+msgid "Redirects anybody who cannot work tickets away from wp-admin and hides the admin bar for them."
+msgstr ""
+
+#: src/Settings/Settings.php:168
+msgid "Keep Data When The Plugin Is Deleted"
+msgstr ""
+
+#: src/Settings/Settings.php:169
+msgid "Leave this on and deleting the plugin will not remove your tickets, replies, attachments or settings."
+msgstr ""
+
+#: src/Settings/Settings.php:193
+msgid "Require A Department"
+msgstr ""
+
+#: src/Settings/Settings.php:194
+msgid "Customers must pick a department when opening a ticket."
+msgstr ""
+
+#: src/Settings/Settings.php:200
+msgid "Require A Category"
+msgstr ""
+
+#: src/Settings/Settings.php:201
+msgid "Customers must pick a category when opening a ticket."
+msgstr ""
+
+#: src/Settings/Settings.php:207
+msgid "Allow Reopening Closed Tickets"
+msgstr ""
+
+#: src/Settings/Settings.php:208
+msgid "Lets customers reply to a closed ticket, which reopens it."
+msgstr ""
+
+#: src/Settings/Settings.php:214
+msgid "Auto Assign New Tickets"
+msgstr ""
+
+#: src/Settings/Settings.php:215
+msgid "Hands each new ticket to whichever eligible agent has the fewest open tickets."
+msgstr ""
+
+#: src/Settings/Settings.php:221
+msgid "Restrict Agents By Department"
+msgstr ""
+
+#: src/Settings/Settings.php:222
+msgid "Agents only see tickets in the departments set on their profile. Agents with no departments set still see everything."
+msgstr ""
+
+#: src/Settings/Settings.php:228
+msgid "Move Status Automatically"
+msgstr ""
+
+#: src/Settings/Settings.php:229
+msgid "Changes the ticket status when somebody replies."
+msgstr ""
+
+#: src/Settings/Settings.php:235
+msgid "Status After An Agent Replies"
+msgstr ""
+
+#: src/Settings/Settings.php:247
+msgid "Status After A Customer Replies"
+msgstr ""
+
+#: src/Settings/Settings.php:274
+msgid "Check For New Replies Every"
+msgstr ""
+
+#: src/Settings/Settings.php:275
+msgid "Seconds between checks for new replies. Lower feels more live but costs more requests."
+msgstr ""
+
+#: src/Settings/Settings.php:283
+msgid "Allow Attachments"
+msgstr ""
+
+#: src/Settings/Settings.php:284
+msgid "Attachments are stored outside the media library and only served to people on the ticket."
+msgstr ""
+
+#: src/Settings/Settings.php:290
+msgid "Maximum Files Per Message"
+msgstr ""
+
+#: src/Settings/Settings.php:303
+msgid "Maximum File Size (MB)"
+msgstr ""
+
+#: src/Settings/Settings.php:304
+msgid "Your server upload limit still applies on top of this."
+msgstr ""
+
+#: src/Settings/Settings.php:317
+msgid "Allowed File Types"
+msgstr ""
+
+#: src/Settings/Settings.php:318
+msgid "Comma separated extensions. Executable and script types are always refused regardless of what is listed here."
+msgstr ""
+
+#: src/Settings/Settings.php:344
+msgid "From Name"
+msgstr ""
+
+#: src/Settings/Settings.php:350
+msgid "From Address"
+msgstr ""
+
+#: src/Settings/Settings.php:357
+msgid "Confirms to the customer and alerts the department's agents."
+msgstr ""
+
+#: src/Settings/Settings.php:363
+#: src/Settings/Settings.php:422
+msgid "New Reply"
+msgstr ""
+
+#: src/Settings/Settings.php:364
+msgid "Emails everybody attached to the ticket whenever a public reply is posted."
+msgstr ""
+
+#: src/Settings/Settings.php:370
+msgid "Internal Notes"
+msgstr ""
+
+#: src/Settings/Settings.php:371
+msgid "Emails internal notes to the agents on the ticket. Customers are never included."
+msgstr ""
+
+#: src/Settings/Settings.php:377
+msgid "Copy All Department Agents On Internal Notes"
+msgstr ""
+
+#: src/Settings/Settings.php:378
+msgid "Widens internal note emails to every agent covering the department, not just the ones on the ticket."
+msgstr ""
+
+#: src/Settings/Settings.php:384
+msgid "Status Changes"
+msgstr ""
+
+#: src/Settings/Settings.php:385
+msgid "Tells the customer when their ticket status moves."
+msgstr ""
+
+#: src/Settings/Settings.php:391
+msgid "Ticket Assignment"
+msgstr ""
+
+#: src/Settings/Settings.php:392
+msgid "Tells an agent when a ticket lands on their plate."
+msgstr ""
+
+#: src/Settings/Settings.php:414
+msgid "Available tokens: {ticket_number}, {ticket_subject}, {ticket_content}, {ticket_url}, {customer_name}, {customer_email}, {reply_author}, {reply_content}, {status}, {priority}, {department}, {category}, {site_name}, {site_url}"
+msgstr ""
+
+#: src/Settings/Settings.php:420
+msgid "New Ticket (to the customer)"
+msgstr ""
+
+#: src/Settings/Settings.php:421
+msgid "New Ticket (to agents)"
+msgstr ""
+
+#: src/Settings/Settings.php:423
+msgid "Internal Note"
+msgstr ""
+
+#: src/Settings/Settings.php:424
+msgid "Status Change"
+msgstr ""
+
+#: src/Settings/Settings.php:425
+msgid "Ticket Assigned"
+msgstr ""
+
+#: src/Settings/Settings.php:450
+msgid "Body"
+msgstr ""
+
+#: src/Settings/Settings.php:474
+msgid "Allow Registration"
+msgstr ""
+
+#: src/Settings/Settings.php:475
+msgid "Lets people create a support account from the portal."
+msgstr ""
+
+#: src/Settings/Settings.php:481
+msgid "Log People In After Registering"
+msgstr ""
+
+#: src/Settings/Settings.php:492
+msgid "Send The Standard New User Emails"
+msgstr ""
+
+#: src/Settings/Settings.php:493
+msgid "WordPress's own new account notifications, to both the admin and the new user."
+msgstr ""
+
+#: templates/auth.php:43
+#: templates/auth.php:56
+#: templates/auth.php:81
+msgid "Log In"
+msgstr ""
+
+#: templates/auth.php:49
+#: templates/auth.php:92
+msgid "Create An Account"
+msgstr ""
+
+#: templates/auth.php:64
+msgid "Email or Username"
+msgstr ""
+
+#: templates/auth.php:69
+#: templates/auth.php:125
+msgid "Password"
+msgstr ""
+
+#: templates/auth.php:76
+msgid "Keep me logged in"
+msgstr ""
+
+#: templates/auth.php:83
+msgid "Lost your password?"
+msgstr ""
+
+#: templates/auth.php:103
+msgid "Leave this empty"
+msgstr ""
+
+#: templates/auth.php:109
+#: templates/profile.php:45
+msgid "First Name"
+msgstr ""
+
+#: templates/auth.php:114
+#: templates/profile.php:54
+msgid "Last Name"
+msgstr ""
+
+#: templates/auth.php:120
+#: templates/profile.php:64
+msgid "Email Address"
+msgstr ""
+
+#: templates/auth.php:130
+msgid "Confirm Password"
+msgstr ""
+
+#: templates/auth.php:135
+msgid "Create Account"
+msgstr ""
+
+#: templates/list.php:50
+msgid "My Tickets"
+msgstr ""
+
+#: templates/list.php:56
+msgid "Only Mine"
+msgstr ""
+
+#: templates/list.php:60
+#: templates/new-ticket.php:45
+msgid "Open A Ticket"
+msgstr ""
+
+#: templates/list.php:63
+#: templates/profile.php:36
+msgid "My Profile"
+msgstr ""
+
+#: templates/list.php:77
+msgid "Search tickets"
+msgstr ""
+
+#: templates/list.php:82
+msgid "Search tickets..."
+msgstr ""
+
+#: templates/list.php:84
+msgid "Filter by status"
+msgstr ""
+
+#: templates/list.php:95
+msgid "Filter by department"
+msgstr ""
+
+#: templates/list.php:110
+msgid "Filter"
+msgstr ""
+
+#: templates/list.php:115
+msgid "There are no tickets to show."
+msgstr ""
+
+#. translators: %s: human readable time difference
+#: templates/list.php:158
+#, php-format
+msgid "updated %s ago"
+msgstr ""
+
+#: templates/list.php:200
+msgid "&larr; Previous"
+msgstr ""
+
+#: templates/list.php:201
+msgid "Next &rarr;"
+msgstr ""
+
+#: templates/new-ticket.php:42
+#: templates/profile.php:33
+#: templates/ticket.php:89
+msgid "Back to all tickets"
+msgstr ""
+
+#: templates/new-ticket.php:65
+msgid "Choose a department..."
+msgstr ""
+
+#: templates/new-ticket.php:82
+msgid "Choose a category..."
+msgstr ""
+
+#: templates/new-ticket.php:109
+msgid "How can we help?"
+msgstr ""
+
+#: templates/new-ticket.php:112
+msgid "Tell us as much as you can about what is going on..."
+msgstr ""
+
+#: templates/new-ticket.php:119
+#: templates/thread.php:91
+msgid "Attach files"
+msgstr ""
+
+#. translators: %1$s: maximum file size, %2$d: maximum number of files
+#: templates/new-ticket.php:126
+#: templates/thread.php:114
+#, php-format
+msgid "Up to %2$d files, %1$s each."
+msgstr ""
+
+#: templates/new-ticket.php:140
+msgid "Open Ticket"
+msgstr ""
+
+#: templates/profile.php:73
+msgid "Change Password"
+msgstr ""
+
+#: templates/profile.php:74
+msgid "Leave these blank to keep your current password."
+msgstr ""
+
+#: templates/profile.php:78
+msgid "New Password"
+msgstr ""
+
+#: templates/profile.php:83
+msgid "Confirm New Password"
+msgstr ""
+
+#: templates/profile.php:89
+msgid "Save Changes"
+msgstr ""
+
+#: templates/profile.php:91
+msgid "Log Out"
+msgstr ""
+
+#: templates/reply.php:71
+msgid "Agent"
+msgstr ""
+
+#: templates/reply.php:75
+msgid "Internal note"
+msgstr ""
+
+#: templates/reply.php:120
+msgid "Reply"
+msgstr ""
+
+#: templates/thread.php:56
+msgid "No replies yet."
+msgstr ""
+
+#: templates/thread.php:78
+msgid "Your reply"
+msgstr ""
+
+#: templates/thread.php:84
+msgid "Type your reply..."
+msgstr ""
+
+#: templates/thread.php:98
+msgid "Internal note (customers will not see this)"
+msgstr ""
+
+#: templates/thread.php:103
+msgid "Send Reply"
+msgstr ""
+
+#: templates/thread.php:126
+msgid "This ticket is closed and cannot be replied to."
+msgstr ""
+
+#: templates/ticket.php:115
+#: templates/ticket.php:166
+msgid "Unknown"
+msgstr ""
+
+#: templates/ticket.php:117
+msgid "Opened the ticket"
+msgstr ""
+
+#: templates/ticket.php:163
+msgid "Details"
+msgstr ""
+
+#: templates/ticket.php:169
+#: templates/ticket.php:172
+#: templates/ticket.php:210
+msgid "None"
+msgstr ""
+
+#: templates/ticket.php:174
+msgid "Opened"
+msgstr ""
+
+#: templates/ticket.php:181
+msgid "Agent Controls"
+msgstr ""
