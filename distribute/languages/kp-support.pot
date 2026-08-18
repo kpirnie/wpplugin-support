@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-18T12:00:28+00:00\n"
+"POT-Creation-Date: 2026-08-18T12:32:15+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: kp-support\n"
@@ -47,7 +47,7 @@ msgid "Chat with %1$s, %2$s"
 msgstr ""
 
 #: src/Helpers/Chat.php:484
-#: src/Helpers/ChatAjax.php:271
+#: src/Modules/ChatAjax.php:271
 msgid "This chat is no longer open."
 msgstr ""
 
@@ -67,77 +67,6 @@ msgstr ""
 msgid "Your message could not be sent. Please try again."
 msgstr ""
 
-#: src/Helpers/ChatAjax.php:106
-#: src/Helpers/ChatAjax.php:133
-#: src/Modules/Ajax.php:76
-#: src/Modules/ChatAdmin.php:152
-#: src/Modules/ChatWidget.php:129
-msgid "Your session expired. Please reload the page."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:114
-#: src/Helpers/ChatAjax.php:141
-#: src/Modules/Ajax.php:84
-#: src/Modules/Portal.php:572
-msgid "Please log in to continue."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:149
-#: src/Modules/ChatAdmin.php:179
-msgid "You are not allowed to work chats."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:171
-msgid "You are not allowed to access that chat."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:207
-msgid "You are sending messages too quickly. Please wait a moment."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:232
-msgid "You are not allowed to start a chat."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:385
-msgid "You are not allowed to assign this chat."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:396
-#: src/Modules/ChatAdmin.php:161
-msgid "That chat could not be assigned."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:404
-#: src/Modules/ChatAdmin.php:160
-msgid "Chat assigned."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:431
-msgid "Please reload the chat and try again."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:439
-msgid "You are not allowed to convert this chat."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:489
-msgid "You are not allowed to close this chat."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:518
-#: src/Modules/ChatAdmin.php:151
-#: src/Modules/ChatWidget.php:128
-msgid "This chat has been closed."
-msgstr ""
-
-#: src/Helpers/ChatAjax.php:694
-#: src/Helpers/ChatConvert.php:309
-#: templates/ticket.php:127
-#: templates/ticket.php:178
-msgid "Unknown"
-msgstr ""
-
 #: src/Helpers/ChatConvert.php:63
 msgid "That chat could not be found."
 msgstr ""
@@ -153,6 +82,13 @@ msgstr ""
 #: src/Helpers/ChatConvert.php:216
 #: src/Helpers/ChatConvert.php:251
 msgid "Chat"
+msgstr ""
+
+#: src/Helpers/ChatConvert.php:309
+#: src/Modules/ChatAjax.php:694
+#: templates/ticket.php:127
+#: templates/ticket.php:178
+msgid "Unknown"
 msgstr ""
 
 #: src/Helpers/Ticket.php:104
@@ -387,6 +323,21 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: src/Modules/Ajax.php:76
+#: src/Modules/ChatAdmin.php:152
+#: src/Modules/ChatAjax.php:106
+#: src/Modules/ChatAjax.php:133
+#: src/Modules/ChatWidget.php:129
+msgid "Your session expired. Please reload the page."
+msgstr ""
+
+#: src/Modules/Ajax.php:84
+#: src/Modules/ChatAjax.php:114
+#: src/Modules/ChatAjax.php:141
+#: src/Modules/Portal.php:572
+msgid "Please log in to continue."
+msgstr ""
+
 #: src/Modules/Ajax.php:106
 msgid "You are not allowed to access that ticket."
 msgstr ""
@@ -478,6 +429,12 @@ msgstr ""
 msgid "Live Chat"
 msgstr ""
 
+#: src/Modules/ChatAdmin.php:151
+#: src/Modules/ChatAjax.php:518
+#: src/Modules/ChatWidget.php:128
+msgid "This chat has been closed."
+msgstr ""
+
 #: src/Modules/ChatAdmin.php:153
 msgid "Nobody has picked this chat up yet."
 msgstr ""
@@ -505,8 +462,51 @@ msgstr ""
 msgid "Convert this chat into an open ticket? The chat will end."
 msgstr ""
 
+#: src/Modules/ChatAdmin.php:160
+#: src/Modules/ChatAjax.php:404
+msgid "Chat assigned."
+msgstr ""
+
+#: src/Modules/ChatAdmin.php:161
+#: src/Modules/ChatAjax.php:396
+msgid "That chat could not be assigned."
+msgstr ""
+
 #: src/Modules/ChatAdmin.php:162
 msgid "Converting..."
+msgstr ""
+
+#: src/Modules/ChatAdmin.php:179
+#: src/Modules/ChatAjax.php:149
+msgid "You are not allowed to work chats."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:171
+msgid "You are not allowed to access that chat."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:207
+msgid "You are sending messages too quickly. Please wait a moment."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:232
+msgid "You are not allowed to start a chat."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:385
+msgid "You are not allowed to assign this chat."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:431
+msgid "Please reload the chat and try again."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:439
+msgid "You are not allowed to convert this chat."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:489
+msgid "You are not allowed to close this chat."
 msgstr ""
 
 #: src/Modules/ChatWidget.php:125

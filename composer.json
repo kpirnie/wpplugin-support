@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "KP\\Support\\": "source/src/"
+            "KP\\Support\\": "src/"
         }
     },
     "config": {
