@@ -4,7 +4,7 @@ Tags: support, helpdesk, ticket system, live chat, customer service
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.22
+Stable tag: 1.0.23
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,7 +36,8 @@ KP Support turns WordPress into a proper help desk. Customers open tickets from 
 * Any chat can be handed to another agent from the queue, and agents can start a chat themselves when they need a second pair of eyes
 * A chat stays a chat until it ends. Hitting Convert To Ticket turns it into an open ticket, and either side closing it archives it as a closed one
 * The opening message becomes the ticket's opening post and everything said after it becomes a reply, timestamps intact
-* Every chat is kept, so the customer can pull a plain text transcript from the ticket it became, whenever they wantf
+* Every chat is kept, so the customer can pull a plain text transcript from the ticket it became, whenever they want
+* Chat messages take attachments on the same terms ticket replies do, stored outside the media library and served only to the people on the chat
 
 = Attachments =
 
@@ -104,7 +105,7 @@ Drop a copy of any of these into `wp-content/themes/your-theme/kp-support/` and 
 * `ticket.php` - the single ticket view, its meta panel and its management controls
 * `chat-panel.php` - the corner docked launcher and chat panel
 * `chat-message.php` - a single chat message, rendered on its own when one arrives over AJAX
-* `chat-admin.php` - the agent chat screen, its queue and its toolbar
+* `chat-admin.php` - `$kpts_agents`, `$kpts_can_assign`, `$kpts_can_convert`, `$kpts_allow_files`
 
 Every variable a template is handed is prefixed with `kpts_`, and each file documents its own in the docblock at the top. The full set:
 
@@ -119,6 +120,9 @@ Every variable a template is handed is prefixed with `kpts_`, and each file docu
 The class names in the markup and the CSS custom properties on the `.kpts-portal` wrapper are the supported styling surface. Keep the `kpts-` classes on the elements the scripts bind to - the reply form, the file input, the internal note toggle and the management selects - or the chat stops working.
 
 == Changelog ==
+
+= 1.0.23 =
+* Chat messages accept attachments, which move onto the ticket when the chat is converted or closed
 
 = 1.0.22 =
 * Fix PSR-4 pathing

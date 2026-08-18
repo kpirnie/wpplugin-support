@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace KP\Support\Modules;
 
 use KP\Support\Helpers\Access;
+use KP\Support\Helpers\ChatAccess;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
@@ -536,6 +537,31 @@ if (! class_exists('\KP\Support\Modules\Attachments')) {
         }
 
         /**
+         * Build the download URL for a file that's still on a chat.
+         *
+         * Once the chat converts these stop resolving and the ticket's own
+         * copy takes over, which is why the index is rewritten on conversion.
+         *
+         * @since  1.0.0
+         * @access public
+         * @param  int    $chat_id The chat id.
+         * @param  string $key     The file key.
+         * @return string The download URL.
+         */
+        public static function chatUrl(int $chat_id, string $key): string
+        {
+
+            // same endpoint, just pointed at a chat instead
+            return add_query_arg(
+                array(
+                    'kpts_file' => $key,
+                    'kpts_chat' => $chat_id,
+                ),
+                home_url('/')
+            );
+        }
+
+        /**
          * Serve up a file, assuming the person asking is allowed to have it.
          *
          * @since  1.0.0
@@ -546,26 +572,39 @@ if (! class_exists('\KP\Support\Modules\Attachments')) {
         {
 
             // nothing to do unless they're asking for a file
-            if (empty($_GET['kpts_file']) || empty($_GET['kpts_ticket'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
+            if (empty($_GET['kpts_file'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
+                return;
+            }
+
+            // and it has to be hung off either a ticket or a chat
+            if (empty($_GET['kpts_ticket']) && empty($_GET['kpts_chat'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
                 return;
             }
 
             // clean up what came in, the key is ours so it's strictly alphanumeric
             $key = preg_replace('/[^A-Za-z0-9]/', '', wp_unslash($_GET['kpts_file'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, stripped to alphanumerics
-            $ticket_id = absint(wp_unslash($_GET['kpts_ticket'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
+            $ticket_id = isset($_GET['kpts_ticket']) ? absint(wp_unslash($_GET['kpts_ticket'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
+            $chat_id = isset($_GET['kpts_chat']) ? absint(wp_unslash($_GET['kpts_chat'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
+
+            // which post are we actually looking at
+            $post_id = ($chat_id > 0) ? $chat_id : $ticket_id;
 
             // both have to be real
-            if ($key === '' || $ticket_id < 1) {
+            if ($key === '' || $post_id < 1) {
                 wp_die(esc_html__('That file could not be found.', 'kp-support'), '', array('response' => 404));
             }
 
-            // and this is the important bit, they have to be allowed on the ticket
-            if (! Access::canViewTicket($ticket_id)) {
+            // and this is the important bit, they have to be allowed on it. a chat
+            // runs its own access rules, a ticket runs the ticket ones
+            $allowed = ($chat_id > 0) ? ChatAccess::canView($chat_id) : Access::canViewTicket($ticket_id);
+
+            // if they're not, they're not
+            if (! $allowed) {
                 wp_die(esc_html__('You are not allowed to access that file.', 'kp-support'), '', array('response' => 403));
             }
 
-            // look the file up in the ticket's index
-            $index = get_post_meta($ticket_id, self::META_INDEX, true);
+            // look the file up in the index
+            $index = get_post_meta($post_id, self::META_INDEX, true);
             if (! is_array($index) || ! isset($index[$key])) {
                 wp_die(esc_html__('That file could not be found.', 'kp-support'), '', array('response' => 404));
             }
@@ -573,9 +612,10 @@ if (! class_exists('\KP\Support\Modules\Attachments')) {
             // grab the record
             $record = $index[$key];
 
-            // if it came in on an internal note, only internal folks get it
+            // if it came in on an internal note, only internal folks get it. chats
+            // have no internal notes, so this only ever applies on the ticket side
             $comment_id = (int) ($record['comment'] ?? 0);
-            if ($comment_id > 0 && Replies::isInternal($comment_id) && ! Access::canSeeInternal($ticket_id)) {
+            if ($chat_id < 1 && $comment_id > 0 && Replies::isInternal($comment_id) && ! Access::canSeeInternal($ticket_id)) {
                 wp_die(esc_html__('You are not allowed to access that file.', 'kp-support'), '', array('response' => 403));
             }
 
@@ -638,8 +678,8 @@ if (! class_exists('\KP\Support\Modules\Attachments')) {
         public function cleanupTicket(int $post_id, $post = null): void
         {
 
-            // only care about our own tickets
-            if (! $post instanceof \WP_Post || $post->post_type !== PostTypes::POST_TYPE) {
+            // only care about our own tickets and chats
+            if (! $post instanceof \WP_Post || ! in_array($post->post_type, array(PostTypes::POST_TYPE, PostTypes::CHAT_POST_TYPE), true)) {
                 return;
             }
 

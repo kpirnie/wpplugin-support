@@ -59,8 +59,14 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             add_action('add_meta_boxes', array($this, 'addMetaBoxes'));
             add_action('save_post_' . PostTypes::POST_TYPE, array($this, 'saveTicketMeta'), 10, 2);
 
+            // drop the boxes we don't want on a ticket
+            add_action('add_meta_boxes', array($this, 'removeMetaBoxes'), 99);
+
             // and our admin assets
             add_action('admin_enqueue_scripts', array($this, 'enqueueAssets'));
+
+            // and hide the editor outright, supports alone doesn't always do it
+            add_action('admin_head', array($this, 'hideEditor'));
         }
 
         /**
@@ -341,6 +347,51 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 'side',
                 'high'
             );
+        }
+
+        /**
+         * Strip the core boxes that have no business on a ticket.
+         *
+         * The editor is the customer's opening message and the Conversation box
+         * owns the replies, so neither the editor nor the comment boxes should
+         * be sitting there for an agent to type into.
+         *
+         * @since  1.0.0
+         * @access public
+         * @return void
+         */
+        public function removeMetaBoxes(): void
+        {
+
+            // the comment boxes, both the list and the discussion settings
+            remove_meta_box('commentsdiv', PostTypes::POST_TYPE, 'normal');
+            remove_meta_box('commentstatusdiv', PostTypes::POST_TYPE, 'normal');
+
+            // and the same again if anything moved them
+            remove_meta_box('commentsdiv', PostTypes::POST_TYPE, 'side');
+            remove_meta_box('commentstatusdiv', PostTypes::POST_TYPE, 'side');
+        }
+
+        /**
+         * Hide the editor on the ticket screen.
+         *
+         * @since  1.0.0
+         * @access public
+         * @return void
+         */
+        public function hideEditor(): void
+        {
+
+            // what screen are we on
+            $screen = get_current_screen();
+
+            // only our own
+            if (! $screen instanceof \WP_Screen || $screen->post_type !== PostTypes::POST_TYPE) {
+                return;
+            }
+
+            // and out it goes
+            echo '<style>#postdivrich, #post-body-content { display: none; }</style>';
         }
 
         /**

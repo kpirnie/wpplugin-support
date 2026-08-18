@@ -118,6 +118,9 @@ if (! class_exists('\KP\Support\Modules\ChatWidget')) {
                 'chatId'       => $chat_id,
                 'isAgent'      => false,
                 'pollInterval' => max(5, (int) $this->opt('poll_interval', 10)) * 1000,
+                'allowFiles'   => (bool) $this->opt('allow_attachments', true),
+                'maxFiles'     => (int) $this->opt('max_attachments', 5),
+                'maxFileSize'  => Attachments::maxSize(),
                 'strings'      => array(
                     'sending'      => __('Sending...', 'kp-support'),
                     'sendFailed'   => __('Your message could not be sent. Please try again.', 'kp-support'),
@@ -131,6 +134,8 @@ if (! class_exists('\KP\Support\Modules\ChatWidget')) {
                     /* translators: %s: the agent's display name */
                     'agentJoined'  => __('%s has joined the chat.', 'kp-support'),
                     'viewTicket'   => __('View the saved ticket', 'kp-support'),
+                    'tooManyFiles' => __('Too many files attached.', 'kp-support'),
+                    'fileTooBig'   => __('One of those files is too large.', 'kp-support'),
                 ),
             ));
         }

@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: KP Support 1.0.22\n"
+"Project-Id-Version: KP Support 1.0.23\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/kp-support\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-18T12:34:09+00:00\n"
+"POT-Creation-Date: 2026-08-18T14:59:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: kp-support\n"
@@ -35,35 +35,35 @@ msgstr ""
 msgid "Kevin Pirnie"
 msgstr ""
 
-#: src/Helpers/Chat.php:138
-#: src/Helpers/Chat.php:150
+#: src/Helpers/Chat.php:139
+#: src/Helpers/Chat.php:151
 msgid "You must be logged in to start a chat."
 msgstr ""
 
 #. translators: 1: the visitor's display name, 2: the date and time the chat started
-#: src/Helpers/Chat.php:160
+#: src/Helpers/Chat.php:161
 #, php-format
 msgid "Chat with %1$s, %2$s"
 msgstr ""
 
-#: src/Helpers/Chat.php:484
+#: src/Helpers/Chat.php:504
 #: src/Modules/ChatAjax.php:271
 msgid "This chat is no longer open."
 msgstr ""
 
-#: src/Helpers/Chat.php:490
+#: src/Helpers/Chat.php:510
 msgid "You must be logged in to send a message."
 msgstr ""
 
-#: src/Helpers/Chat.php:498
-#: src/Modules/ChatAdmin.php:150
-#: src/Modules/ChatWidget.php:124
+#: src/Helpers/Chat.php:518
+#: src/Modules/ChatAdmin.php:153
+#: src/Modules/ChatWidget.php:127
 msgid "Please enter a message."
 msgstr ""
 
-#: src/Helpers/Chat.php:519
-#: src/Modules/ChatAdmin.php:149
-#: src/Modules/ChatWidget.php:123
+#: src/Helpers/Chat.php:539
+#: src/Modules/ChatAdmin.php:152
+#: src/Modules/ChatWidget.php:126
 msgid "Your message could not be sent. Please try again."
 msgstr ""
 
@@ -85,7 +85,7 @@ msgid "Chat"
 msgstr ""
 
 #: src/Helpers/ChatConvert.php:309
-#: src/Modules/ChatAjax.php:694
+#: src/Modules/ChatAjax.php:723
 #: templates/ticket.php:127
 #: templates/ticket.php:178
 msgid "Unknown"
@@ -168,37 +168,37 @@ msgstr ""
 msgid "Your ticket has been opened."
 msgstr ""
 
-#: src/Modules/Admin.php:80
-#: src/Modules/Admin.php:410
+#: src/Modules/Admin.php:86
+#: src/Modules/Admin.php:461
 msgid "Ticket"
 msgstr ""
 
-#: src/Modules/Admin.php:81
+#: src/Modules/Admin.php:87
 #: src/Settings/Settings.php:518
 #: templates/new-ticket.php:51
 msgid "Subject"
 msgstr ""
 
-#: src/Modules/Admin.php:82
-#: src/Modules/Admin.php:414
+#: src/Modules/Admin.php:88
+#: src/Modules/Admin.php:465
 #: templates/ticket.php:177
 msgid "Requester"
 msgstr ""
 
-#: src/Modules/Admin.php:83
+#: src/Modules/Admin.php:89
 #: src/Modules/PostTypes.php:257
 #: templates/ticket.php:196
 msgid "Status"
 msgstr ""
 
-#: src/Modules/Admin.php:84
+#: src/Modules/Admin.php:90
 #: src/Modules/PostTypes.php:241
 #: templates/new-ticket.php:94
 #: templates/ticket.php:208
 msgid "Priority"
 msgstr ""
 
-#: src/Modules/Admin.php:85
+#: src/Modules/Admin.php:91
 #: src/Modules/PostTypes.php:209
 #: templates/new-ticket.php:61
 #: templates/ticket.php:180
@@ -206,128 +206,132 @@ msgstr ""
 msgid "Department"
 msgstr ""
 
-#: src/Modules/Admin.php:86
-#: src/Modules/Admin.php:423
+#: src/Modules/Admin.php:92
+#: src/Modules/Admin.php:474
 #: templates/ticket.php:234
 msgid "Assigned To"
 msgstr ""
 
-#: src/Modules/Admin.php:87
+#: src/Modules/Admin.php:93
 msgid "Replies"
 msgstr ""
 
-#: src/Modules/Admin.php:88
+#: src/Modules/Admin.php:94
 msgid "Last Activity"
 msgstr ""
 
-#: src/Modules/Admin.php:140
-#: src/Modules/Admin.php:425
-#: templates/chat-admin.php:67
+#: src/Modules/Admin.php:146
+#: src/Modules/Admin.php:476
+#: templates/chat-admin.php:69
 #: templates/list.php:180
 #: templates/ticket.php:236
 msgid "Unassigned"
 msgstr ""
 
-#: src/Modules/Admin.php:152
+#: src/Modules/Admin.php:158
 msgid "ago"
 msgstr ""
 
-#: src/Modules/Admin.php:227
+#: src/Modules/Admin.php:233
 #: templates/list.php:86
 msgid "All statuses"
 msgstr ""
 
-#: src/Modules/Admin.php:228
+#: src/Modules/Admin.php:234
 msgid "All priorities"
 msgstr ""
 
-#: src/Modules/Admin.php:229
+#: src/Modules/Admin.php:235
 #: templates/list.php:97
 msgid "All departments"
 msgstr ""
 
-#: src/Modules/Admin.php:328
-#: templates/chat-admin.php:94
+#: src/Modules/Admin.php:334
+#: templates/chat-admin.php:96
 msgid "Conversation"
 msgstr ""
 
-#: src/Modules/Admin.php:338
+#: src/Modules/Admin.php:344
 msgid "Ticket Details"
 msgstr ""
 
-#: src/Modules/Admin.php:362
+#: src/Modules/Admin.php:413
 msgid "Save the ticket first to start the conversation."
 msgstr ""
 
-#: src/Modules/Admin.php:368
+#: src/Modules/Admin.php:419
 msgid "You are not allowed to view this conversation."
 msgstr ""
 
-#: src/Modules/Admin.php:452
+#: src/Modules/Admin.php:503
 msgid "Open in Portal"
 msgstr ""
 
-#: src/Modules/Admin.php:456
+#: src/Modules/Admin.php:507
 msgid "Participants"
 msgstr ""
 
-#: src/Modules/Admin.php:594
-#: src/Modules/ChatAdmin.php:148
-#: src/Modules/ChatWidget.php:122
+#: src/Modules/Admin.php:645
+#: src/Modules/ChatAdmin.php:151
+#: src/Modules/ChatWidget.php:125
 #: src/Modules/Portal.php:232
 msgid "Sending..."
 msgstr ""
 
-#: src/Modules/Admin.php:595
+#: src/Modules/Admin.php:646
 #: src/Modules/Portal.php:233
 msgid "Your reply could not be sent. Please try again."
 msgstr ""
 
-#: src/Modules/Admin.php:596
+#: src/Modules/Admin.php:647
 #: src/Modules/Portal.php:234
 #: src/Modules/Replies.php:216
 msgid "Please enter a reply."
 msgstr ""
 
-#: src/Modules/Admin.php:597
+#: src/Modules/Admin.php:648
+#: src/Modules/ChatAdmin.php:166
+#: src/Modules/ChatWidget.php:137
 #: src/Modules/Portal.php:235
 msgid "Too many files attached."
 msgstr ""
 
-#: src/Modules/Admin.php:598
+#: src/Modules/Admin.php:649
+#: src/Modules/ChatAdmin.php:167
+#: src/Modules/ChatWidget.php:138
 #: src/Modules/Portal.php:236
 msgid "One of those files is too large."
 msgstr ""
 
-#: src/Modules/Admin.php:599
+#: src/Modules/Admin.php:650
 #: src/Modules/Portal.php:237
 msgid "Are you sure you want to close this ticket?"
 msgstr ""
 
-#: src/Modules/Admin.php:600
+#: src/Modules/Admin.php:651
 #: src/Modules/Portal.php:238
-#: templates/chat-admin.php:52
+#: templates/chat-admin.php:54
 msgid "Loading..."
 msgstr ""
 
 #. translators: %s: the name of the person being replied to
-#: src/Modules/Admin.php:602
+#: src/Modules/Admin.php:653
 #: src/Modules/Portal.php:240
 #, php-format
 msgid "Replying to %s"
 msgstr ""
 
-#: src/Modules/Admin.php:603
+#: src/Modules/Admin.php:654
 #: src/Modules/Portal.php:241
-#: templates/thread.php:72
+#: templates/thread.php:119
 msgid "Cancel"
 msgstr ""
 
 #: src/Modules/Ajax.php:76
-#: src/Modules/ChatAdmin.php:152
+#: src/Modules/ChatAdmin.php:155
 #: src/Modules/ChatAjax.php:106
 #: src/Modules/ChatAjax.php:133
-#: src/Modules/ChatWidget.php:129
+#: src/Modules/ChatWidget.php:132
 msgid "Your session expired. Please reload the page."
 msgstr ""
 
@@ -368,115 +372,115 @@ msgid "Ticket updated."
 msgstr ""
 
 #. translators: %d: maximum number of files
-#: src/Modules/Attachments.php:298
+#: src/Modules/Attachments.php:299
 #, php-format
 msgid "You can only attach up to %d files."
 msgstr ""
 
-#: src/Modules/Attachments.php:383
+#: src/Modules/Attachments.php:384
 msgid "That file failed to upload. Please try again."
 msgstr ""
 
-#: src/Modules/Attachments.php:389
+#: src/Modules/Attachments.php:390
 msgid "That upload could not be verified."
 msgstr ""
 
 #. translators: %s: human readable maximum file size
-#: src/Modules/Attachments.php:400
+#: src/Modules/Attachments.php:401
 #, php-format
 msgid "Files must be smaller than %s."
 msgstr ""
 
-#: src/Modules/Attachments.php:409
+#: src/Modules/Attachments.php:410
 msgid "That file name could not be used."
 msgstr ""
 
-#: src/Modules/Attachments.php:419
+#: src/Modules/Attachments.php:420
 msgid "That file type is not allowed."
 msgstr ""
 
 #. translators: %s: the rejected file extension
-#: src/Modules/Attachments.php:428
+#: src/Modules/Attachments.php:429
 #, php-format
 msgid "Files of type \"%s\" are not allowed."
 msgstr ""
 
-#: src/Modules/Attachments.php:438
+#: src/Modules/Attachments.php:439
 msgid "The attachment directory could not be created."
 msgstr ""
 
-#: src/Modules/Attachments.php:449
-#: src/Modules/Attachments.php:454
+#: src/Modules/Attachments.php:450
+#: src/Modules/Attachments.php:455
 msgid "That file could not be saved."
 msgstr ""
 
-#: src/Modules/Attachments.php:559
-#: src/Modules/Attachments.php:570
 #: src/Modules/Attachments.php:594
-#: src/Modules/Attachments.php:599
-#: src/Modules/Attachments.php:608
+#: src/Modules/Attachments.php:609
+#: src/Modules/Attachments.php:634
+#: src/Modules/Attachments.php:639
+#: src/Modules/Attachments.php:648
 msgid "That file could not be found."
 msgstr ""
 
-#: src/Modules/Attachments.php:564
-#: src/Modules/Attachments.php:579
+#: src/Modules/Attachments.php:603
+#: src/Modules/Attachments.php:619
 msgid "You are not allowed to access that file."
 msgstr ""
 
 #: src/Modules/ChatAdmin.php:81
 #: src/Modules/ChatAdmin.php:82
-#: templates/chat-admin.php:33
+#: templates/chat-admin.php:35
 msgid "Live Chat"
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:151
-#: src/Modules/ChatAjax.php:518
-#: src/Modules/ChatWidget.php:128
+#: src/Modules/ChatAdmin.php:154
+#: src/Modules/ChatAjax.php:529
+#: src/Modules/ChatWidget.php:131
 msgid "This chat has been closed."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:153
+#: src/Modules/ChatAdmin.php:156
 msgid "Nobody has picked this chat up yet."
 msgstr ""
 
 #. translators: %s: the agent's display name
-#: src/Modules/ChatAdmin.php:155
+#: src/Modules/ChatAdmin.php:158
 #, php-format
 msgid "Handled by %s"
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:156
+#: src/Modules/ChatAdmin.php:159
 msgid "No chats waiting."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:157
-#: templates/chat-admin.php:99
+#: src/Modules/ChatAdmin.php:160
+#: templates/chat-admin.php:101
 msgid "Pick a chat from the queue to get started."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:158
+#: src/Modules/ChatAdmin.php:161
 msgid "Close this chat out? It will be archived as a closed ticket."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:159
+#: src/Modules/ChatAdmin.php:162
 msgid "Convert this chat into an open ticket? The chat will end."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:160
-#: src/Modules/ChatAjax.php:404
+#: src/Modules/ChatAdmin.php:163
+#: src/Modules/ChatAjax.php:415
 msgid "Chat assigned."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:161
-#: src/Modules/ChatAjax.php:396
+#: src/Modules/ChatAdmin.php:164
+#: src/Modules/ChatAjax.php:407
 msgid "That chat could not be assigned."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:162
+#: src/Modules/ChatAdmin.php:165
 msgid "Converting..."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:179
+#: src/Modules/ChatAdmin.php:184
 #: src/Modules/ChatAjax.php:149
 msgid "You are not allowed to work chats."
 msgstr ""
@@ -493,49 +497,53 @@ msgstr ""
 msgid "You are not allowed to start a chat."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:385
+#: src/Modules/ChatAjax.php:396
 msgid "You are not allowed to assign this chat."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:431
+#: src/Modules/ChatAjax.php:442
 msgid "Please reload the chat and try again."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:439
+#: src/Modules/ChatAjax.php:450
 msgid "You are not allowed to convert this chat."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:489
+#: src/Modules/ChatAjax.php:500
 msgid "You are not allowed to close this chat."
 msgstr ""
 
-#: src/Modules/ChatWidget.php:125
+#: src/Modules/ChatAjax.php:752
+msgid "Sent an attachment"
+msgstr ""
+
+#: src/Modules/ChatWidget.php:128
 msgid "Starting chat..."
 msgstr ""
 
-#: src/Modules/ChatWidget.php:126
+#: src/Modules/ChatWidget.php:129
 msgid "The chat could not be started. Please try again."
 msgstr ""
 
-#: src/Modules/ChatWidget.php:127
+#: src/Modules/ChatWidget.php:130
 msgid "End this chat? A copy will be saved to your tickets."
 msgstr ""
 
-#: src/Modules/ChatWidget.php:130
+#: src/Modules/ChatWidget.php:133
 msgid "Waiting for an agent..."
 msgstr ""
 
 #. translators: %s: the agent's display name
-#: src/Modules/ChatWidget.php:132
+#: src/Modules/ChatWidget.php:135
 #, php-format
 msgid "%s has joined the chat."
 msgstr ""
 
-#: src/Modules/ChatWidget.php:133
+#: src/Modules/ChatWidget.php:136
 msgid "View the saved ticket"
 msgstr ""
 
-#: src/Modules/ChatWidget.php:166
+#: src/Modules/ChatWidget.php:171
 #: src/Settings/Settings.php:296
 msgid "Need help?"
 msgstr ""
@@ -724,7 +732,7 @@ msgid "Edit Ticket"
 msgstr ""
 
 #: src/Modules/PostTypes.php:124
-#: templates/chat-admin.php:87
+#: templates/chat-admin.php:89
 msgid "View Ticket"
 msgstr ""
 
@@ -1451,62 +1459,71 @@ msgstr ""
 msgid "Create Account"
 msgstr ""
 
-#: templates/chat-admin.php:41
+#: templates/chat-admin.php:43
 msgid "Mine"
 msgstr ""
 
-#: templates/chat-admin.php:44
+#: templates/chat-admin.php:46
 msgid "Waiting"
 msgstr ""
 
-#: templates/chat-admin.php:47
+#: templates/chat-admin.php:49
 msgid "All"
 msgstr ""
 
-#: templates/chat-admin.php:64
+#: templates/chat-admin.php:66
 msgid "Assign this chat"
 msgstr ""
 
-#: templates/chat-admin.php:78
+#: templates/chat-admin.php:80
 msgid "Convert To Ticket"
 msgstr ""
 
-#: templates/chat-admin.php:83
+#: templates/chat-admin.php:85
 msgid "Close Chat"
 msgstr ""
 
-#: templates/chat-admin.php:91
+#: templates/chat-admin.php:93
 msgid "Chat conversation"
 msgstr ""
 
-#: templates/chat-admin.php:106
-#: templates/chat-panel.php:96
+#: templates/chat-admin.php:115
+#: templates/chat-panel.php:126
 msgid "Your message"
 msgstr ""
 
-#: templates/chat-admin.php:112
-#: templates/thread.php:84
+#: templates/chat-admin.php:121
+#: templates/thread.php:131
 msgid "Type your reply..."
 msgstr ""
 
-#: templates/chat-admin.php:114
-#: templates/chat-panel.php:104
+#: templates/chat-admin.php:124
+#: templates/chat-admin.php:125
+#: templates/chat-panel.php:135
+#: templates/chat-panel.php:136
+#: templates/new-ticket.php:119
+#: templates/thread.php:138
+msgid "Attach files"
+msgstr ""
+
+#: templates/chat-admin.php:136
+#: templates/chat-panel.php:147
 msgid "Send"
 msgstr ""
 
-#: templates/chat-panel.php:60
+#: templates/chat-panel.php:66
 msgid "Live chat"
 msgstr ""
 
-#: templates/chat-panel.php:66
+#: templates/chat-panel.php:72
 msgid "End chat"
 msgstr ""
 
-#: templates/chat-panel.php:68
+#: templates/chat-panel.php:74
 msgid "Minimize chat"
 msgstr ""
 
-#: templates/chat-panel.php:102
+#: templates/chat-panel.php:132
 msgid "Type your message..."
 msgstr ""
 
@@ -1588,14 +1605,9 @@ msgstr ""
 msgid "Tell us as much as you can about what is going on..."
 msgstr ""
 
-#: templates/new-ticket.php:119
-#: templates/thread.php:91
-msgid "Attach files"
-msgstr ""
-
 #. translators: %1$s: maximum file size, %2$d: maximum number of files
 #: templates/new-ticket.php:126
-#: templates/thread.php:114
+#: templates/thread.php:161
 #, php-format
 msgid "Up to %2$d files, %1$s each."
 msgstr ""
@@ -1640,23 +1652,23 @@ msgstr ""
 msgid "Reply"
 msgstr ""
 
-#: templates/thread.php:56
+#: templates/thread.php:98
 msgid "No replies yet."
 msgstr ""
 
-#: templates/thread.php:78
+#: templates/thread.php:125
 msgid "Your reply"
 msgstr ""
 
-#: templates/thread.php:98
+#: templates/thread.php:145
 msgid "Internal note (customers will not see this)"
 msgstr ""
 
-#: templates/thread.php:103
+#: templates/thread.php:150
 msgid "Send Reply"
 msgstr ""
 
-#: templates/thread.php:126
+#: templates/thread.php:173
 msgid "This ticket is closed and cannot be replied to."
 msgstr ""
 

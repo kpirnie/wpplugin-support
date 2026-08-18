@@ -48,8 +48,50 @@ foreach ($kpts_flat as $_kpts_reply) {
 $kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
 ?>
 <div class="kpts-thread kpts-context-<?php echo esc_attr($kpts_context); ?>"
-     data-ticket-id="<?php echo esc_attr((string) $kpts_ticket_id); ?>"
-     data-latest="<?php echo esc_attr($kpts_latest); ?>">
+    data-ticket-id="<?php echo esc_attr((string) $kpts_ticket_id); ?>"
+    data-latest="<?php echo esc_attr($kpts_latest); ?>">
+
+    <?php if ($kpts_context === 'admin') : ?>
+        <?php
+        // the front end renders the opening message in ticket.php, but in admin
+        // the editor is gone, so it belongs at the top of the conversation
+        $kpts_ticket = get_post($kpts_ticket_id);
+        ?>
+        <?php if ($kpts_ticket instanceof \WP_Post) : ?>
+            <div class="kpts-opening-message">
+                <div class="kpts-opening-meta">
+                    <?php echo get_avatar((int) $kpts_ticket->post_author, 40); ?>
+                    <span class="kpts-opening-author">
+                        <?php echo esc_html(get_the_author_meta('display_name', (int) $kpts_ticket->post_author)); ?>
+                    </span>
+                    <span class="kpts-opening-date">
+                        <?php echo esc_html(get_the_date(get_option('date_format') . ' ' . get_option('time_format'), $kpts_ticket)); ?>
+                    </span>
+                </div>
+                <div class="kpts-opening-content">
+                    <?php echo wp_kses_post(wpautop($kpts_ticket->post_content)); ?>
+                </div>
+                <?php
+                // and whatever came in with it
+                $kpts_opening_files = get_post_meta($kpts_ticket_id, \KP\Support\Helpers\Ticket::META_ATTACHMENTS, true);
+                ?>
+                <?php if (is_array($kpts_opening_files) && ! empty($kpts_opening_files)) : ?>
+                    <ul class="kpts-attachments">
+                        <?php foreach ($kpts_opening_files as $_kpts_file) : ?>
+                            <?php if (empty($_kpts_file['key']) || empty($_kpts_file['name'])) : ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <li>
+                                <a href="<?php echo esc_url(Attachments::url($kpts_ticket_id, (string) $_kpts_file['key'])); ?>" rel="nofollow">
+                                    <?php echo esc_html((string) $_kpts_file['name']); ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
 
     <ul class="kpts-replies kpts-replies-root">
         <?php if (empty($kpts_replies)) : ?>
@@ -65,7 +107,12 @@ $kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
     </ul>
 
     <?php if ($kpts_can_reply) : ?>
-        <form class="kpts-reply-form" method="post" enctype="multipart/form-data">
+        <?php
+        // in wp-admin this whole thing sits inside the post edit form, and a
+        // nested form gets thrown away by the parser, so we use a div there
+        $kpts_wrap = ($kpts_context === 'admin') ? 'div' : 'form';
+        ?>
+        <<?php echo esc_html($kpts_wrap); ?> class="kpts-reply-form" <?php echo ($kpts_wrap === 'form') ? ' method="post" enctype="multipart/form-data"' : ''; ?>>
 
             <div class="kpts-replying-to" hidden>
                 <span class="kpts-replying-to-text"></span>
@@ -78,10 +125,10 @@ $kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
                 <?php esc_html_e('Your reply', 'kp-support'); ?>
             </label>
             <textarea id="kpts-reply-content-<?php echo esc_attr((string) $kpts_ticket_id); ?>"
-                      class="kpts-reply-content-input"
-                      name="content"
-                      rows="4"
-                      placeholder="<?php esc_attr_e('Type your reply...', 'kp-support'); ?>"></textarea>
+                class="kpts-reply-content-input"
+                name="content"
+                rows="4"
+                placeholder="<?php esc_attr_e('Type your reply...', 'kp-support'); ?>"></textarea>
 
             <div class="kpts-reply-toolbar">
 
@@ -99,7 +146,7 @@ $kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
                     </label>
                 <?php endif; ?>
 
-                <button type="submit" class="kpts-button kpts-send-reply">
+                <button type="<?php echo ($kpts_wrap === 'form') ? 'submit' : 'button'; ?>" class="kpts-button kpts-send-reply">
                     <?php esc_html_e('Send Reply', 'kp-support'); ?>
                 </button>
             </div>
@@ -120,7 +167,7 @@ $kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
             <?php endif; ?>
 
             <div class="kpts-reply-error" role="alert" hidden></div>
-        </form>
+        </<?php echo esc_html($kpts_wrap); ?>>
     <?php else : ?>
         <p class="kpts-notice kpts-notice-info">
             <?php esc_html_e('This ticket is closed and cannot be replied to.', 'kp-support'); ?>

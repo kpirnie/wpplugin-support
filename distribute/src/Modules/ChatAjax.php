@@ -279,8 +279,19 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             // pull the message, kses runs inside Chat::addMessage
             $content = wp_unslash($_POST['content'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized with wp_kses in Chat::addMessage()
 
+            // take whatever files came along with it
+            $attachments = Attachments::processUploads('kpts_files', get_current_user_id());
+
+            // if any file was rejected, stop right here and say why
+            if (is_wp_error($attachments)) {
+                wp_send_json_error(array(
+                    'message' => $attachments->get_error_message(),
+                    'code'    => $attachments->get_error_code(),
+                ), 400);
+            }
+
             // drop it in
-            $message_id = Chat::addMessage($chat_id, get_current_user_id(), (string) $content);
+            $message_id = Chat::addMessage($chat_id, get_current_user_id(), (string) $content, $attachments);
 
             // if that failed, hand the reason back
             if (is_wp_error($message_id)) {
@@ -576,16 +587,34 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             // who said it
             $user_id = (int) $comment->user_id;
 
+            // pull whatever files came in on it
+            $files = array();
+            foreach (Chat::messageFiles((int) $comment->comment_ID) as $_file) {
+
+                // skip anything malformed
+                if (empty($_file['key']) || empty($_file['name'])) {
+                    continue;
+                }
+
+                // describe it
+                $files[] = array(
+                    'name' => (string) $_file['name'],
+                    'url'  => Attachments::chatUrl($chat_id, (string) $_file['key']),
+                    'size' => size_format((int) ($_file['size'] ?? 0)),
+                );
+            }
+
             // and describe the whole thing
             return array(
-                'id'      => (int) $comment->comment_ID,
-                'content' => wpautop(wp_kses($comment->comment_content, Replies::allowedTags())),
-                'author'  => $comment->comment_author,
-                'avatar'  => get_avatar_url($user_id, array('size' => 48)),
-                'isAgent' => $user_id !== Chat::visitor($chat_id),
-                'isMine'  => $user_id === get_current_user_id(),
-                'date'    => mysql2date(get_option('time_format'), $comment->comment_date),
-                'gmt'     => $comment->comment_date_gmt,
+                'id'          => (int) $comment->comment_ID,
+                'content'     => wpautop(wp_kses($comment->comment_content, Replies::allowedTags())),
+                'author'      => $comment->comment_author,
+                'avatar'      => get_avatar_url($user_id, array('size' => 48)),
+                'isAgent'     => $user_id !== Chat::visitor($chat_id),
+                'isMine'      => $user_id === get_current_user_id(),
+                'date'        => mysql2date(get_option('time_format'), $comment->comment_date),
+                'gmt'         => $comment->comment_date_gmt,
+                'attachments' => $files,
             );
         }
 
@@ -693,7 +722,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
                     'chatId'   => $_chat_id,
                     'visitor'  => ($_visitor instanceof \WP_User) ? $_visitor->display_name : __('Unknown', 'kp-support'),
                     'avatar'   => get_avatar_url(Chat::visitor($_chat_id), array('size' => 48)),
-                    'preview'  => ($_last instanceof \WP_Comment) ? wp_trim_words(wp_strip_all_tags($_last->comment_content), 10, '...') : '',
+                    'preview'  => ($_last instanceof \WP_Comment) ? $this->previewFor($_last) : '',
                     'activity' => (string) get_post_meta($_chat_id, Chat::META_LAST_ACTIVITY, true),
                     'state'    => $this->statePayload($_chat_id),
                     'confirm'  => wp_create_nonce('kpts_chat_convert_' . $_chat_id),
@@ -702,6 +731,29 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
 
             // hand them back
             return $rows;
+        }
+
+        /**
+         * Build the one line preview a queue row shows.
+         *
+         * @since  1.0.0
+         * @access private
+         * @param  \WP_Comment $message The last message on the chat.
+         * @return string The preview.
+         */
+        private function previewFor(\WP_Comment $message): string
+        {
+
+            // what they said
+            $preview = wp_trim_words(wp_strip_all_tags($message->comment_content), 10, '...');
+
+            // a message that's nothing but a file still needs something to show
+            if ($preview === '' && ! empty(Chat::messageFiles((int) $message->comment_ID))) {
+                $preview = __('Sent an attachment', 'kp-support');
+            }
+
+            // hand it back
+            return $preview;
         }
 
         /**

@@ -148,11 +148,53 @@
         meta.appendChild(time);
         bubble.appendChild(meta);
 
-        // the message body, already run through kses server side
+                // the message body, already run through kses server side
         var content = document.createElement('div');
         content.className = 'kpts-chat-content';
         content.innerHTML = message.content || '';
         bubble.appendChild(content);
+
+        // and anything that came in with it
+        if (message.attachments && message.attachments.length) {
+
+            // the list they sit in
+            var files = document.createElement('ul');
+            files.className = 'kpts-chat-attachments';
+
+            // walk each one
+            message.attachments.forEach(function (file) {
+
+                // the row
+                var item = document.createElement('li');
+                item.className = 'kpts-chat-attachment';
+
+                // the link, href set as a property so nothing exotic gets through
+                var link = document.createElement('a');
+                link.href = file.url || '';
+                link.rel = 'nofollow';
+
+                // its name, textContent so nothing can be injected
+                var name = document.createElement('span');
+                name.className = 'kpts-chat-attachment-name';
+                name.textContent = file.name || '';
+                link.appendChild(name);
+
+                // and how big it is
+                if (file.size) {
+                    var size = document.createElement('span');
+                    size.className = 'kpts-chat-attachment-size';
+                    size.textContent = file.size;
+                    link.appendChild(size);
+                }
+
+                // in it goes
+                item.appendChild(link);
+                files.appendChild(item);
+            });
+
+            // and onto the bubble
+            bubble.appendChild(files);
+        }
 
         // and hand the whole row back
         li.appendChild(bubble);
@@ -389,6 +431,69 @@
     }
 
     /**
+     * Check the files somebody picked against our limits.
+     *
+     * @param {HTMLInputElement} input The file input.
+     * @return {string} An error message, or an empty string if they're fine.
+     */
+    function validateFiles(input) {
+
+        // nothing picked
+        if (!input || !input.files || !input.files.length) {
+            return '';
+        }
+
+        // too many of them
+        if (cfg.maxFiles && input.files.length > cfg.maxFiles) {
+            return strings.tooManyFiles || 'Too many files.';
+        }
+
+        // and check each one's size
+        for (var i = 0; i < input.files.length; i++) {
+            if (cfg.maxFileSize && input.files[i].size > cfg.maxFileSize) {
+                return strings.fileTooBig || 'That file is too large.';
+            }
+        }
+
+        // they're good
+        return '';
+    }
+
+    /**
+     * List out the files somebody picked, so they can see what's attached.
+     *
+     * @param {HTMLInputElement} input The file input.
+     * @param {Element}          list  The list to render into.
+     * @return {void}
+     */
+    function renderFileList(input, list) {
+
+        // nothing to render into
+        if (!list) {
+            return;
+        }
+
+        // start clean
+        list.textContent = '';
+
+        // nothing picked, so nothing to show
+        if (!input || !input.files || !input.files.length) {
+            list.hidden = true;
+            return;
+        }
+
+        // one row per file, textContent so nothing can be injected
+        for (var i = 0; i < input.files.length; i++) {
+            var item = document.createElement('li');
+            item.textContent = input.files[i].name;
+            list.appendChild(item);
+        }
+
+        // and show it
+        list.hidden = false;
+    }
+
+    /**
      * Send whatever is in the box.
      *
      * @param {HTMLFormElement} form The chat form.
@@ -401,13 +506,22 @@
             return;
         }
 
-        // what they typed
+        // what they typed, and whatever they attached
         var input = form.querySelector('.kpts-chat-input');
+        var fileInput = form.querySelector('.kpts-chat-files');
         var content = input ? input.value.trim() : '';
+        var hasFiles = !!(fileInput && fileInput.files && fileInput.files.length);
 
-        // nothing to send
-        if (!content) {
+        // nothing to send, an attachment on its own is fine
+        if (!content && !hasFiles) {
             showNotice(strings.emptyMessage);
+            return;
+        }
+
+        // check the files before we bother the server with them
+        var fileError = validateFiles(fileInput);
+        if (fileError) {
+            showNotice(fileError);
             return;
         }
 
@@ -429,6 +543,13 @@
         data.append('chat_id', state.chatId);
         data.append('content', content);
 
+        // and hang the files off it
+        if (hasFiles) {
+            for (var i = 0; i < fileInput.files.length; i++) {
+                data.append('kpts_files[]', fileInput.files[i]);
+            }
+        }
+
         // off it goes
         request(data).then(function (response) {
 
@@ -441,9 +562,15 @@
                 return;
             }
 
-            // clear the box now we know it landed
+                        // clear the box now we know it landed
             if (input) {
                 input.value = '';
+            }
+
+            // and the files with it
+            if (fileInput) {
+                fileInput.value = '';
+                renderFileList(fileInput, form.querySelector('.kpts-chat-file-list'));
             }
 
             // render it and move our cutoff forward
@@ -654,6 +781,15 @@
                 event.preventDefault();
                 send(form);
             });
+
+            // show them what they've picked
+            var panelFiles = form.querySelector('.kpts-chat-files');
+            if (panelFiles) {
+                panelFiles.addEventListener('change', function () {
+                    showNotice(validateFiles(panelFiles));
+                    renderFileList(panelFiles, form.querySelector('.kpts-chat-file-list'));
+                });
+            }
 
             // and enter sends, shift enter breaks the line
             var input = form.querySelector('.kpts-chat-input');
@@ -1010,6 +1146,15 @@
                 event.preventDefault();
                 send(form);
             });
+
+            // show them what they've picked
+            var agentFiles = form.querySelector('.kpts-chat-files');
+            if (agentFiles) {
+                agentFiles.addEventListener('change', function () {
+                    showNotice(validateFiles(agentFiles));
+                    renderFileList(agentFiles, form.querySelector('.kpts-chat-file-list'));
+                });
+            }
 
             // and enter sends, shift enter breaks the line
             var input = form.querySelector('.kpts-chat-input');

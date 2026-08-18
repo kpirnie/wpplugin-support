@@ -49,5 +49,26 @@ $kpts_side = ! empty($kpts_message['isMine']) ? 'mine' : 'theirs';
         <div class="kpts-chat-content">
             <?php echo wp_kses_post((string) ($kpts_message['content'] ?? '')); ?>
         </div>
+
+        <?php if (! empty($kpts_message['attachments'])) : ?>
+            <ul class="kpts-chat-attachments">
+                <?php foreach ($kpts_message['attachments'] as $_kpts_file) : ?>
+                    <?php
+                    // skip anything malformed
+                    if (empty($_kpts_file['url']) || empty($_kpts_file['name'])) {
+                        continue;
+                    }
+                    ?>
+                    <li class="kpts-chat-attachment">
+                        <a href="<?php echo esc_url((string) $_kpts_file['url']); ?>" rel="nofollow">
+                            <span class="kpts-chat-attachment-name"><?php echo esc_html((string) $_kpts_file['name']); ?></span>
+                            <?php if (! empty($_kpts_file['size'])) : ?>
+                                <span class="kpts-chat-attachment-size"><?php echo esc_html((string) $_kpts_file['size']); ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
     </div>
 </li>

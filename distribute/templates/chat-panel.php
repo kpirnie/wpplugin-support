@@ -23,6 +23,9 @@
 declare(strict_types=1);
 
 use KP\Support\Helpers\Template;
+use KP\Support\Helpers\Chat;
+use KP\Support\Modules\Attachments;
+use KP\Support\Plugin;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
@@ -42,8 +45,11 @@ foreach ($kpts_messages as $_kpts_message) {
         $kpts_latest = $_kpts_message->comment_date_gmt;
     }
 }
+
+// are attachments even switched on
+$kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
 ?>
-<div class="kpts-chat kpts-chat-<?php echo esc_attr($kpts_position); ?>"
+<div class="kpts-chat kpts-chat-docked kpts-chat-<?php echo esc_attr($kpts_position); ?>"
     data-chat-id="<?php echo esc_attr((string) $kpts_chat_id); ?>"
     data-latest="<?php echo esc_attr($kpts_latest); ?>"
     data-state="<?php echo esc_attr($kpts_state); ?>">
@@ -73,16 +79,33 @@ foreach ($kpts_messages as $_kpts_message) {
         <ul class="kpts-chat-messages" aria-live="polite">
             <?php foreach ($kpts_messages as $_kpts_message) : ?>
                 <?php
-                // render each one through the same template the poller uses
+                // whatever files came in on it
+                $_kpts_files = array();
+                foreach (Chat::messageFiles((int) $_kpts_message->comment_ID) as $_kpts_file) {
+
+                    // skip anything malformed
+                    if (empty($_kpts_file['key']) || empty($_kpts_file['name'])) {
+                        continue;
+                    }
+
+                    // describe it
+                    $_kpts_files[] = array(
+                        'name' => (string) $_kpts_file['name'],
+                        'url'  => Attachments::chatUrl($kpts_chat_id, (string) $_kpts_file['key']),
+                        'size' => size_format((int) ($_kpts_file['size'] ?? 0)),
+                    );
+                }
+
                 Template::render('chat-message', array(
                     'message' => array(
-                        'id'      => (int) $_kpts_message->comment_ID,
-                        'content' => wpautop(wp_kses_post($_kpts_message->comment_content)),
-                        'author'  => $_kpts_message->comment_author,
-                        'avatar'  => get_avatar_url((int) $_kpts_message->user_id, array('size' => 48)),
-                        'isAgent' => (int) $_kpts_message->user_id !== $kpts_visitor,
-                        'isMine'  => (int) $_kpts_message->user_id === $kpts_visitor,
-                        'date'    => mysql2date(get_option('time_format'), $_kpts_message->comment_date),
+                        'id'          => (int) $_kpts_message->comment_ID,
+                        'content'     => wpautop(wp_kses_post($_kpts_message->comment_content)),
+                        'author'      => $_kpts_message->comment_author,
+                        'avatar'      => get_avatar_url((int) $_kpts_message->user_id, array('size' => 48)),
+                        'isAgent'     => (int) $_kpts_message->user_id !== $kpts_visitor,
+                        'isMine'      => (int) $_kpts_message->user_id === $kpts_visitor,
+                        'date'        => mysql2date(get_option('time_format'), $_kpts_message->comment_date),
+                        'attachments' => $_kpts_files,
                     ),
                 ));
                 ?>
@@ -92,17 +115,38 @@ foreach ($kpts_messages as $_kpts_message) {
         <p class="kpts-chat-notice" role="alert" hidden></p>
 
         <form class="kpts-chat-form" novalidate>
-            <label class="screen-reader-text" for="kpts-chat-input">
-                <?php esc_html_e('Your message', 'kp-support'); ?>
-            </label>
-            <textarea id="kpts-chat-input"
-                class="kpts-chat-input"
-                name="content"
-                rows="2"
-                placeholder="<?php esc_attr_e('Type your message...', 'kp-support'); ?>"></textarea>
-            <button type="submit" class="kpts-chat-send">
-                <?php esc_html_e('Send', 'kp-support'); ?>
-            </button>
+
+            <?php if ($kpts_allow_files) : ?>
+                <ul class="kpts-chat-file-list" hidden></ul>
+            <?php endif; ?>
+
+            <div class="kpts-chat-form-row">
+
+                <label class="screen-reader-text" for="kpts-chat-input">
+                    <?php esc_html_e('Your message', 'kp-support'); ?>
+                </label>
+                <textarea id="kpts-chat-input"
+                    class="kpts-chat-input"
+                    name="content"
+                    rows="2"
+                    placeholder="<?php esc_attr_e('Type your message...', 'kp-support'); ?>"></textarea>
+
+                <?php if ($kpts_allow_files) : ?>
+                    <label class="kpts-chat-attach" title="<?php esc_attr_e('Attach files', 'kp-support'); ?>">
+                        <span class="screen-reader-text"><?php esc_html_e('Attach files', 'kp-support'); ?></span>
+                        <span class="kpts-chat-attach-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" focusable="false">
+                                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M21 11.5l-8.8 8.8a5 5 0 01-7.1-7.1l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-2.8-2.8l8.3-8.3" />
+                            </svg>
+                        </span>
+                        <input type="file" class="kpts-chat-files" name="kpts_files[]" multiple />
+                    </label>
+                <?php endif; ?>
+
+                <button type="submit" class="kpts-chat-send">
+                    <?php esc_html_e('Send', 'kp-support'); ?>
+                </button>
+            </div>
         </form>
     </section>
 </div>

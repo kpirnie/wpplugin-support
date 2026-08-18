@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace KP\Support\Helpers;
 
+use KP\Support\Modules\Attachments;
 use KP\Support\Modules\PostTypes;
 use KP\Support\Modules\Replies;
 
@@ -467,16 +468,35 @@ if (! class_exists('\KP\Support\Helpers\Chat')) {
         }
 
         /**
+         * Get the files hanging off a chat message.
+         *
+         * @since  1.0.0
+         * @access public
+         * @param  int $message_id The message id.
+         * @return array<int, array<string, mixed>> The file records.
+         */
+        public static function messageFiles(int $message_id): array
+        {
+
+            // straight off the comment meta
+            $files = get_comment_meta($message_id, Attachments::META_REPLY_FILES, true);
+
+            // and hand back something loopable either way
+            return is_array($files) ? $files : array();
+        }
+
+        /**
          * Post a message onto a chat.
          *
          * @since  1.0.0
          * @access public
-         * @param  int    $chat_id The chat id.
-         * @param  int    $user_id Who's saying it.
-         * @param  string $content What they said.
+         * @param  int                        $chat_id     The chat id.
+         * @param  int                        $user_id     Who's saying it.
+         * @param  string                     $content     What they said.
+         * @param  array<int, array<string, mixed>> $attachments Any files that came with it.
          * @return int|\WP_Error The new message id, or an error.
          */
-        public static function addMessage(int $chat_id, int $user_id, string $content): int|\WP_Error
+        public static function addMessage(int $chat_id, int $user_id, string $content, array $attachments = array()): int|\WP_Error
         {
 
             // it has to be a real chat that's still running
@@ -493,8 +513,8 @@ if (! class_exists('\KP\Support\Helpers\Chat')) {
             // clean the content down to our allowed tags
             $content = trim(wp_kses($content, Replies::allowedTags()));
 
-            // an empty message isn't a message
-            if ($content === '') {
+            // an empty message isn't a message, unless they attached something
+            if ($content === '' && empty($attachments)) {
                 return new \WP_Error('kpts_empty_message', __('Please enter a message.', 'kp-support'));
             }
 
@@ -521,6 +541,12 @@ if (! class_exists('\KP\Support\Helpers\Chat')) {
 
             // cast it down
             $message_id = (int) $message_id;
+
+            // hang any files off the message and index them against the chat
+            if (! empty($attachments)) {
+                update_comment_meta($message_id, Attachments::META_REPLY_FILES, $attachments);
+                Attachments::indexFiles($chat_id, $attachments, $message_id);
+            }
 
             // stamp the chat as active
             self::touch($chat_id);

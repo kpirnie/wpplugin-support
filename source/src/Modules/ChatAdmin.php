@@ -144,6 +144,9 @@ if (! class_exists('\KP\Support\Modules\ChatAdmin')) {
                 'canConvert'    => current_user_can('kpts_convert_chats'),
                 'pollInterval'  => max(5, (int) $this->opt('poll_interval', 10)) * 1000,
                 'queueInterval' => max(5, (int) $this->opt('poll_interval', 10)) * 1000,
+                'allowFiles'    => (bool) $this->opt('allow_attachments', true),
+                'maxFiles'      => (int) $this->opt('max_attachments', 5),
+                'maxFileSize'   => Attachments::maxSize(),
                 'strings'       => array(
                     'sending'        => __('Sending...', 'kp-support'),
                     'sendFailed'     => __('Your message could not be sent. Please try again.', 'kp-support'),
@@ -160,6 +163,8 @@ if (! class_exists('\KP\Support\Modules\ChatAdmin')) {
                     'assigned'       => __('Chat assigned.', 'kp-support'),
                     'assignFailed'   => __('That chat could not be assigned.', 'kp-support'),
                     'converting'     => __('Converting...', 'kp-support'),
+                    'tooManyFiles'   => __('Too many files attached.', 'kp-support'),
+                    'fileTooBig'     => __('One of those files is too large.', 'kp-support'),
                 ),
             ));
         }
@@ -184,6 +189,7 @@ if (! class_exists('\KP\Support\Modules\ChatAdmin')) {
                 'agents'      => $this->agentOptions(),
                 'can_assign'  => current_user_can('kpts_assign_chats'),
                 'can_convert' => current_user_can('kpts_convert_chats'),
+                'allow_files' => (bool) $this->opt('allow_attachments', true),
             ));
         }
 

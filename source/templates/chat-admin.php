@@ -16,6 +16,7 @@
  * @var array<int, string> $kpts_agents      The agents a chat can be handed to.
  * @var bool               $kpts_can_assign  Whether they can reassign.
  * @var bool               $kpts_can_convert Whether they can convert.
+ * @var bool               $kpts_allow_files The attachment setting.
  */
 
 declare(strict_types=1);
@@ -27,6 +28,7 @@ defined('ABSPATH') || die('No direct script access allowed');
 $kpts_agents = isset($kpts_agents) && is_array($kpts_agents) ? $kpts_agents : array();
 $kpts_can_assign = ! empty($kpts_can_assign);
 $kpts_can_convert = ! empty($kpts_can_convert);
+$kpts_allow_files = ! empty($kpts_allow_files);
 ?>
 <div class="wrap">
 
@@ -102,17 +104,38 @@ $kpts_can_convert = ! empty($kpts_can_convert);
                 <p class="kpts-chat-notice" role="alert" hidden></p>
 
                 <form class="kpts-chat-form" novalidate hidden>
-                    <label class="screen-reader-text" for="kpts-chat-input">
-                        <?php esc_html_e('Your message', 'kp-support'); ?>
-                    </label>
-                    <textarea id="kpts-chat-input"
-                        class="kpts-chat-input"
-                        name="content"
-                        rows="2"
-                        placeholder="<?php esc_attr_e('Type your reply...', 'kp-support'); ?>"></textarea>
-                    <button type="submit" class="kpts-chat-send">
-                        <?php esc_html_e('Send', 'kp-support'); ?>
-                    </button>
+
+                    <?php if ($kpts_allow_files) : ?>
+                        <ul class="kpts-chat-file-list" hidden></ul>
+                    <?php endif; ?>
+
+                    <div class="kpts-chat-form-row">
+
+                        <label class="screen-reader-text" for="kpts-chat-input">
+                            <?php esc_html_e('Your message', 'kp-support'); ?>
+                        </label>
+                        <textarea id="kpts-chat-input"
+                            class="kpts-chat-input"
+                            name="content"
+                            rows="2"
+                            placeholder="<?php esc_attr_e('Type your reply...', 'kp-support'); ?>"></textarea>
+
+                        <?php if ($kpts_allow_files) : ?>
+                            <label class="kpts-chat-attach" title="<?php esc_attr_e('Attach files', 'kp-support'); ?>">
+                                <span class="screen-reader-text"><?php esc_html_e('Attach files', 'kp-support'); ?></span>
+                                <span class="kpts-chat-attach-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" focusable="false">
+                                        <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M21 11.5l-8.8 8.8a5 5 0 01-7.1-7.1l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-2.8-2.8l8.3-8.3" />
+                                    </svg>
+                                </span>
+                                <input type="file" class="kpts-chat-files" name="kpts_files[]" multiple />
+                            </label>
+                        <?php endif; ?>
+
+                        <button type="submit" class="kpts-chat-send">
+                            <?php esc_html_e('Send', 'kp-support'); ?>
+                        </button>
+                    </div>
                 </form>
             </section>
         </div>

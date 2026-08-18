@@ -145,7 +145,7 @@ if (! class_exists('\KP\Support\Modules\PostTypes')) {
                 'hierarchical'        => false,
                 'menu_position'       => 26,
                 'menu_icon'           => 'dashicons-sos',
-                'supports'            => array('title', 'editor', 'author'),
+                'supports'            => array('title', 'author'),
                 'capability_type'     => array('kpts_ticket', 'kpts_tickets'),
                 'map_meta_cap'        => true,
                 'delete_with_user'    => false,

@@ -699,3 +699,38 @@
         width: 100%;
     }
 }
+
+/* ---------- opening message, admin only ---------- */
+
+.kpts-opening-message {
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--kpts-border);
+    border-left: 3px solid var(--kpts-accent);
+    border-radius: var(--kpts-radius);
+    background: var(--kpts-bg);
+}
+
+.kpts-opening-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.kpts-opening-meta img {
+    border-radius: 50%;
+}
+
+.kpts-opening-author {
+    font-weight: 600;
+}
+
+.kpts-opening-date {
+    font-size: 12px;
+    color: var(--kpts-muted);
+}
+
+.kpts-opening-content p:last-child {
+    margin-bottom: 0;
+}

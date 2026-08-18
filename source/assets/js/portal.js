@@ -392,9 +392,17 @@
             }
         });
 
-        // sending a reply
+        // sending a reply. in wp-admin the wrapper is a div rather than a form,
+        // because a nested form inside the post edit form gets thrown away, so
+        // we listen for the button there and the submit everywhere else
         if (form) {
-            form.addEventListener('submit', function (event) {
+            var sendEvent = (form.tagName === 'FORM') ? 'submit' : 'click';
+            form.addEventListener(sendEvent, function (event) {
+
+                // the click listener only cares about our own button
+                if (sendEvent === 'click' && !event.target.closest('.kpts-send-reply')) {
+                    return;
+                }
 
                 // we're handling this ourselves
                 event.preventDefault();
@@ -421,14 +429,24 @@
                     return;
                 }
 
-                // build the request out of the form itself so the files come along
-                var data = new FormData(form);
+                // build the request by hand, FormData only reads a real form and
+                // in wp-admin our wrapper is a div
+                var data = new FormData();
                 data.append('action', 'kpts_send_reply');
                 data.append('ticket_id', state.ticketId);
+                data.append('content', content ? content.value : '');
+                data.append('parent', parentInput ? parentInput.value : '0');
 
-                // make sure the internal flag reflects the checkbox
-                if (internal && !internal.checked) {
-                    data.delete('internal');
+                // only flag it internal when the box is actually ticked
+                if (internal && internal.checked) {
+                    data.append('internal', '1');
+                }
+
+                // and hang the files off it
+                if (hasFiles) {
+                    for (var i = 0; i < fileInput.files.length; i++) {
+                        data.append('kpts_files[]', fileInput.files[i]);
+                    }
                 }
 
                 // lock the button while it's in flight
@@ -464,8 +482,17 @@
                     // refresh the status badge
                     updateStatus(response.data.status);
 
-                    // and reset the form back to a clean top level reply
-                    form.reset();
+                    // and clear it back to a clean top level reply, by hand
+                    // because a div has no reset
+                    if (content) {
+                        content.value = '';
+                    }
+                    if (internal) {
+                        internal.checked = false;
+                    }
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
                     if (parentInput) {
                         parentInput.value = '0';
                     }
