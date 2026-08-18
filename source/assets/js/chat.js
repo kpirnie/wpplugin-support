@@ -29,7 +29,9 @@
         live: true,
         filter: 'mine',
         queueTimer: null,
-        confirm: ''
+        confirm: '',
+        waitingSince: 0,
+        waitingOffered: false
     };
 
     /**
@@ -240,8 +242,33 @@
             return;
         }
 
-        // hang on to whether it's still running
+                // hang on to whether it's still running
         state.live = !!chatState.live;
+
+        // track how long they've been sat in the queue
+        if (state.live && !chatState.agentName) {
+
+            // start the clock the first time we see them waiting
+            if (!state.waitingSince) {
+                state.waitingSince = Date.now();
+            }
+
+            // and offer them a way out once it's dragged on
+            var limit = (cfg.waitingTimeout || 0) * 60000;
+            if (limit > 0 && (Date.now() - state.waitingSince) >= limit) {
+                offerTicket();
+            }
+        } else {
+
+            // somebody picked it up, or it's over
+            state.waitingSince = 0;
+
+            // clear the offer back off if it's showing
+            var offer = document.querySelector('.kpts-chat-waiting-offer');
+            if (offer) {
+                offer.remove();
+            }
+        }
 
         // the panel wrapper carries it for the styling
         var wrap = document.querySelector('.kpts-chat');
@@ -281,6 +308,52 @@
         if (!state.live) {
             stopPolling();
         }
+    }
+
+    /**
+     * Offer to turn a chat nobody has picked up into a ticket.
+     *
+     * @return {void}
+     */
+    function offerTicket() {
+
+        // only ever once, and only on the visitor side
+        if (state.waitingOffered || cfg.isAgent) {
+            return;
+        }
+
+        // where it goes
+        var panel = document.querySelector('.kpts-chat-panel');
+        var notice = document.querySelector('.kpts-chat-notice');
+        if (!panel || !notice) {
+            return;
+        }
+
+        // build the offer out
+        var box = document.createElement('div');
+        box.className = 'kpts-chat-waiting-offer';
+
+        // what it says
+        var text = document.createElement('p');
+        text.textContent = strings.waitingTooLong || '';
+        box.appendChild(text);
+
+        // and the button that does it
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'kpts-chat-make-ticket';
+        button.textContent = strings.makeTicket || '';
+        button.addEventListener('click', function () {
+            box.remove();
+            close(true);
+        });
+        box.appendChild(button);
+
+        // drop it in above the notice
+        panel.insertBefore(box, notice);
+
+        // and don't ask again
+        state.waitingOffered = true;
     }
 
     /**
@@ -665,10 +738,15 @@
      *
      * @return {void}
      */
-    function close() {
+    function close(skipConfirm) {
 
         // nothing to close
         if (!state.chatId || !state.live) {
+            return;
+        }
+
+        // make them mean it, unless they just told us to
+        if (!skipConfirm && !window.confirm(strings.confirmClose)) {
             return;
         }
 
@@ -705,6 +783,95 @@
     }
 
     /**
+     * Send the leave-a-message form when nobody is online.
+     *
+     * @param {HTMLFormElement} form The offline form.
+     * @return {void}
+     */
+    function sendOffline(form) {
+
+        // don't double submit
+        if (state.sending) {
+            return;
+        }
+
+        // what they typed
+        var subject = form.querySelector('.kpts-chat-offline-subject');
+        var body = form.querySelector('.kpts-chat-offline-body');
+
+        // both are required
+        if (!subject || !body || !subject.value.trim() || !body.value.trim()) {
+            showNotice(strings.emptyMessage);
+            return;
+        }
+
+        // whatever they attached has to pass first
+        var files = form.querySelector('.kpts-chat-files');
+        var problem = files ? validateFiles(files) : '';
+        if (problem) {
+            showNotice(problem);
+            return;
+        }
+
+        // build it up
+        var data = new FormData();
+        data.append('action', 'kpts_chat_offline_ticket');
+        data.append('subject', subject.value.trim());
+        data.append('message', body.value.trim());
+
+        // and add the files on
+        if (files && files.files) {
+            for (var i = 0; i < files.files.length; i++) {
+                data.append('kpts_files[]', files.files[i]);
+            }
+        }
+
+        // off it goes
+        state.sending = true;
+        showNotice(strings.sending);
+
+        request(data).then(function (response) {
+
+            // we're done either way
+            state.sending = false;
+
+            // it didn't take
+            if (!response.success) {
+                showNotice((response.data && response.data.message) || strings.sendFailed);
+                return;
+            }
+
+            // keep the rotated nonce
+            if (response.data && response.data.nonce) {
+                state.nonce = response.data.nonce;
+            }
+
+            // swap the form out for where it went
+            form.innerHTML = '';
+            var done = document.createElement('p');
+            done.className = 'kpts-chat-offline-done';
+            done.textContent = (response.data && response.data.message) || '';
+            form.appendChild(done);
+
+            // and a link over to it
+            if (response.data && response.data.url) {
+                var link = document.createElement('a');
+                link.href = response.data.url;
+                link.textContent = strings.viewTicket;
+                form.appendChild(link);
+            }
+
+            // clear the notice down
+            showNotice('');
+        }).catch(function () {
+
+            // the network dropped
+            state.sending = false;
+            showNotice(strings.sendFailed);
+        });
+    }
+
+    /**
      * Wire the panel up.
      *
      * @return {void}
@@ -727,6 +894,7 @@
         var launcher = wrap.querySelector('.kpts-chat-launcher');
         var panel = wrap.querySelector('.kpts-chat-panel');
         var form = wrap.querySelector('.kpts-chat-form');
+        var offline = wrap.querySelector('.kpts-chat-offline-form');
 
         // opening it starts a chat if they haven't got one going
         if (launcher && panel) {
@@ -749,7 +917,14 @@
                     list.scrollTop = list.scrollHeight;
                 }
 
-                // and get a chat going
+                // and get a chat going, unless there's nobody to talk to
+                if (offline) {
+                    var subject = wrap.querySelector('.kpts-chat-offline-subject');
+                    if (subject) {
+                        subject.focus();
+                    }
+                    return;
+                }
                 start().then(function () {
                     var input = wrap.querySelector('.kpts-chat-input');
                     if (input) {
@@ -799,6 +974,23 @@
                         event.preventDefault();
                         send(form);
                     }
+                });
+            }
+        }
+
+        // the leave-a-message form, when nobody is around
+        if (offline) {
+            offline.addEventListener('submit', function (event) {
+                event.preventDefault();
+                sendOffline(offline);
+            });
+
+            // show them what they've picked
+            var offlineFiles = offline.querySelector('.kpts-chat-files');
+            if (offlineFiles) {
+                offlineFiles.addEventListener('change', function () {
+                    showNotice(validateFiles(offlineFiles));
+                    renderFileList(offlineFiles, offline.querySelector('.kpts-chat-file-list'));
                 });
             }
         }

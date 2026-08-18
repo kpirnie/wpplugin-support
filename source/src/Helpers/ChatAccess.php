@@ -34,6 +34,24 @@ if (! class_exists('\KP\Support\Helpers\ChatAccess')) {
      */
     final class ChatAccess
     {
+
+
+        /**
+         * The transient prefix we track agent presence under.
+         *
+         * @since 1.0.21
+         * @var string
+         */
+        public const PRESENCE_PREFIX = 'kpts_chat_seen_';
+
+        /**
+         * The days we keep hours for, in the order they're configured.
+         *
+         * @since 1.0.21
+         * @var array<int, string>
+         */
+        public const DAYS = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
+
         /**
          * Work out whether a user can work chats at all.
          *
@@ -296,6 +314,175 @@ if (! class_exists('\KP\Support\Helpers\ChatAccess')) {
 
             // let people hook in and adjust the decision
             return (bool) apply_filters('kpts_can_start_chat', true, $user_id);
+        }
+
+        /**
+         * How long an agent counts as online for, in seconds.
+         *
+         * @since  1.0.21
+         * @access public
+         * @return int The presence window.
+         */
+        public static function presenceWindow(): int
+        {
+
+            // the setting is in minutes, and we never go below one
+            $minutes = max(1, (int) Plugin::opt('chat_presence_window', 5));
+
+            // hand it back in seconds
+            return $minutes * MINUTE_IN_SECONDS;
+        }
+
+        /**
+         * Work out whether we're inside the configured business hours.
+         *
+         * Hours take precedence over presence, so an agent sitting in the queue
+         * outside hours still reads as unavailable.
+         *
+         * @since  1.0.21
+         * @access public
+         * @return bool True if we're open, or if hours aren't being enforced.
+         */
+        public static function withinBusinessHours(): bool
+        {
+
+            // not enforcing them means always open
+            if (! Plugin::opt('chat_hours_enable', false)) {
+                return true;
+            }
+
+            // where we are in the site's own timezone
+            $now = current_datetime();
+
+            // which day that is
+            $day = self::DAYS[(int) $now->format('w')];
+
+            // is that day open at all
+            if (! Plugin::opt('chat_hours_' . $day . '_open', false)) {
+                return false;
+            }
+
+            // what we're working with
+            $from = trim((string) Plugin::opt('chat_hours_' . $day . '_from', ''));
+            $to = trim((string) Plugin::opt('chat_hours_' . $day . '_to', ''));
+
+            // an open day with no times set runs all day
+            if ($from === '' || $to === '') {
+                return true;
+            }
+
+            // compare them as plain minutes so nothing has to be parsed as a date
+            $current = ((int) $now->format('G') * 60) + (int) $now->format('i');
+            $opens = self::minutesFromTime($from);
+            $closes = self::minutesFromTime($to);
+
+            // a window that wraps past midnight is two ranges, not one
+            if ($closes <= $opens) {
+                return ($current >= $opens || $current < $closes);
+            }
+
+            // otherwise it's the straightforward case
+            return ($current >= $opens && $current < $closes);
+        }
+
+        /**
+         * Turn an HH:MM string into minutes past midnight.
+         *
+         * @since  1.0.21
+         * @access private
+         * @param  string $time The time to convert.
+         * @return int The minutes.
+         */
+        private static function minutesFromTime(string $time): int
+        {
+
+            // split it up
+            $parts = explode(':', $time);
+
+            // and add it together, clamped to a real clock
+            return (min(23, max(0, (int) ($parts[0] ?? 0))) * 60) + min(59, max(0, (int) ($parts[1] ?? 0)));
+        }
+
+        /**
+         * Work out whether chat is available right now.
+         *
+         * @since  1.0.21
+         * @access public
+         * @return bool True if we're open and somebody is around.
+         */
+        public static function chatAvailable(): bool
+        {
+
+            // hours win, so if we're closed it doesn't matter who's online
+            if (! self::withinBusinessHours()) {
+                return false;
+            }
+
+            // otherwise it comes down to presence
+            return self::anyAgentOnline();
+        }
+
+        /**
+         * Mark an agent as being here right now.
+         *
+         * Written on every queue poll and screen render, so "online" means an
+         * agent genuinely has the queue open. It expires itself.
+         *
+         * @since  1.0.21
+         * @access public
+         * @param  int|null $user_id The agent, defaults to the current user.
+         * @return void
+         */
+        public static function markPresence(?int $user_id = null): void
+        {
+
+            // default to whoever is logged in
+            $user_id = $user_id ?? get_current_user_id();
+
+            // they have to actually be an agent
+            if ($user_id < 1 || ! self::isChatAgent($user_id)) {
+                return;
+            }
+
+            // stamp it
+            set_transient(self::PRESENCE_PREFIX . $user_id, time(), self::presenceWindow());
+        }
+
+        /**
+         * Work out whether anybody is around to take a chat.
+         *
+         * @since  1.0.21
+         * @access public
+         * @return bool True if at least one agent has the queue open.
+         */
+        public static function anyAgentOnline(): bool
+        {
+
+            // everybody who could work a chat
+            $users = get_users(array(
+                'capability' => 'kpts_handle_chats',
+                'fields'     => 'ID',
+            ));
+
+            // walk them looking for a live one
+            foreach ($users as $_user_id) {
+
+                // cast it down
+                $user_id = (int) $_user_id;
+
+                // they have to cover chats before their presence counts
+                if (! self::agentCoversChats($user_id)) {
+                    continue;
+                }
+
+                // and the first live transient is enough
+                if (get_transient(self::PRESENCE_PREFIX . $user_id) !== false) {
+                    return true;
+                }
+            }
+
+            // nobody home
+            return (bool) apply_filters('kpts_any_agent_online', false);
         }
     }
 }

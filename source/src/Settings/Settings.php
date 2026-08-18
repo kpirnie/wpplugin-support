@@ -16,8 +16,11 @@ declare(strict_types=1);
 namespace KP\Support\Settings;
 
 use KP\Support\Plugin;
+use KP\Support\Helpers\ChatAccess;
+use KP\Support\Helpers\MailLog;
 use KP\Support\Modules\AbstractModule;
 use KP\Support\Modules\PostTypes;
+use KP\Support\Modules\Smtp;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
@@ -46,6 +49,9 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
 
             // build the page after the taxonomies are registered, we need their terms
             add_action('init', array($this, 'registerPage'), 20);
+
+            // and handle the mail log being cleared out
+            add_action('admin_post_kpts_clear_mail_log', array($this, 'clearMailLog'));
         }
 
         /**
@@ -100,6 +106,14 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
                         'sections' => array('notifications' => array(
                             'title'  => __('Email Notifications', 'kp-support'),
                             'fields' => $this->notificationFields(),
+                        )),
+                    ),
+                    'smtp'          => array(
+                        'title'    => __('SMTP', 'kp-support'),
+                        'sections' => array('smtp' => array(
+                            'title'       => __('Outgoing Mail', 'kp-support'),
+                            'description' => __('These settings only apply to the mail this plugin sends. Everything else on the site goes out however it already does. The From name and address are set on the Notifications tab and are reused here. Note that the password is included in a settings export.', 'kp-support'),
+                            'fields'      => $this->smtpFields(),
                         )),
                     ),
                     'templates'     => array(
@@ -267,7 +281,7 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
         {
 
             // how the chat polls and what files we take
-            return array(
+            $fields = array(
                 array(
                     'id'          => 'enable_chat',
                     'type'        => 'switch',
@@ -311,11 +325,57 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
                     'default'     => 'CHAT - ',
                 ),
                 array(
+                    'id'          => 'chat_presence_window',
+                    'type'        => 'number',
+                    'label'       => __('Presence Window', 'kp-support'),
+                    'description' => __('How many minutes an agent counts as online for after their last queue poll.', 'kp-support'),
+                    'default'     => 5,
+                    'min'         => 1,
+                    'max'         => 60,
+                ),
+                array(
+                    'id'          => 'chat_offline_message',
+                    'type'        => 'textarea',
+                    'label'       => __('Offline Message', 'kp-support'),
+                    'description' => __('Shown above the leave-a-message form when nobody is online.', 'kp-support'),
+                ),
+                array(
+                    'id'          => 'chat_closed_message',
+                    'type'        => 'textarea',
+                    'label'       => __('Closed Message', 'kp-support'),
+                    'description' => __('Shown above the leave-a-message form outside business hours.', 'kp-support'),
+                ),
+                array(
+                    'id'          => 'chat_hours_enable',
+                    'type'        => 'switch',
+                    'label'       => __('Enforce Business Hours', 'kp-support'),
+                    'description' => __('Hours take precedence over presence, so chat stays closed outside them even with an agent in the queue.', 'kp-support'),
+                    'default'     => false,
+                ),
+                array(
+                    'id'          => 'chat_abandon_hours',
+                    'type'        => 'number',
+                    'label'       => __('Abandon After', 'kp-support'),
+                    'description' => __('Hours of silence before a chat is closed out and archived as a ticket.', 'kp-support'),
+                    'default'     => 24,
+                    'min'         => 1,
+                    'max'         => 168,
+                ),
+                array(
+                    'id'          => 'chat_waiting_timeout',
+                    'type'        => 'number',
+                    'label'       => __('Waiting Timeout', 'kp-support'),
+                    'description' => __('Minutes a customer waits before being offered a ticket instead. Zero switches the offer off.', 'kp-support'),
+                    'default'     => 5,
+                    'min'         => 0,
+                    'max'         => 60,
+                ),
+                array(
                     'id'          => 'status_after_chat_convert',
                     'type'        => 'select',
                     'title'       => __('Status After Convert', 'kp-support'),
                     'description' => __('The status a ticket gets when an agent converts a live chat.', 'kp-support'),
-                    'options'     => $this->termOptions(PostTypes::TAX_STATUS, 'slug'),
+                    'options'     => $this->termOptions(PostTypes::TAX_STATUS),
                     'default'     => 'open',
                 ),
                 array(
@@ -323,7 +383,7 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
                     'type'        => 'select',
                     'title'       => __('Status After Close', 'kp-support'),
                     'description' => __('The status a ticket gets when either side closes the chat out.', 'kp-support'),
-                    'options'     => $this->termOptions(PostTypes::TAX_STATUS, 'slug'),
+                    'options'     => $this->termOptions(PostTypes::TAX_STATUS),
                     'default'     => 'closed',
                 ),
                 array(
@@ -391,6 +451,74 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
                     ),
                 ),
             );
+
+            // and a row of fields per day
+            foreach ($this->dayLabels() as $_day => $_label) {
+
+                // is the day open at all
+                $fields[] = array(
+                    'id'          => 'chat_hours_' . $_day . '_open',
+                    'type'        => 'switch',
+                    /* translators: %s: the day of the week. */
+                    'label'       => sprintf(__('%s Open', 'kp-support'), $_label),
+                    'conditional' => array(
+                        'field'     => 'chat_hours_enable',
+                        'value'     => true,
+                        'condition' => '==',
+                    ),
+                );
+
+                // when it opens
+                $fields[] = array(
+                    'id'          => 'chat_hours_' . $_day . '_from',
+                    'type'        => 'time',
+                    /* translators: %s: the day of the week. */
+                    'label'       => sprintf(__('%s From', 'kp-support'), $_label),
+                    'default'     => '09:00',
+                    'conditional' => array(
+                        'field'     => 'chat_hours_' . $_day . '_open',
+                        'value'     => true,
+                        'condition' => '==',
+                    ),
+                );
+
+                // and when it shuts
+                $fields[] = array(
+                    'id'          => 'chat_hours_' . $_day . '_to',
+                    'type'        => 'time',
+                    /* translators: %s: the day of the week. */
+                    'label'       => sprintf(__('%s To', 'kp-support'), $_label),
+                    'default'     => '17:00',
+                    'conditional' => array(
+                        'field'     => 'chat_hours_' . $_day . '_open',
+                        'value'     => true,
+                        'condition' => '==',
+                    ),
+                );
+            }
+
+            return $fields;
+        }
+
+        /**
+         * The days of the week, keyed the way the settings are.
+         *
+         * @since  1.0.21
+         * @access private
+         * @return array<string, string> The labels, keyed by day.
+         */
+        private function dayLabels(): array
+        {
+
+            // pull them from WordPress so they're already translated
+            $days = array();
+
+            // walk our own order
+            foreach (ChatAccess::DAYS as $_index => $_day) {
+                $days[$_day] = $GLOBALS['wp_locale']->get_weekday($_index);
+            }
+
+            return $days;
         }
 
         /**
@@ -466,7 +594,290 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
                     'description' => __('Tells an agent when a ticket lands on their plate.', 'kp-support'),
                     'default'     => true,
                 ),
+                array(
+                    'id'      => 'mail_log_heading',
+                    'type'    => 'heading',
+                    'label'   => __('Recent Email Activity', 'kp-support'),
+                    'tag'     => 'h3',
+                ),
+                array(
+                    'id'      => 'mail_log',
+                    'type'    => 'html',
+                    'content' => $this->mailLogTable(),
+                ),
             );
+        }
+
+        /**
+         * The SMTP tab's fields.
+         *
+         * @since  1.0.21
+         * @access private
+         * @return array<int, array<string, mixed>> The field definitions.
+         */
+        private function smtpFields(): array
+        {
+
+            // start with whatever we need to warn them about
+            $fields = array();
+
+            // if there's already a mailer running, say so
+            $mailer = Smtp::activeMailer();
+            if ($mailer !== '') {
+                $fields[] = array(
+                    'id'           => 'smtp_mailer_notice',
+                    'type'         => 'message',
+                    'message_type' => 'warning',
+                    'content'      => sprintf(
+                        /* translators: %s: the name of the detected mailer plugin. */
+                        esc_html__('%s is active on this site. Our SMTP settings only ever apply to this plugin\'s own mail, so leaving this off will let that plugin keep handling everything.', 'kp-support'),
+                        esc_html($mailer)
+                    ),
+                );
+            }
+
+            // the connection itself
+            $fields[] = array(
+                'id'          => 'smtp_enable',
+                'type'        => 'switch',
+                'label'       => __('Enable SMTP', 'kp-support'),
+                'description' => __('Off means our mail falls straight through to whatever WordPress already uses.', 'kp-support'),
+                'default'     => false,
+            );
+
+            $fields[] = array(
+                'id'          => 'smtp_host',
+                'type'        => 'text',
+                'label'       => __('Host', 'kp-support'),
+                'conditional' => array(
+                    'field'     => 'smtp_enable',
+                    'value'     => true,
+                    'condition' => '==',
+                ),
+            );
+
+            $fields[] = array(
+                'id'          => 'smtp_port',
+                'type'        => 'number',
+                'label'       => __('Port', 'kp-support'),
+                'default'     => 587,
+                'min'         => 1,
+                'max'         => 65535,
+                'conditional' => array(
+                    'field'     => 'smtp_enable',
+                    'value'     => true,
+                    'condition' => '==',
+                ),
+            );
+
+            $fields[] = array(
+                'id'          => 'smtp_encryption',
+                'type'        => 'select',
+                'label'       => __('Encryption', 'kp-support'),
+                'options'     => array(
+                    'none' => __('None', 'kp-support'),
+                    'ssl'  => __('SSL', 'kp-support'),
+                    'tls'  => __('TLS', 'kp-support'),
+                ),
+                'default'     => 'tls',
+                'conditional' => array(
+                    'field'     => 'smtp_enable',
+                    'value'     => true,
+                    'condition' => '==',
+                ),
+            );
+
+            $fields[] = array(
+                'id'          => 'smtp_auth',
+                'type'        => 'switch',
+                'label'       => __('Authenticate', 'kp-support'),
+                'default'     => true,
+                'conditional' => array(
+                    'field'     => 'smtp_enable',
+                    'value'     => true,
+                    'condition' => '==',
+                ),
+            );
+
+            $fields[] = array(
+                'id'          => 'smtp_username',
+                'type'        => 'text',
+                'label'       => __('Username', 'kp-support'),
+                'conditional' => array(
+                    'field'     => 'smtp_auth',
+                    'value'     => true,
+                    'condition' => '==',
+                ),
+            );
+
+            $fields[] = array(
+                'id'          => 'smtp_password',
+                'type'        => 'password',
+                'label'       => __('Password', 'kp-support'),
+                'conditional' => array(
+                    'field'     => 'smtp_auth',
+                    'value'     => true,
+                    'condition' => '==',
+                ),
+            );
+
+            // and the test button
+            $fields[] = array(
+                'id'      => 'smtp_test',
+                'type'    => 'html',
+                'content' => $this->smtpTestButton(),
+            );
+
+            return $fields;
+        }
+
+        /**
+         * Build the test email button, plus the result of the last one.
+         *
+         * @since  1.0.21
+         * @access private
+         * @return string The markup.
+         */
+        private function smtpTestButton(): string
+        {
+
+            // where it's going, so they know before they click
+            $user = wp_get_current_user();
+            $address = ($user instanceof \WP_User) ? $user->user_email : '';
+
+            // the button itself
+            $html = sprintf(
+                '<p><a href="%1$s" class="button">%2$s</a></p>',
+                esc_url(wp_nonce_url(
+                    admin_url('admin-post.php?action=kpts_smtp_test'),
+                    'kpts_smtp_test'
+                )),
+                esc_html__('Send A Test Email', 'kp-support')
+            );
+
+            // tell them where it lands
+            $html .= sprintf(
+                '<p class="description">%s</p>',
+                sprintf(
+                    /* translators: %s: the current user's email address. */
+                    esc_html__('Sends to %s. The outcome is recorded in the log on the Notifications tab.', 'kp-support'),
+                    esc_html($address)
+                )
+            );
+
+            // whatever the last one did, if we've just come back from it
+            $result = isset($_GET['kpts_test']) ? sanitize_key(wp_unslash($_GET['kpts_test'])) : '';
+
+            // the messages we're willing to show
+            $messages = array(
+                'sent'       => array('success', __('The test email was handed off without an error.', 'kp-support')),
+                'failed'     => array('error', __('The test email failed. Check the log on the Notifications tab for the reason.', 'kp-support')),
+                'no-address' => array('error', __('Your account has no valid email address to send to.', 'kp-support')),
+            );
+
+            // show it if we recognise it
+            if (isset($messages[$result])) {
+                $html .= sprintf(
+                    '<div class="notice notice-%1$s inline"><p>%2$s</p></div>',
+                    esc_attr($messages[$result][0]),
+                    esc_html($messages[$result][1])
+                );
+            }
+
+            return $html;
+        }
+
+        /**
+         * Build the mail log table out for the notifications tab.
+         *
+         * @since  1.0.21
+         * @access private
+         * @return string The table markup.
+         */
+        private function mailLogTable(): string
+        {
+
+            // what we've got recorded
+            $entries = MailLog::entries();
+
+            // nothing yet
+            if (empty($entries)) {
+                return sprintf('<p>%s</p>', esc_html__('Nothing sent yet.', 'kp-support'));
+            }
+
+            // how we label each outcome
+            $labels = array(
+                'sent'    => __('Sent', 'kp-support'),
+                'failed'  => __('Failed', 'kp-support'),
+                'skipped' => __('Skipped', 'kp-support'),
+            );
+
+            // head the table up
+            $html = '<table class="widefat striped"><thead><tr>'
+                . '<th>' . esc_html__('When', 'kp-support') . '</th>'
+                . '<th>' . esc_html__('Outcome', 'kp-support') . '</th>'
+                . '<th>' . esc_html__('To', 'kp-support') . '</th>'
+                . '<th>' . esc_html__('Subject', 'kp-support') . '</th>'
+                . '<th>' . esc_html__('Detail', 'kp-support') . '</th>'
+                . '</tr></thead><tbody>';
+
+            // and walk the entries in
+            foreach ($entries as $_entry) {
+
+                // pull the outcome out so we can label it
+                $outcome = (string) ($_entry['outcome'] ?? '');
+
+                // build the row
+                $html .= '<tr>'
+                    . '<td>' . esc_html(wp_date('Y-m-d H:i:s', (int) ($_entry['time'] ?? 0))) . '</td>'
+                    . '<td>' . esc_html($labels[$outcome] ?? $outcome) . '</td>'
+                    . '<td>' . esc_html((string) ($_entry['recipient'] ?? '')) . '</td>'
+                    . '<td>' . esc_html((string) ($_entry['subject'] ?? '')) . '</td>'
+                    . '<td>' . esc_html((string) ($_entry['error'] ?? '')) . '</td>'
+                    . '</tr>';
+            }
+
+            // close it out and hang the clear button off the bottom
+            $html .= '</tbody></table>';
+            $html .= sprintf(
+                '<p><a href="%1$s" class="button">%2$s</a></p>',
+                esc_url(wp_nonce_url(
+                    admin_url('admin-post.php?action=kpts_clear_mail_log'),
+                    'kpts_clear_mail_log'
+                )),
+                esc_html__('Clear Log', 'kp-support')
+            );
+
+            return $html;
+        }
+
+        /**
+         * Empty the mail log out and drop them back on the settings screen.
+         *
+         * @since  1.0.21
+         * @access public
+         * @return void
+         */
+        public function clearMailLog(): void
+        {
+
+            // they have to be allowed to be in here
+            if (! current_user_can('kpts_manage_settings')) {
+                wp_die(esc_html__('You are not allowed to do that.', 'kp-support'));
+            }
+
+            // and it has to have come from our button
+            check_admin_referer('kpts_clear_mail_log');
+
+            // wipe it
+            MailLog::clear();
+
+            // back to where they were
+            wp_safe_redirect(admin_url(
+                'edit.php?post_type=' . PostTypes::POST_TYPE
+                    . '&page=kp-support-settings&tab=notifications'
+            ));
+            exit;
         }
 
         /**

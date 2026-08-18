@@ -4,7 +4,7 @@ Tags: support, helpdesk, ticket system, live chat, customer service
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.20
+Stable tag: 1.0.39
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -120,6 +120,27 @@ Every variable a template is handed is prefixed with `kpts_`, and each file docu
 The class names in the markup and the CSS custom properties on the `.kpts-portal` wrapper are the supported styling surface. Keep the `kpts-` classes on the elements the scripts bind to - the reply form, the file input, the internal note toggle and the management selects - or the chat stops working.
 
 == Changelog ==
+
+= 1.0.39 =
+* Added: updates now come through the normal WordPress update flow, pulled from GitHub releases
+* Added: agent presence tracking, so chat only offers itself when somebody actually has the queue open
+* Added: business hours per day, which take precedence over agent presence
+* Added: a leave-a-message form when nobody is available or the desk is closed, opening a ticket directly
+* Added: a daily sweep that closes out abandoned chats and archives them as tickets
+* Added: an offer to turn a chat into a ticket when nobody picks it up in time
+* Added: SMTP settings, scoped to this plugin's own mail so an existing mailer plugin is left alone
+* Added: a test email button, and detection of a known mailer plugin already running
+* Added: a log of the last 25 emails and their outcome, on the Notifications tab
+* Added: an opening message field on the ticket create screen
+* Changed: Live Chat is now its own top level menu, sitting above Support
+* Changed: priority and status moved into the Ticket Details metabox as single selects
+* Changed: the Publish metabox is now Status, with Visibility removed
+* Changed: taxonomy terms can only be added, edited or deleted by an administrator
+* Changed: the chat launcher swaps to a close icon while the panel is open
+* Fixed: failed and skipped emails are now recorded instead of failing silently
+* Fixed: the Author metabox no longer shows on the ticket screen
+* Fixed: a duplicate Ticket Assignment setting on the Notifications tab
+* Fixed: an extra argument passed to the term options helper on the Chat settings tab
 
 = 1.0.20 =
 * Added live chat: a corner docked panel on the front end and a Live Chat queue under the Support menu for agents

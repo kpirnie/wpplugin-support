@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: KP Support 1.0.23\n"
+"Project-Id-Version: KP Support 1.0.39\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/kp-support\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-18T14:59:30+00:00\n"
+"POT-Creation-Date: 2026-08-18T20:29:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: kp-support\n"
@@ -47,7 +47,7 @@ msgid "Chat with %1$s, %2$s"
 msgstr ""
 
 #: src/Helpers/Chat.php:504
-#: src/Modules/ChatAjax.php:271
+#: src/Modules/ChatAjax.php:358
 msgid "This chat is no longer open."
 msgstr ""
 
@@ -56,14 +56,14 @@ msgid "You must be logged in to send a message."
 msgstr ""
 
 #: src/Helpers/Chat.php:518
-#: src/Modules/ChatAdmin.php:153
-#: src/Modules/ChatWidget.php:127
+#: src/Modules/ChatAdmin.php:180
+#: src/Modules/ChatWidget.php:128
 msgid "Please enter a message."
 msgstr ""
 
 #: src/Helpers/Chat.php:539
-#: src/Modules/ChatAdmin.php:152
-#: src/Modules/ChatWidget.php:126
+#: src/Modules/ChatAdmin.php:179
+#: src/Modules/ChatWidget.php:127
 msgid "Your message could not be sent. Please try again."
 msgstr ""
 
@@ -85,7 +85,7 @@ msgid "Chat"
 msgstr ""
 
 #: src/Helpers/ChatConvert.php:309
-#: src/Modules/ChatAjax.php:723
+#: src/Modules/ChatAjax.php:813
 #: templates/ticket.php:127
 #: templates/ticket.php:178
 msgid "Unknown"
@@ -168,37 +168,43 @@ msgstr ""
 msgid "Your ticket has been opened."
 msgstr ""
 
-#: src/Modules/Admin.php:86
-#: src/Modules/Admin.php:461
+#: src/Modules/Admin.php:89
+#: src/Modules/Admin.php:539
 msgid "Ticket"
 msgstr ""
 
-#: src/Modules/Admin.php:87
-#: src/Settings/Settings.php:518
+#: src/Modules/Admin.php:90
+#: src/Settings/Settings.php:820
+#: src/Settings/Settings.php:929
+#: templates/chat-panel.php:131
+#: templates/chat-panel.php:137
 #: templates/new-ticket.php:51
 msgid "Subject"
 msgstr ""
 
-#: src/Modules/Admin.php:88
-#: src/Modules/Admin.php:465
+#: src/Modules/Admin.php:91
+#: src/Modules/Admin.php:547
 #: templates/ticket.php:177
 msgid "Requester"
 msgstr ""
 
-#: src/Modules/Admin.php:89
-#: src/Modules/PostTypes.php:257
+#: src/Modules/Admin.php:92
+#: src/Modules/Admin.php:385
+#: src/Modules/Admin.php:542
+#: src/Modules/PostTypes.php:258
 #: templates/ticket.php:196
 msgid "Status"
 msgstr ""
 
-#: src/Modules/Admin.php:90
+#: src/Modules/Admin.php:93
+#: src/Modules/Admin.php:543
 #: src/Modules/PostTypes.php:241
 #: templates/new-ticket.php:94
 #: templates/ticket.php:208
 msgid "Priority"
 msgstr ""
 
-#: src/Modules/Admin.php:91
+#: src/Modules/Admin.php:94
 #: src/Modules/PostTypes.php:209
 #: templates/new-ticket.php:61
 #: templates/ticket.php:180
@@ -206,138 +212,151 @@ msgstr ""
 msgid "Department"
 msgstr ""
 
-#: src/Modules/Admin.php:92
-#: src/Modules/Admin.php:474
+#: src/Modules/Admin.php:95
+#: src/Modules/Admin.php:556
 #: templates/ticket.php:234
 msgid "Assigned To"
 msgstr ""
 
-#: src/Modules/Admin.php:93
+#: src/Modules/Admin.php:96
 msgid "Replies"
 msgstr ""
 
-#: src/Modules/Admin.php:94
+#: src/Modules/Admin.php:97
 msgid "Last Activity"
 msgstr ""
 
-#: src/Modules/Admin.php:146
-#: src/Modules/Admin.php:476
+#: src/Modules/Admin.php:149
+#: src/Modules/Admin.php:558
 #: templates/chat-admin.php:69
 #: templates/list.php:180
 #: templates/ticket.php:236
 msgid "Unassigned"
 msgstr ""
 
-#: src/Modules/Admin.php:158
+#: src/Modules/Admin.php:161
 msgid "ago"
 msgstr ""
 
-#: src/Modules/Admin.php:233
+#: src/Modules/Admin.php:236
 #: templates/list.php:86
 msgid "All statuses"
 msgstr ""
 
-#: src/Modules/Admin.php:234
+#: src/Modules/Admin.php:237
 msgid "All priorities"
 msgstr ""
 
-#: src/Modules/Admin.php:235
+#: src/Modules/Admin.php:238
 #: templates/list.php:97
 msgid "All departments"
 msgstr ""
 
-#: src/Modules/Admin.php:334
+#: src/Modules/Admin.php:337
 #: templates/chat-admin.php:96
 msgid "Conversation"
 msgstr ""
 
-#: src/Modules/Admin.php:344
+#: src/Modules/Admin.php:347
 msgid "Ticket Details"
 msgstr ""
 
-#: src/Modules/Admin.php:413
-msgid "Save the ticket first to start the conversation."
+#: src/Modules/Admin.php:437
+msgid "Opening Message"
 msgstr ""
 
-#: src/Modules/Admin.php:419
+#: src/Modules/Admin.php:448
+msgid "This becomes the first post in the conversation."
+msgstr ""
+
+#: src/Modules/Admin.php:456
 msgid "You are not allowed to view this conversation."
 msgstr ""
 
-#: src/Modules/Admin.php:503
+#: src/Modules/Admin.php:585
 msgid "Open in Portal"
 msgstr ""
 
-#: src/Modules/Admin.php:507
+#: src/Modules/Admin.php:589
 msgid "Participants"
 msgstr ""
 
-#: src/Modules/Admin.php:645
-#: src/Modules/ChatAdmin.php:151
-#: src/Modules/ChatWidget.php:125
+#: src/Modules/Admin.php:641
+#: src/Modules/Admin.php:657
+#: src/Settings/Settings.php:678
+#: templates/ticket.php:181
+#: templates/ticket.php:184
+#: templates/ticket.php:222
+msgid "None"
+msgstr ""
+
+#: src/Modules/Admin.php:824
+#: src/Modules/ChatAdmin.php:178
+#: src/Modules/ChatWidget.php:126
 #: src/Modules/Portal.php:232
 msgid "Sending..."
 msgstr ""
 
-#: src/Modules/Admin.php:646
+#: src/Modules/Admin.php:825
 #: src/Modules/Portal.php:233
 msgid "Your reply could not be sent. Please try again."
 msgstr ""
 
-#: src/Modules/Admin.php:647
+#: src/Modules/Admin.php:826
 #: src/Modules/Portal.php:234
 #: src/Modules/Replies.php:216
 msgid "Please enter a reply."
 msgstr ""
 
-#: src/Modules/Admin.php:648
-#: src/Modules/ChatAdmin.php:166
-#: src/Modules/ChatWidget.php:137
+#: src/Modules/Admin.php:827
+#: src/Modules/ChatAdmin.php:193
+#: src/Modules/ChatWidget.php:138
 #: src/Modules/Portal.php:235
 msgid "Too many files attached."
 msgstr ""
 
-#: src/Modules/Admin.php:649
-#: src/Modules/ChatAdmin.php:167
-#: src/Modules/ChatWidget.php:138
+#: src/Modules/Admin.php:828
+#: src/Modules/ChatAdmin.php:194
+#: src/Modules/ChatWidget.php:139
 #: src/Modules/Portal.php:236
 msgid "One of those files is too large."
 msgstr ""
 
-#: src/Modules/Admin.php:650
+#: src/Modules/Admin.php:829
 #: src/Modules/Portal.php:237
 msgid "Are you sure you want to close this ticket?"
 msgstr ""
 
-#: src/Modules/Admin.php:651
+#: src/Modules/Admin.php:830
 #: src/Modules/Portal.php:238
 #: templates/chat-admin.php:54
 msgid "Loading..."
 msgstr ""
 
 #. translators: %s: the name of the person being replied to
-#: src/Modules/Admin.php:653
+#: src/Modules/Admin.php:832
 #: src/Modules/Portal.php:240
 #, php-format
 msgid "Replying to %s"
 msgstr ""
 
-#: src/Modules/Admin.php:654
+#: src/Modules/Admin.php:833
 #: src/Modules/Portal.php:241
 #: templates/thread.php:119
 msgid "Cancel"
 msgstr ""
 
 #: src/Modules/Ajax.php:76
-#: src/Modules/ChatAdmin.php:155
-#: src/Modules/ChatAjax.php:106
-#: src/Modules/ChatAjax.php:133
-#: src/Modules/ChatWidget.php:132
+#: src/Modules/ChatAdmin.php:182
+#: src/Modules/ChatAjax.php:107
+#: src/Modules/ChatAjax.php:134
+#: src/Modules/ChatWidget.php:133
 msgid "Your session expired. Please reload the page."
 msgstr ""
 
 #: src/Modules/Ajax.php:84
-#: src/Modules/ChatAjax.php:114
-#: src/Modules/ChatAjax.php:141
+#: src/Modules/ChatAjax.php:115
+#: src/Modules/ChatAjax.php:142
 #: src/Modules/Portal.php:572
 msgid "Please log in to continue."
 msgstr ""
@@ -427,132 +446,168 @@ msgstr ""
 msgid "You are not allowed to access that file."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:81
-#: src/Modules/ChatAdmin.php:82
+#: src/Modules/ChatAdmin.php:87
+#: src/Modules/ChatAdmin.php:88
 #: templates/chat-admin.php:35
 msgid "Live Chat"
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:154
-#: src/Modules/ChatAjax.php:529
-#: src/Modules/ChatWidget.php:131
+#: src/Modules/ChatAdmin.php:181
+#: src/Modules/ChatAjax.php:619
+#: src/Modules/ChatWidget.php:132
 msgid "This chat has been closed."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:156
+#: src/Modules/ChatAdmin.php:183
 msgid "Nobody has picked this chat up yet."
 msgstr ""
 
 #. translators: %s: the agent's display name
-#: src/Modules/ChatAdmin.php:158
+#: src/Modules/ChatAdmin.php:185
 #, php-format
 msgid "Handled by %s"
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:159
+#: src/Modules/ChatAdmin.php:186
 msgid "No chats waiting."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:160
+#: src/Modules/ChatAdmin.php:187
 #: templates/chat-admin.php:101
 msgid "Pick a chat from the queue to get started."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:161
+#: src/Modules/ChatAdmin.php:188
 msgid "Close this chat out? It will be archived as a closed ticket."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:162
+#: src/Modules/ChatAdmin.php:189
 msgid "Convert this chat into an open ticket? The chat will end."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:163
-#: src/Modules/ChatAjax.php:415
+#: src/Modules/ChatAdmin.php:190
+#: src/Modules/ChatAjax.php:505
 msgid "Chat assigned."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:164
-#: src/Modules/ChatAjax.php:407
+#: src/Modules/ChatAdmin.php:191
+#: src/Modules/ChatAjax.php:497
 msgid "That chat could not be assigned."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:165
+#: src/Modules/ChatAdmin.php:192
 msgid "Converting..."
 msgstr ""
 
-#: src/Modules/ChatAdmin.php:184
-#: src/Modules/ChatAjax.php:149
+#: src/Modules/ChatAdmin.php:211
+#: src/Modules/ChatAjax.php:150
 msgid "You are not allowed to work chats."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:171
+#: src/Modules/ChatAjax.php:172
 msgid "You are not allowed to access that chat."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:207
+#: src/Modules/ChatAjax.php:208
 msgid "You are sending messages too quickly. Please wait a moment."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:232
+#: src/Modules/ChatAjax.php:233
 msgid "You are not allowed to start a chat."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:396
+#: src/Modules/ChatAjax.php:241
+#: src/Modules/ChatAjax.php:249
+msgid "There is nobody available to chat right now."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:285
+#: src/Modules/Smtp.php:146
+#: src/Settings/Settings.php:866
+msgid "You are not allowed to do that."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:297
+msgid "Please fill in both a subject and a message."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:334
+msgid "Thanks, your message has been logged as a ticket."
+msgstr ""
+
+#: src/Modules/ChatAjax.php:486
 msgid "You are not allowed to assign this chat."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:442
+#: src/Modules/ChatAjax.php:532
 msgid "Please reload the chat and try again."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:450
+#: src/Modules/ChatAjax.php:540
 msgid "You are not allowed to convert this chat."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:500
+#: src/Modules/ChatAjax.php:590
 msgid "You are not allowed to close this chat."
 msgstr ""
 
-#: src/Modules/ChatAjax.php:752
+#: src/Modules/ChatAjax.php:842
 msgid "Sent an attachment"
 msgstr ""
 
-#: src/Modules/ChatWidget.php:128
+#: src/Modules/ChatWidget.php:129
 msgid "Starting chat..."
 msgstr ""
 
-#: src/Modules/ChatWidget.php:129
+#: src/Modules/ChatWidget.php:130
 msgid "The chat could not be started. Please try again."
 msgstr ""
 
-#: src/Modules/ChatWidget.php:130
+#: src/Modules/ChatWidget.php:131
 msgid "End this chat? A copy will be saved to your tickets."
 msgstr ""
 
-#: src/Modules/ChatWidget.php:133
+#: src/Modules/ChatWidget.php:134
 msgid "Waiting for an agent..."
 msgstr ""
 
 #. translators: %s: the agent's display name
-#: src/Modules/ChatWidget.php:135
+#: src/Modules/ChatWidget.php:136
 #, php-format
 msgid "%s has joined the chat."
 msgstr ""
 
-#: src/Modules/ChatWidget.php:136
+#: src/Modules/ChatWidget.php:137
 msgid "View the saved ticket"
 msgstr ""
 
-#: src/Modules/ChatWidget.php:171
-#: src/Settings/Settings.php:296
+#: src/Modules/ChatWidget.php:140
+msgid "Nobody has picked this up yet. Would you like to turn it into a ticket instead?"
+msgstr ""
+
+#: src/Modules/ChatWidget.php:141
+msgid "Turn into a ticket"
+msgstr ""
+
+#: src/Modules/ChatWidget.php:175
+#: src/Plugin.php:452
+msgid "Nobody is available right now. Leave us a message and we will get back to you."
+msgstr ""
+
+#: src/Modules/ChatWidget.php:176
+msgid "We are closed right now. Leave us a message and we will get back to you."
+msgstr ""
+
+#: src/Modules/ChatWidget.php:182
+#: src/Settings/Settings.php:310
 msgid "Need help?"
 msgstr ""
 
-#: src/Modules/Notifications.php:95
+#: src/Modules/Notifications.php:100
 msgid "[{ticket_number}] We received your ticket: {ticket_subject}"
 msgstr ""
 
-#: src/Modules/Notifications.php:99
+#: src/Modules/Notifications.php:104
 msgid ""
 "Hi {customer_name},\n"
 "\n"
@@ -568,11 +623,11 @@ msgid ""
 "- {site_name}"
 msgstr ""
 
-#: src/Modules/Notifications.php:121
+#: src/Modules/Notifications.php:126
 msgid "[{ticket_number}] New ticket: {ticket_subject}"
 msgstr ""
 
-#: src/Modules/Notifications.php:125
+#: src/Modules/Notifications.php:130
 msgid ""
 "A new ticket has been opened by {customer_name}.\n"
 "\n"
@@ -586,15 +641,15 @@ msgid ""
 "{ticket_url}"
 msgstr ""
 
-#: src/Modules/Notifications.php:178
+#: src/Modules/Notifications.php:183
 msgid "A customer"
 msgstr ""
 
-#: src/Modules/Notifications.php:190
+#: src/Modules/Notifications.php:195
 msgid "New chat waiting from {customer_name}"
 msgstr ""
 
-#: src/Modules/Notifications.php:194
+#: src/Modules/Notifications.php:199
 msgid ""
 "{customer_name} has started a live chat and is waiting for somebody to pick it up.\n"
 "\n"
@@ -604,11 +659,11 @@ msgid ""
 "- {site_name}"
 msgstr ""
 
-#: src/Modules/Notifications.php:249
+#: src/Modules/Notifications.php:254
 msgid "[{ticket_number}] Internal note from {reply_author}"
 msgstr ""
 
-#: src/Modules/Notifications.php:253
+#: src/Modules/Notifications.php:258
 msgid ""
 "<strong>This is an internal note. The customer cannot see it.</strong>\n"
 "\n"
@@ -620,11 +675,11 @@ msgid ""
 "{ticket_url}"
 msgstr ""
 
-#: src/Modules/Notifications.php:265
+#: src/Modules/Notifications.php:270
 msgid "[{ticket_number}] New reply: {ticket_subject}"
 msgstr ""
 
-#: src/Modules/Notifications.php:269
+#: src/Modules/Notifications.php:274
 msgid ""
 "{reply_author} replied to {ticket_subject}:\n"
 "\n"
@@ -636,11 +691,11 @@ msgid ""
 "- {site_name}"
 msgstr ""
 
-#: src/Modules/Notifications.php:343
+#: src/Modules/Notifications.php:348
 msgid "[{ticket_number}] Status updated: {status}"
 msgstr ""
 
-#: src/Modules/Notifications.php:347
+#: src/Modules/Notifications.php:352
 msgid ""
 "Hi {customer_name},\n"
 "\n"
@@ -652,11 +707,11 @@ msgid ""
 "- {site_name}"
 msgstr ""
 
-#: src/Modules/Notifications.php:384
+#: src/Modules/Notifications.php:389
 msgid "[{ticket_number}] Assigned to you: {ticket_subject}"
 msgstr ""
 
-#: src/Modules/Notifications.php:388
+#: src/Modules/Notifications.php:393
 msgid ""
 "A ticket has been assigned to you.\n"
 "\n"
@@ -669,8 +724,12 @@ msgid ""
 "{ticket_url}"
 msgstr ""
 
-#: src/Modules/Notifications.php:463
+#: src/Modules/Notifications.php:468
 msgid "there"
+msgstr ""
+
+#: src/Modules/Notifications.php:536
+msgid "No recipients left after exclusions."
 msgstr ""
 
 #: src/Modules/Portal.php:167
@@ -723,7 +782,7 @@ msgid "Add New Ticket"
 msgstr ""
 
 #: src/Modules/PostTypes.php:122
-#: src/Settings/Settings.php:423
+#: src/Settings/Settings.php:551
 msgid "New Ticket"
 msgstr ""
 
@@ -812,127 +871,127 @@ msgstr ""
 msgid "Priorities"
 msgstr ""
 
-#: src/Modules/PostTypes.php:256
+#: src/Modules/PostTypes.php:257
 msgid "Statuses"
 msgstr ""
 
 #. translators: %s: plural taxonomy label
-#: src/Modules/PostTypes.php:288
+#: src/Modules/PostTypes.php:290
 #, php-format
 msgid "Search %s"
 msgstr ""
 
 #. translators: %s: plural taxonomy label
-#: src/Modules/PostTypes.php:293
+#: src/Modules/PostTypes.php:295
 #, php-format
 msgid "All %s"
 msgstr ""
 
 #. translators: %s: singular taxonomy label
-#: src/Modules/PostTypes.php:298
+#: src/Modules/PostTypes.php:300
 #, php-format
 msgid "Edit %s"
 msgstr ""
 
 #. translators: %s: singular taxonomy label
-#: src/Modules/PostTypes.php:303
+#: src/Modules/PostTypes.php:305
 #, php-format
 msgid "Update %s"
 msgstr ""
 
 #. translators: %s: singular taxonomy label
-#: src/Modules/PostTypes.php:308
+#: src/Modules/PostTypes.php:310
 #, php-format
 msgid "Add New %s"
 msgstr ""
 
 #. translators: %s: singular taxonomy label
-#: src/Modules/PostTypes.php:313
+#: src/Modules/PostTypes.php:315
 #, php-format
 msgid "New %s Name"
 msgstr ""
 
 #. translators: %s: plural taxonomy label
-#: src/Modules/PostTypes.php:319
+#: src/Modules/PostTypes.php:321
 #, php-format
 msgid "No %s found."
 msgstr ""
 
 #. translators: %s: plural taxonomy label
-#: src/Modules/PostTypes.php:324
+#: src/Modules/PostTypes.php:326
 #, php-format
 msgid "Back to %s"
 msgstr ""
 
-#: src/Modules/PostTypes.php:345
+#: src/Modules/PostTypes.php:347
 msgid "General Support"
 msgstr ""
 
-#: src/Modules/PostTypes.php:346
+#: src/Modules/PostTypes.php:348
 msgid "Billing"
 msgstr ""
 
-#: src/Modules/PostTypes.php:347
+#: src/Modules/PostTypes.php:349
 msgid "Technical"
 msgstr ""
 
-#: src/Modules/PostTypes.php:348
+#: src/Modules/PostTypes.php:350
 msgid "Sales"
 msgstr ""
 
-#: src/Modules/PostTypes.php:358
+#: src/Modules/PostTypes.php:360
 msgid "Question"
 msgstr ""
 
-#: src/Modules/PostTypes.php:359
+#: src/Modules/PostTypes.php:361
 msgid "Bug Report"
 msgstr ""
 
-#: src/Modules/PostTypes.php:360
+#: src/Modules/PostTypes.php:362
 msgid "Feature Request"
 msgstr ""
 
-#: src/Modules/PostTypes.php:361
+#: src/Modules/PostTypes.php:363
 msgid "Other"
 msgstr ""
 
-#: src/Modules/PostTypes.php:371
+#: src/Modules/PostTypes.php:373
 msgid "Low"
 msgstr ""
 
-#: src/Modules/PostTypes.php:372
+#: src/Modules/PostTypes.php:374
 msgid "Normal"
 msgstr ""
 
-#: src/Modules/PostTypes.php:373
+#: src/Modules/PostTypes.php:375
 msgid "High"
 msgstr ""
 
-#: src/Modules/PostTypes.php:374
+#: src/Modules/PostTypes.php:376
 msgid "Urgent"
 msgstr ""
 
-#: src/Modules/PostTypes.php:392
+#: src/Modules/PostTypes.php:394
 msgid "New"
 msgstr ""
 
-#: src/Modules/PostTypes.php:393
+#: src/Modules/PostTypes.php:395
 msgid "Open"
 msgstr ""
 
-#: src/Modules/PostTypes.php:394
+#: src/Modules/PostTypes.php:396
 msgid "Pending Customer"
 msgstr ""
 
-#: src/Modules/PostTypes.php:395
+#: src/Modules/PostTypes.php:397
 msgid "On Hold"
 msgstr ""
 
-#: src/Modules/PostTypes.php:396
+#: src/Modules/PostTypes.php:398
 msgid "Resolved"
 msgstr ""
 
-#: src/Modules/PostTypes.php:397
+#: src/Modules/PostTypes.php:399
 msgid "Closed"
 msgstr ""
 
@@ -976,6 +1035,14 @@ msgstr ""
 msgid "Appended to the bottom of this agent's public replies."
 msgstr ""
 
+#: src/Modules/Smtp.php:166
+msgid "KP Support test email"
+msgstr ""
+
+#: src/Modules/Smtp.php:167
+msgid "If you are reading this, mail is getting out."
+msgstr ""
+
 #: src/Modules/TermFields.php:88
 #: src/Modules/TermFields.php:140
 #: src/Modules/TermFields.php:230
@@ -1006,6 +1073,14 @@ msgstr ""
 msgid "Closed State"
 msgstr ""
 
+#: src/Modules/Updater.php:248
+msgid "See the GitHub releases for the full notes."
+msgstr ""
+
+#: src/Modules/Updater.php:339
+msgid "Could not rename the plugin folder during the update."
+msgstr ""
+
 #: src/Plugin.php:178
 msgid "KP Support cannot be network activated. Please activate it on each individual site instead."
 msgstr ""
@@ -1014,393 +1089,585 @@ msgstr ""
 msgid "Network Activation Not Supported"
 msgstr ""
 
-#: src/Plugin.php:342
+#: src/Plugin.php:349
 msgid "KP Support:"
 msgstr ""
 
-#: src/Plugin.php:343
+#: src/Plugin.php:350
 msgid "the KPT WP Field Framework could not be found. Install the plugin dependencies with:"
 msgstr ""
 
-#: src/Settings/Settings.php:69
+#: src/Plugin.php:457
+msgid "We are closed right now. Leave us a message and we will get back to you as soon as we are available."
+msgstr ""
+
+#: src/Settings/Settings.php:75
 msgid "Support Settings"
 msgstr ""
 
-#: src/Settings/Settings.php:70
+#: src/Settings/Settings.php:76
 msgid "Settings"
 msgstr ""
 
-#: src/Settings/Settings.php:78
+#: src/Settings/Settings.php:84
 msgid "General"
 msgstr ""
 
-#: src/Settings/Settings.php:80
+#: src/Settings/Settings.php:86
 msgid "Portal"
 msgstr ""
 
-#: src/Settings/Settings.php:85
+#: src/Settings/Settings.php:91
 msgid "Tickets"
 msgstr ""
 
-#: src/Settings/Settings.php:87
+#: src/Settings/Settings.php:93
 msgid "Ticket Handling"
 msgstr ""
 
-#: src/Settings/Settings.php:92
+#: src/Settings/Settings.php:98
 msgid "Chat &amp; Files"
 msgstr ""
 
-#: src/Settings/Settings.php:94
+#: src/Settings/Settings.php:100
 msgid "Chat and Attachments"
 msgstr ""
 
-#: src/Settings/Settings.php:99
+#: src/Settings/Settings.php:105
 msgid "Notifications"
 msgstr ""
 
-#: src/Settings/Settings.php:101
+#: src/Settings/Settings.php:107
 msgid "Email Notifications"
 msgstr ""
 
-#: src/Settings/Settings.php:106
-#: src/Settings/Settings.php:108
-msgid "Email Templates"
-msgstr ""
-
-#: src/Settings/Settings.php:109
-msgid "Leave any of these empty to use the built in default."
+#: src/Settings/Settings.php:112
+msgid "SMTP"
 msgstr ""
 
 #: src/Settings/Settings.php:114
+msgid "Outgoing Mail"
+msgstr ""
+
+#: src/Settings/Settings.php:115
+msgid "These settings only apply to the mail this plugin sends. Everything else on the site goes out however it already does. The From name and address are set on the Notifications tab and are reused here. Note that the password is included in a settings export."
+msgstr ""
+
+#: src/Settings/Settings.php:120
+#: src/Settings/Settings.php:122
+msgid "Email Templates"
+msgstr ""
+
+#: src/Settings/Settings.php:123
+msgid "Leave any of these empty to use the built in default."
+msgstr ""
+
+#: src/Settings/Settings.php:128
 msgid "Accounts"
 msgstr ""
 
-#: src/Settings/Settings.php:116
+#: src/Settings/Settings.php:130
 msgid "Registration and Login"
 msgstr ""
 
-#: src/Settings/Settings.php:139
+#: src/Settings/Settings.php:153
 msgid "Portal Page"
 msgstr ""
 
-#: src/Settings/Settings.php:140
+#: src/Settings/Settings.php:154
 msgid "The page containing the [kp_support] shortcode. Ticket links in emails point here."
 msgstr ""
 
-#: src/Settings/Settings.php:145
+#: src/Settings/Settings.php:159
 msgid "Ticket Number Prefix"
 msgstr ""
 
-#: src/Settings/Settings.php:146
+#: src/Settings/Settings.php:160
 msgid "Shown in front of every ticket number."
 msgstr ""
 
-#: src/Settings/Settings.php:152
+#: src/Settings/Settings.php:166
 msgid "Tickets Per Page"
 msgstr ""
 
-#: src/Settings/Settings.php:153
+#: src/Settings/Settings.php:167
 msgid "How many tickets to show in the portal list at a time."
 msgstr ""
 
-#: src/Settings/Settings.php:161
+#: src/Settings/Settings.php:175
 msgid "Keep Customers Out Of The Dashboard"
 msgstr ""
 
-#: src/Settings/Settings.php:162
+#: src/Settings/Settings.php:176
 msgid "Redirects anybody who cannot work tickets away from wp-admin and hides the admin bar for them."
 msgstr ""
 
-#: src/Settings/Settings.php:168
+#: src/Settings/Settings.php:182
 msgid "Keep Data When The Plugin Is Deleted"
 msgstr ""
 
-#: src/Settings/Settings.php:169
+#: src/Settings/Settings.php:183
 msgid "Leave this on and deleting the plugin will not remove your tickets, replies, attachments or settings."
 msgstr ""
 
-#: src/Settings/Settings.php:193
+#: src/Settings/Settings.php:207
 msgid "Require A Department"
 msgstr ""
 
-#: src/Settings/Settings.php:194
+#: src/Settings/Settings.php:208
 msgid "Customers must pick a department when opening a ticket."
 msgstr ""
 
-#: src/Settings/Settings.php:200
+#: src/Settings/Settings.php:214
 msgid "Require A Category"
 msgstr ""
 
-#: src/Settings/Settings.php:201
+#: src/Settings/Settings.php:215
 msgid "Customers must pick a category when opening a ticket."
 msgstr ""
 
-#: src/Settings/Settings.php:207
+#: src/Settings/Settings.php:221
 msgid "Allow Reopening Closed Tickets"
 msgstr ""
 
-#: src/Settings/Settings.php:208
+#: src/Settings/Settings.php:222
 msgid "Lets customers reply to a closed ticket, which reopens it."
 msgstr ""
 
-#: src/Settings/Settings.php:214
+#: src/Settings/Settings.php:228
 msgid "Auto Assign New Tickets"
 msgstr ""
 
-#: src/Settings/Settings.php:215
+#: src/Settings/Settings.php:229
 msgid "Hands each new ticket to whichever eligible agent has the fewest open tickets."
 msgstr ""
 
-#: src/Settings/Settings.php:221
+#: src/Settings/Settings.php:235
 msgid "Restrict Agents By Department"
 msgstr ""
 
-#: src/Settings/Settings.php:222
+#: src/Settings/Settings.php:236
 msgid "Agents only see tickets in the departments set on their profile. Agents with no departments set still see everything."
 msgstr ""
 
-#: src/Settings/Settings.php:228
+#: src/Settings/Settings.php:242
 msgid "Move Status Automatically"
 msgstr ""
 
-#: src/Settings/Settings.php:229
+#: src/Settings/Settings.php:243
 msgid "Changes the ticket status when somebody replies."
 msgstr ""
 
-#: src/Settings/Settings.php:235
+#: src/Settings/Settings.php:249
 msgid "Status After An Agent Replies"
 msgstr ""
 
-#: src/Settings/Settings.php:247
+#: src/Settings/Settings.php:261
 msgid "Status After A Customer Replies"
 msgstr ""
 
-#: src/Settings/Settings.php:274
+#: src/Settings/Settings.php:288
 msgid "Enable Live Chat"
 msgstr ""
 
-#: src/Settings/Settings.php:275
+#: src/Settings/Settings.php:289
 msgid "Show the chat launcher to logged in customers."
 msgstr ""
 
-#: src/Settings/Settings.php:281
+#: src/Settings/Settings.php:295
 msgid "Launcher Position"
 msgstr ""
 
-#: src/Settings/Settings.php:282
+#: src/Settings/Settings.php:296
 msgid "Which corner the chat launcher sits in."
 msgstr ""
 
-#: src/Settings/Settings.php:284
+#: src/Settings/Settings.php:298
 msgid "Bottom Right"
 msgstr ""
 
-#: src/Settings/Settings.php:285
+#: src/Settings/Settings.php:299
 msgid "Bottom Left"
 msgstr ""
 
-#: src/Settings/Settings.php:286
+#: src/Settings/Settings.php:300
 msgid "Top Right"
 msgstr ""
 
-#: src/Settings/Settings.php:287
+#: src/Settings/Settings.php:301
 msgid "Top Left"
 msgstr ""
 
-#: src/Settings/Settings.php:294
+#: src/Settings/Settings.php:308
 msgid "Launcher Label"
 msgstr ""
 
-#: src/Settings/Settings.php:295
+#: src/Settings/Settings.php:309
 msgid "The text shown on the chat launcher."
 msgstr ""
 
-#: src/Settings/Settings.php:301
+#: src/Settings/Settings.php:315
 msgid "Chat Department"
 msgstr ""
 
-#: src/Settings/Settings.php:302
+#: src/Settings/Settings.php:316
 msgid "The department chats are routed to, and the one converted tickets land in."
 msgstr ""
 
-#: src/Settings/Settings.php:309
+#: src/Settings/Settings.php:323
 msgid "Converted Ticket Prefix"
 msgstr ""
 
-#: src/Settings/Settings.php:310
+#: src/Settings/Settings.php:324
 msgid "Prefixed to the subject of every ticket built from a chat."
 msgstr ""
 
-#: src/Settings/Settings.php:316
-msgid "Status After Convert"
+#: src/Settings/Settings.php:330
+msgid "Presence Window"
 msgstr ""
 
-#: src/Settings/Settings.php:317
-msgid "The status a ticket gets when an agent converts a live chat."
+#: src/Settings/Settings.php:331
+msgid "How many minutes an agent counts as online for after their last queue poll."
 msgstr ""
 
-#: src/Settings/Settings.php:324
-msgid "Status After Close"
+#: src/Settings/Settings.php:339
+msgid "Offline Message"
 msgstr ""
 
-#: src/Settings/Settings.php:325
-msgid "The status a ticket gets when either side closes the chat out."
+#: src/Settings/Settings.php:340
+msgid "Shown above the leave-a-message form when nobody is online."
 msgstr ""
 
-#: src/Settings/Settings.php:332
-msgid "Messages Per Minute"
+#: src/Settings/Settings.php:345
+msgid "Closed Message"
 msgstr ""
 
-#: src/Settings/Settings.php:333
-msgid "How many messages one person can send in a minute before being throttled."
-msgstr ""
-
-#: src/Settings/Settings.php:341
-msgid "Check For New Replies Every"
-msgstr ""
-
-#: src/Settings/Settings.php:342
-msgid "Seconds between checks for new replies. Lower feels more live but costs more requests."
-msgstr ""
-
-#: src/Settings/Settings.php:350
-msgid "Allow Attachments"
+#: src/Settings/Settings.php:346
+msgid "Shown above the leave-a-message form outside business hours."
 msgstr ""
 
 #: src/Settings/Settings.php:351
-msgid "Attachments are stored outside the media library and only served to people on the ticket."
+msgid "Enforce Business Hours"
 msgstr ""
 
-#: src/Settings/Settings.php:357
-msgid "Maximum Files Per Message"
+#: src/Settings/Settings.php:352
+msgid "Hours take precedence over presence, so chat stays closed outside them even with an agent in the queue."
 msgstr ""
 
-#: src/Settings/Settings.php:370
-msgid "Maximum File Size (MB)"
+#: src/Settings/Settings.php:358
+msgid "Abandon After"
 msgstr ""
 
-#: src/Settings/Settings.php:371
-msgid "Your server upload limit still applies on top of this."
+#: src/Settings/Settings.php:359
+msgid "Hours of silence before a chat is closed out and archived as a ticket."
+msgstr ""
+
+#: src/Settings/Settings.php:367
+msgid "Waiting Timeout"
+msgstr ""
+
+#: src/Settings/Settings.php:368
+msgid "Minutes a customer waits before being offered a ticket instead. Zero switches the offer off."
+msgstr ""
+
+#: src/Settings/Settings.php:376
+msgid "Status After Convert"
+msgstr ""
+
+#: src/Settings/Settings.php:377
+msgid "The status a ticket gets when an agent converts a live chat."
 msgstr ""
 
 #: src/Settings/Settings.php:384
-msgid "Allowed File Types"
+msgid "Status After Close"
 msgstr ""
 
 #: src/Settings/Settings.php:385
-msgid "Comma separated extensions. Executable and script types are always refused regardless of what is listed here."
+msgid "The status a ticket gets when either side closes the chat out."
+msgstr ""
+
+#: src/Settings/Settings.php:392
+msgid "Messages Per Minute"
+msgstr ""
+
+#: src/Settings/Settings.php:393
+msgid "How many messages one person can send in a minute before being throttled."
+msgstr ""
+
+#: src/Settings/Settings.php:401
+msgid "Check For New Replies Every"
+msgstr ""
+
+#: src/Settings/Settings.php:402
+msgid "Seconds between checks for new replies. Lower feels more live but costs more requests."
+msgstr ""
+
+#: src/Settings/Settings.php:410
+msgid "Allow Attachments"
 msgstr ""
 
 #: src/Settings/Settings.php:411
-msgid "From Name"
+msgid "Attachments are stored outside the media library and only served to people on the ticket."
 msgstr ""
 
 #: src/Settings/Settings.php:417
-msgid "From Address"
-msgstr ""
-
-#: src/Settings/Settings.php:424
-msgid "Confirms to the customer and alerts the department's agents."
+msgid "Maximum Files Per Message"
 msgstr ""
 
 #: src/Settings/Settings.php:430
-msgid "New Chat"
+msgid "Maximum File Size (MB)"
 msgstr ""
 
 #: src/Settings/Settings.php:431
-msgid "Email the agents when somebody opens a live chat."
-msgstr ""
-
-#: src/Settings/Settings.php:437
-#: src/Settings/Settings.php:496
-msgid "New Reply"
-msgstr ""
-
-#: src/Settings/Settings.php:438
-msgid "Emails everybody attached to the ticket whenever a public reply is posted."
+msgid "Your server upload limit still applies on top of this."
 msgstr ""
 
 #: src/Settings/Settings.php:444
-msgid "Internal Notes"
+msgid "Allowed File Types"
 msgstr ""
 
 #: src/Settings/Settings.php:445
+msgid "Comma separated extensions. Executable and script types are always refused regardless of what is listed here."
+msgstr ""
+
+#. translators: %s: the day of the week.
+#: src/Settings/Settings.php:463
+#, php-format
+msgid "%s Open"
+msgstr ""
+
+#. translators: %s: the day of the week.
+#: src/Settings/Settings.php:476
+#, php-format
+msgid "%s From"
+msgstr ""
+
+#. translators: %s: the day of the week.
+#: src/Settings/Settings.php:490
+#, php-format
+msgid "%s To"
+msgstr ""
+
+#: src/Settings/Settings.php:539
+msgid "From Name"
+msgstr ""
+
+#: src/Settings/Settings.php:545
+msgid "From Address"
+msgstr ""
+
+#: src/Settings/Settings.php:552
+msgid "Confirms to the customer and alerts the department's agents."
+msgstr ""
+
+#: src/Settings/Settings.php:558
+msgid "New Chat"
+msgstr ""
+
+#: src/Settings/Settings.php:559
+msgid "Email the agents when somebody opens a live chat."
+msgstr ""
+
+#: src/Settings/Settings.php:565
+#: src/Settings/Settings.php:907
+msgid "New Reply"
+msgstr ""
+
+#: src/Settings/Settings.php:566
+msgid "Emails everybody attached to the ticket whenever a public reply is posted."
+msgstr ""
+
+#: src/Settings/Settings.php:572
+msgid "Internal Notes"
+msgstr ""
+
+#: src/Settings/Settings.php:573
 msgid "Emails internal notes to the agents on the ticket. Customers are never included."
 msgstr ""
 
-#: src/Settings/Settings.php:451
+#: src/Settings/Settings.php:579
 msgid "Copy All Department Agents On Internal Notes"
 msgstr ""
 
-#: src/Settings/Settings.php:452
+#: src/Settings/Settings.php:580
 msgid "Widens internal note emails to every agent covering the department, not just the ones on the ticket."
 msgstr ""
 
-#: src/Settings/Settings.php:458
+#: src/Settings/Settings.php:586
 msgid "Status Changes"
 msgstr ""
 
-#: src/Settings/Settings.php:459
+#: src/Settings/Settings.php:587
 msgid "Tells the customer when their ticket status moves."
 msgstr ""
 
-#: src/Settings/Settings.php:465
+#: src/Settings/Settings.php:593
 msgid "Ticket Assignment"
 msgstr ""
 
-#: src/Settings/Settings.php:466
+#: src/Settings/Settings.php:594
 msgid "Tells an agent when a ticket lands on their plate."
 msgstr ""
 
-#: src/Settings/Settings.php:488
+#: src/Settings/Settings.php:600
+msgid "Recent Email Activity"
+msgstr ""
+
+#. translators: %s: the name of the detected mailer plugin.
+#: src/Settings/Settings.php:633
+#, php-format
+msgid "%s is active on this site. Our SMTP settings only ever apply to this plugin's own mail, so leaving this off will let that plugin keep handling everything."
+msgstr ""
+
+#: src/Settings/Settings.php:643
+msgid "Enable SMTP"
+msgstr ""
+
+#: src/Settings/Settings.php:644
+msgid "Off means our mail falls straight through to whatever WordPress already uses."
+msgstr ""
+
+#: src/Settings/Settings.php:651
+msgid "Host"
+msgstr ""
+
+#: src/Settings/Settings.php:662
+msgid "Port"
+msgstr ""
+
+#: src/Settings/Settings.php:676
+msgid "Encryption"
+msgstr ""
+
+#: src/Settings/Settings.php:679
+msgid "SSL"
+msgstr ""
+
+#: src/Settings/Settings.php:680
+msgid "TLS"
+msgstr ""
+
+#: src/Settings/Settings.php:693
+msgid "Authenticate"
+msgstr ""
+
+#: src/Settings/Settings.php:705
+msgid "Username"
+msgstr ""
+
+#: src/Settings/Settings.php:716
+#: templates/auth.php:69
+#: templates/auth.php:125
+msgid "Password"
+msgstr ""
+
+#: src/Settings/Settings.php:755
+msgid "Send A Test Email"
+msgstr ""
+
+#. translators: %s: the current user's email address.
+#: src/Settings/Settings.php:763
+#, php-format
+msgid "Sends to %s. The outcome is recorded in the log on the Notifications tab."
+msgstr ""
+
+#: src/Settings/Settings.php:773
+msgid "The test email was handed off without an error."
+msgstr ""
+
+#: src/Settings/Settings.php:774
+msgid "The test email failed. Check the log on the Notifications tab for the reason."
+msgstr ""
+
+#: src/Settings/Settings.php:775
+msgid "Your account has no valid email address to send to."
+msgstr ""
+
+#: src/Settings/Settings.php:805
+msgid "Nothing sent yet."
+msgstr ""
+
+#: src/Settings/Settings.php:810
+msgid "Sent"
+msgstr ""
+
+#: src/Settings/Settings.php:811
+msgid "Failed"
+msgstr ""
+
+#: src/Settings/Settings.php:812
+msgid "Skipped"
+msgstr ""
+
+#: src/Settings/Settings.php:817
+msgid "When"
+msgstr ""
+
+#: src/Settings/Settings.php:818
+msgid "Outcome"
+msgstr ""
+
+#: src/Settings/Settings.php:819
+msgid "To"
+msgstr ""
+
+#: src/Settings/Settings.php:821
+msgid "Detail"
+msgstr ""
+
+#: src/Settings/Settings.php:848
+msgid "Clear Log"
+msgstr ""
+
+#: src/Settings/Settings.php:899
 msgid "Available tokens: {ticket_number}, {ticket_subject}, {ticket_content}, {ticket_url}, {customer_name}, {customer_email}, {reply_author}, {reply_content}, {status}, {priority}, {department}, {category}, {site_name}, {site_url}. The chat template only supports {customer_name}, {customer_email}, {chat_url}, {site_name} and {site_url}."
 msgstr ""
 
-#: src/Settings/Settings.php:494
+#: src/Settings/Settings.php:905
 msgid "New Ticket (to the customer)"
 msgstr ""
 
-#: src/Settings/Settings.php:495
+#: src/Settings/Settings.php:906
 msgid "New Ticket (to agents)"
 msgstr ""
 
-#: src/Settings/Settings.php:497
+#: src/Settings/Settings.php:908
 msgid "Internal Note"
 msgstr ""
 
-#: src/Settings/Settings.php:498
+#: src/Settings/Settings.php:909
 msgid "Status Change"
 msgstr ""
 
-#: src/Settings/Settings.php:499
+#: src/Settings/Settings.php:910
 msgid "Ticket Assigned"
 msgstr ""
 
-#: src/Settings/Settings.php:500
+#: src/Settings/Settings.php:911
 msgid "New Chat (to agents)"
 msgstr ""
 
-#: src/Settings/Settings.php:525
+#: src/Settings/Settings.php:936
 msgid "Body"
 msgstr ""
 
-#: src/Settings/Settings.php:549
+#: src/Settings/Settings.php:960
 msgid "Allow Registration"
 msgstr ""
 
-#: src/Settings/Settings.php:550
+#: src/Settings/Settings.php:961
 msgid "Lets people create a support account from the portal."
 msgstr ""
 
-#: src/Settings/Settings.php:556
+#: src/Settings/Settings.php:967
 msgid "Log People In After Registering"
 msgstr ""
 
-#: src/Settings/Settings.php:567
+#: src/Settings/Settings.php:978
 msgid "Send The Standard New User Emails"
 msgstr ""
 
-#: src/Settings/Settings.php:568
+#: src/Settings/Settings.php:979
 msgid "WordPress's own new account notifications, to both the admin and the new user."
 msgstr ""
 
@@ -1417,11 +1684,6 @@ msgstr ""
 
 #: templates/auth.php:64
 msgid "Email or Username"
-msgstr ""
-
-#: templates/auth.php:69
-#: templates/auth.php:125
-msgid "Password"
 msgstr ""
 
 #: templates/auth.php:76
@@ -1488,7 +1750,8 @@ msgid "Chat conversation"
 msgstr ""
 
 #: templates/chat-admin.php:115
-#: templates/chat-panel.php:126
+#: templates/chat-panel.php:140
+#: templates/chat-panel.php:174
 msgid "Your message"
 msgstr ""
 
@@ -1499,31 +1762,38 @@ msgstr ""
 
 #: templates/chat-admin.php:124
 #: templates/chat-admin.php:125
-#: templates/chat-panel.php:135
-#: templates/chat-panel.php:136
+#: templates/chat-panel.php:151
+#: templates/chat-panel.php:183
+#: templates/chat-panel.php:184
 #: templates/new-ticket.php:119
 #: templates/thread.php:138
 msgid "Attach files"
 msgstr ""
 
 #: templates/chat-admin.php:136
-#: templates/chat-panel.php:147
+#: templates/chat-panel.php:157
+#: templates/chat-panel.php:195
 msgid "Send"
 msgstr ""
 
-#: templates/chat-panel.php:66
+#: templates/chat-panel.php:76
 msgid "Live chat"
 msgstr ""
 
-#: templates/chat-panel.php:72
+#: templates/chat-panel.php:82
 msgid "End chat"
 msgstr ""
 
-#: templates/chat-panel.php:74
+#: templates/chat-panel.php:84
 msgid "Minimize chat"
 msgstr ""
 
-#: templates/chat-panel.php:132
+#: templates/chat-panel.php:146
+#: templates/new-ticket.php:109
+msgid "How can we help?"
+msgstr ""
+
+#: templates/chat-panel.php:180
 msgid "Type your message..."
 msgstr ""
 
@@ -1595,10 +1865,6 @@ msgstr ""
 
 #: templates/new-ticket.php:82
 msgid "Choose a category..."
-msgstr ""
-
-#: templates/new-ticket.php:109
-msgid "How can we help?"
 msgstr ""
 
 #: templates/new-ticket.php:112
@@ -1682,12 +1948,6 @@ msgstr ""
 
 #: templates/ticket.php:175
 msgid "Details"
-msgstr ""
-
-#: templates/ticket.php:181
-#: templates/ticket.php:184
-#: templates/ticket.php:222
-msgid "None"
 msgstr ""
 
 #: templates/ticket.php:186

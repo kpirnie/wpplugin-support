@@ -143,9 +143,9 @@ if (! class_exists('\KP\Support\Modules\PostTypes')) {
                 'rewrite'             => false,
                 'has_archive'         => false,
                 'hierarchical'        => false,
-                'menu_position'       => 26,
+                'menu_position'       => 27,
                 'menu_icon'           => 'dashicons-sos',
-                'supports'            => array('title', 'author'),
+                'supports'            => array('title'),
                 'capability_type'     => array('kpts_ticket', 'kpts_tickets'),
                 'map_meta_cap'        => true,
                 'delete_with_user'    => false,
@@ -196,9 +196,9 @@ if (! class_exists('\KP\Support\Modules\PostTypes')) {
 
             // the capabilities we use for managing our taxonomy terms
             $caps = array(
-                'manage_terms' => 'kpts_manage_settings',
-                'edit_terms'   => 'kpts_manage_settings',
-                'delete_terms' => 'kpts_manage_settings',
+                'manage_terms' => 'manage_options',
+                'edit_terms'   => 'manage_options',
+                'delete_terms' => 'manage_options',
                 'assign_terms' => 'edit_kpts_tickets',
             );
 
@@ -248,6 +248,7 @@ if (! class_exists('\KP\Support\Modules\PostTypes')) {
                 'query_var'         => false,
                 'rewrite'           => false,
                 'capabilities'      => $caps,
+                'meta_box_cb'       => false,
             ));
 
             // where the ticket sits in its lifecycle
@@ -264,6 +265,7 @@ if (! class_exists('\KP\Support\Modules\PostTypes')) {
                 'query_var'         => false,
                 'rewrite'           => false,
                 'capabilities'      => $caps,
+                'meta_box_cb'       => false,
             ));
         }
 

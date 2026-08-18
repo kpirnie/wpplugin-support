@@ -121,6 +121,7 @@ if (! class_exists('\KP\Support\Modules\ChatWidget')) {
                 'allowFiles'   => (bool) $this->opt('allow_attachments', true),
                 'maxFiles'     => (int) $this->opt('max_attachments', 5),
                 'maxFileSize'  => Attachments::maxSize(),
+                'waitingTimeout' => (int) $this->opt('chat_waiting_timeout', 5),
                 'strings'      => array(
                     'sending'      => __('Sending...', 'kp-support'),
                     'sendFailed'   => __('Your message could not be sent. Please try again.', 'kp-support'),
@@ -136,6 +137,8 @@ if (! class_exists('\KP\Support\Modules\ChatWidget')) {
                     'viewTicket'   => __('View the saved ticket', 'kp-support'),
                     'tooManyFiles' => __('Too many files attached.', 'kp-support'),
                     'fileTooBig'   => __('One of those files is too large.', 'kp-support'),
+                    'waitingTooLong' => __('Nobody has picked this up yet. Would you like to turn it into a ticket instead?', 'kp-support'),
+                    'makeTicket'     => __('Turn into a ticket', 'kp-support'),
                 ),
             ));
         }
@@ -164,6 +167,14 @@ if (! class_exists('\KP\Support\Modules\ChatWidget')) {
                 $position = 'bottom-right';
             }
 
+            // is anybody around to take it
+            $online = ChatAccess::chatAvailable();
+
+            // and what we say when they aren't
+            $offline_message = ChatAccess::withinBusinessHours()
+                ? (string) $this->opt('chat_offline_message', __('Nobody is available right now. Leave us a message and we will get back to you.', 'kp-support'))
+                : (string) $this->opt('chat_closed_message', __('We are closed right now. Leave us a message and we will get back to you.', 'kp-support'));
+
             // and out it goes
             Template::render('chat-panel', array(
                 'chat_id'  => $chat_id,
@@ -172,6 +183,8 @@ if (! class_exists('\KP\Support\Modules\ChatWidget')) {
                 'messages' => ($chat_id > 0) ? Chat::messages($chat_id) : array(),
                 'visitor'  => get_current_user_id(),
                 'state'    => ($chat_id > 0) ? Chat::state($chat_id) : '',
+                'online'   => $online,
+                'offline_message' => $offline_message,
             ));
         }
     }

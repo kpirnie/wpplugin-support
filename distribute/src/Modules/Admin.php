@@ -59,6 +59,9 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             add_action('add_meta_boxes', array($this, 'addMetaBoxes'));
             add_action('save_post_' . PostTypes::POST_TYPE, array($this, 'saveTicketMeta'), 10, 2);
 
+            // the opening message has to go in before the post is written
+            add_filter('wp_insert_post_data', array($this, 'filterInsertData'), 10, 2);
+
             // drop the boxes we don't want on a ticket
             add_action('add_meta_boxes', array($this, 'removeMetaBoxes'), 99);
 
@@ -370,6 +373,21 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             // and the same again if anything moved them
             remove_meta_box('commentsdiv', PostTypes::POST_TYPE, 'side');
             remove_meta_box('commentstatusdiv', PostTypes::POST_TYPE, 'side');
+
+            // the author box, the requester is tracked in Ticket Details
+            remove_meta_box('authordiv', PostTypes::POST_TYPE, 'normal');
+            remove_meta_box('authordiv', PostTypes::POST_TYPE, 'side');
+
+            // the publish box is really just the ticket's status, so say so
+            remove_meta_box('submitdiv', PostTypes::POST_TYPE, 'side');
+            add_meta_box(
+                'submitdiv',
+                __('Status', 'kp-support'),
+                'post_submit_meta_box',
+                PostTypes::POST_TYPE,
+                'side',
+                'core'
+            );
         }
 
         /**
@@ -390,8 +408,9 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 return;
             }
 
-            // and out it goes
-            echo '<style>#postdivrich, #post-body-content { display: none; }</style>';
+            // and out it goes, along with the visibility row in the status box
+            echo '<style>#postdivrich, #post-body-content { display: none; }'
+                . '#submitdiv .misc-pub-visibility { display: none; }</style>';
         }
 
         /**
@@ -408,9 +427,27 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             // cast the id down
             $ticket_id = (int) $post->ID;
 
-            // brand new tickets don't have a conversation yet
+            // brand new tickets don't have a conversation yet, so this is where
+            // the opening message gets typed instead
             if (get_post_status($ticket_id) === 'auto-draft') {
-                echo '<p>' . esc_html__('Save the ticket first to start the conversation.', 'kp-support') . '</p>';
+
+                // the label
+                printf(
+                    '<p><label for="kpts_opening_message"><strong>%s</strong></label></p>',
+                    esc_html__('Opening Message', 'kp-support')
+                );
+
+                // and the field itself
+                printf(
+                    '<textarea name="kpts_opening_message" id="kpts_opening_message" rows="10" style="width:100%%;"></textarea>'
+                );
+
+                // tell them what it becomes
+                printf(
+                    '<p class="description">%s</p>',
+                    esc_html__('This becomes the first post in the conversation.', 'kp-support')
+                );
+
                 return;
             }
 
@@ -437,6 +474,47 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
         }
 
         /**
+         * Put the opening message into the post content as the ticket is written.
+         *
+         * This has to happen on the way in rather than in save_post, otherwise
+         * we'd be updating the post from inside its own save.
+         *
+         * @since  1.0.21
+         * @access public
+         * @param  array<string, mixed> $data    The post data heading for the database.
+         * @param  array<string, mixed> $postarr The raw posted data.
+         * @return array<string, mixed> The data, with the opening message in it.
+         */
+        public function filterInsertData($data, $postarr): array
+        {
+
+            // only ever our tickets
+            if (($data['post_type'] ?? '') !== PostTypes::POST_TYPE) {
+                return $data;
+            }
+
+            // nothing was typed
+            if (! isset($_POST['kpts_opening_message'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified below
+                return $data;
+            }
+
+            // the nonce has to check out
+            if (! isset($_POST['kpts_ticket_nonce']) || ! wp_verify_nonce(sanitize_key(wp_unslash($_POST['kpts_ticket_nonce'])), 'kpts_save_ticket')) {
+                return $data;
+            }
+
+            // never overwrite a conversation that already has an opening post
+            if (trim((string) ($data['post_content'] ?? '')) !== '') {
+                return $data;
+            }
+
+            // and in it goes
+            $data['post_content'] = wp_kses_post(wp_unslash($_POST['kpts_opening_message'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above
+
+            return $data;
+        }
+
+        /**
          * Render the ticket details metabox.
          *
          * @since  1.0.0
@@ -459,6 +537,10 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
 
             // the ticket number
             echo '<p><strong>' . esc_html__('Ticket', 'kp-support') . ':</strong> ' . esc_html(Ticket::number($ticket_id)) . '</p>';
+
+            // status and priority, one term each, never a multi select
+            $this->renderTermSelect($ticket_id, PostTypes::TAX_STATUS, __('Status', 'kp-support'), 'kpts_status');
+            $this->renderTermSelect($ticket_id, PostTypes::TAX_PRIORITY, __('Priority', 'kp-support'), 'kpts_priority');
 
             // who it's from
             if ($requester instanceof \WP_User) {
@@ -519,6 +601,77 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
         }
 
         /**
+         * Render a single term dropdown for one of our flat taxonomies.
+         *
+         * @since  1.0.21
+         * @access private
+         * @param  int    $ticket_id The ticket id.
+         * @param  string $taxonomy  The taxonomy to pull terms from.
+         * @param  string $label     The label to put on it.
+         * @param  string $name      The field name to post under.
+         * @return void
+         */
+        private function renderTermSelect(int $ticket_id, string $taxonomy, string $label, string $name): void
+        {
+
+            // what's on it now
+            $current = Ticket::termId($ticket_id, $taxonomy);
+
+            // everything they could pick
+            $terms = get_terms(array(
+                'taxonomy'   => $taxonomy,
+                'hide_empty' => false,
+            ));
+
+            // nothing to show
+            if (is_wp_error($terms) || empty($terms)) {
+                return;
+            }
+
+            // if they can't set it, it's just a read out
+            if (! current_user_can('edit_kpts_tickets')) {
+
+                // find the one that's on it
+                $term = ($current > 0) ? get_term($current, $taxonomy) : null;
+
+                // and print it
+                printf(
+                    '<p><strong>%1$s:</strong> %2$s</p>',
+                    esc_html($label),
+                    esc_html(($term instanceof \WP_Term) ? $term->name : __('None', 'kp-support'))
+                );
+
+                return;
+            }
+
+            // open the field up
+            printf(
+                '<p><label for="%1$s"><strong>%2$s</strong></label><br /><select name="%1$s" id="%1$s" style="width:100%%;">',
+                esc_attr($name),
+                esc_html($label)
+            );
+
+            // an empty first option so it can be cleared
+            printf(
+                '<option value="0">%s</option>',
+                esc_html__('None', 'kp-support')
+            );
+
+            // and every term we found
+            foreach ($terms as $_term) {
+                printf(
+                    '<option value="%1$d" %2$s>%3$s</option>',
+                    (int) $_term->term_id,
+                    selected($current, (int) $_term->term_id, false),
+                    esc_html($_term->name)
+                );
+            }
+
+            // close it up
+            echo '</select></p>';
+        }
+
+        /**
          * Save what we put on the ticket edit screen.
          *
          * @since  1.0.0
@@ -553,6 +706,22 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 Ticket::setAssignee($post_id, absint(wp_unslash($_POST['kpts_assignee']))); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
             }
 
+            // the status, one term only
+            if (isset($_POST['kpts_status'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                $status_id = absint(wp_unslash($_POST['kpts_status'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                if ($status_id > 0) {
+                    Ticket::setStatus($post_id, $status_id);
+                }
+            }
+
+            // and the priority, same again
+            if (isset($_POST['kpts_priority'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                $priority_id = absint(wp_unslash($_POST['kpts_priority'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                if ($priority_id > 0) {
+                    Ticket::setTerm($post_id, PostTypes::TAX_PRIORITY, $priority_id);
+                }
+            }
+
             // a ticket opened straight from wp-admin has no requester yet, so the
             // author becomes the requester and goes onto the participant list
             if ((int) get_post_meta($post_id, Access::META_REQUESTER, true) < 1) {
@@ -565,6 +734,16 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                     update_post_meta($post_id, Access::META_REQUESTER, $author);
                     Ticket::addParticipant($post_id, $author);
                 }
+            }
+
+            // a ticket opened from wp-admin with nothing picked still needs both
+            if (Ticket::termId($post_id, PostTypes::TAX_STATUS) < 1) {
+                Ticket::setStatusBySlug($post_id, 'open');
+            }
+
+            // same for the priority
+            if (Ticket::termId($post_id, PostTypes::TAX_PRIORITY) < 1) {
+                Ticket::setTerm($post_id, PostTypes::TAX_PRIORITY, Ticket::termIdBySlug(PostTypes::TAX_PRIORITY, PostTypes::defaultPrioritySlug()));
             }
 
             // make sure it has a ticket number and an activity stamp

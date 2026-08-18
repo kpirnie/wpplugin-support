@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace KP\Support\Modules;
 
 use KP\Support\Helpers\Chat;
+use KP\Support\Helpers\ChatConvert;
 use KP\Support\Helpers\ChatAccess;
 use KP\Support\Helpers\Template;
 
@@ -56,12 +57,18 @@ if (! class_exists('\KP\Support\Modules\ChatAdmin')) {
             // our screen, before the settings page so it sits above it
             add_action('admin_menu', array($this, 'addMenu'), 5);
 
+            // and drop the self-referencing submenu entry it comes with
+            add_action('admin_menu', array($this, 'trimMenu'), 999);
+
             // and its assets
             add_action('admin_enqueue_scripts', array($this, 'enqueueAssets'));
+
+            // the daily sweep that reaps abandoned chats
+            add_action('kpts_daily_maintenance', array($this, 'reapAbandoned'));
         }
 
         /**
-         * Add the chat screen under the Support menu.
+         * Add the chat screen as its own top level menu.
          *
          * @since  1.0.0
          * @access public
@@ -75,15 +82,35 @@ if (! class_exists('\KP\Support\Modules\ChatAdmin')) {
                 return;
             }
 
-            // hang it off the ticket post type's menu
-            add_submenu_page(
-                'edit.php?post_type=' . PostTypes::POST_TYPE,
+            // its own menu, sitting directly above Support
+            add_menu_page(
                 __('Live Chat', 'kp-support'),
                 __('Live Chat', 'kp-support'),
                 'kpts_handle_chats',
                 self::MENU_SLUG,
-                array($this, 'renderScreen')
+                array($this, 'renderScreen'),
+                'dashicons-format-chat',
+                26
             );
+        }
+
+        /**
+         * Drop the duplicate submenu entry WordPress adds under a top level menu.
+         *
+         * @since  1.0.21
+         * @access public
+         * @return void
+         */
+        public function trimMenu(): void
+        {
+
+            // nothing to trim if we never added it
+            if (! $this->opt('enable_chat', false)) {
+                return;
+            }
+
+            // it repeats the parent's label, so it's just noise
+            remove_submenu_page(self::MENU_SLUG, self::MENU_SLUG);
         }
 
         /**
@@ -97,8 +124,8 @@ if (! class_exists('\KP\Support\Modules\ChatAdmin')) {
         private function isChatScreen(string $hook): bool
         {
 
-            // the hook the submenu page ends up under
-            return $hook === PostTypes::POST_TYPE . '_page_' . self::MENU_SLUG;
+            // the hook a top level page ends up under
+            return $hook === 'toplevel_page_' . self::MENU_SLUG;
         }
 
         /**
@@ -184,6 +211,9 @@ if (! class_exists('\KP\Support\Modules\ChatAdmin')) {
                 wp_die(esc_html__('You are not allowed to work chats.', 'kp-support'));
             }
 
+            // they've got the queue open, so they're online
+            ChatAccess::markPresence();
+
             // and out it goes
             Template::render('chat-admin', array(
                 'agents'      => $this->agentOptions(),
@@ -219,6 +249,62 @@ if (! class_exists('\KP\Support\Modules\ChatAdmin')) {
 
             // hand them back
             return $agents;
+        }
+
+        /**
+         * Close out any chat nobody has touched in a while.
+         *
+         * Runs through the same close path an agent would use, so an abandoned
+         * chat archives itself as a ticket rather than sitting in Waiting.
+         *
+         * @since  1.0.21
+         * @access public
+         * @return void
+         */
+        public function reapAbandoned(): void
+        {
+
+            // how long we leave one alone for
+            $hours = max(1, (int) $this->opt('chat_abandon_hours', 24));
+
+            // anything older than this is fair game
+            $cutoff = gmdate('Y-m-d H:i:s', time() - ($hours * HOUR_IN_SECONDS));
+
+            // go find them
+            $chats = get_posts(array(
+                'post_type'      => PostTypes::CHAT_POST_TYPE,
+                'post_status'    => 'publish',
+                'posts_per_page' => 50,
+                'fields'         => 'ids',
+                'no_found_rows'  => true,
+                'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- a daily sweep over live chats only
+                    'relation' => 'AND',
+                    array(
+                        'key'     => Chat::META_STATE,
+                        'value'   => array(Chat::STATE_WAITING, Chat::STATE_ACTIVE),
+                        'compare' => 'IN',
+                    ),
+                    array(
+                        'key'     => Chat::META_LAST_ACTIVITY,
+                        'value'   => $cutoff,
+                        'compare' => '<',
+                        'type'    => 'DATETIME',
+                    ),
+                ),
+            ));
+
+            // nothing to reap
+            if (empty($chats)) {
+                return;
+            }
+
+            // and close each one out
+            foreach ($chats as $_chat_id) {
+                ChatConvert::toTicket((int) $_chat_id, array(
+                    'state'  => Chat::STATE_AGENT_CLOSED,
+                    'status' => (string) $this->opt('status_after_chat_close', 'closed'),
+                ));
+            }
         }
     }
 }

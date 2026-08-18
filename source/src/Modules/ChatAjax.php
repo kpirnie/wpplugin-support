@@ -74,6 +74,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
                 'kpts_chat_assign' => 'assignChat',
                 'kpts_chat_convert' => 'convertChat',
                 'kpts_chat_close'  => 'closeChat',
+                'kpts_chat_offline_ticket' => 'offlineTicket',
             );
 
             // wire each one up
@@ -234,6 +235,22 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
                 ), 403);
             }
 
+            // and somebody has to actually be around to take it
+            if (! ChatAccess::anyAgentOnline()) {
+                wp_send_json_error(array(
+                    'message' => __('There is nobody available to chat right now.', 'kp-support'),
+                    'code'    => 'offline',
+                ), 409);
+            }
+
+            // and we have to be open with somebody around to take it
+            if (! ChatAccess::chatAvailable()) {
+                wp_send_json_error(array(
+                    'message' => __('There is nobody available to chat right now.', 'kp-support'),
+                    'code'    => 'offline',
+                ), 409);
+            }
+
             // open it, or pick up the one they already have going
             $chat_id = Chat::create(get_current_user_id());
 
@@ -247,6 +264,76 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
 
             // hand back the chat and everything already on it
             wp_send_json_success($this->chatPayload($chat_id, ''));
+        }
+
+        /**
+         * Take a leave-a-message submission when nobody is online.
+         *
+         * @since  1.0.21
+         * @access public
+         * @return void
+         */
+        public function offlineTicket(): void
+        {
+
+            // nonce and login
+            $this->verifyRequest();
+
+            // they still need to be allowed to open a chat to use this
+            if (! ChatAccess::canStart()) {
+                wp_send_json_error(array(
+                    'message' => __('You are not allowed to do that.', 'kp-support'),
+                    'code'    => 'forbidden',
+                ), 403);
+            }
+
+            // what they typed
+            $subject = isset($_POST['subject']) ? sanitize_text_field(wp_unslash($_POST['subject'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+            $message = isset($_POST['message']) ? wp_kses_post(wp_unslash($_POST['message'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+
+            // both are required
+            if ($subject === '' || trim(wp_strip_all_tags($message)) === '') {
+                wp_send_json_error(array(
+                    'message' => __('Please fill in both a subject and a message.', 'kp-support'),
+                    'code'    => 'empty',
+                ), 400);
+            }
+
+            // take whatever came with it
+            $attachments = Attachments::processUploads('kpts_files', get_current_user_id());
+
+            // if any file was rejected, stop right here and say why
+            if (is_wp_error($attachments)) {
+                wp_send_json_error(array(
+                    'message' => $attachments->get_error_message(),
+                    'code'    => $attachments->get_error_code(),
+                ), 400);
+            }
+
+            // open it as a normal ticket
+            $ticket_id = Ticket::create(array(
+                'subject'     => $subject,
+                'message'     => $message,
+                'requester'   => get_current_user_id(),
+                'department'  => Ticket::termIdBySlug(PostTypes::TAX_DEPARTMENT, (string) $this->opt('chat_department', '')),
+                'attachments' => $attachments,
+            ));
+
+            // if that failed, hand the reason back
+            if (is_wp_error($ticket_id)) {
+                wp_send_json_error(array(
+                    'message' => $ticket_id->get_error_message(),
+                    'code'    => $ticket_id->get_error_code(),
+                ), 400);
+            }
+
+            // and tell them where it went
+            wp_send_json_success(array(
+                'ticket_id' => (int) $ticket_id,
+                'url'       => Portal::ticketUrl((int) $ticket_id),
+                'message'   => __('Thanks, your message has been logged as a ticket.', 'kp-support'),
+                'nonce'     => $this->freshNonce(),
+            ));
         }
 
         /**
@@ -363,6 +450,9 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
 
             // agents only, on the agent nonce
             $this->verifyAgentRequest();
+
+            // they're clearly here, so stamp their presence
+            ChatAccess::markPresence();
 
             // which slice do they want
             $filter = isset($_POST['filter']) ? sanitize_key(wp_unslash($_POST['filter'])) : 'all'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyAgentRequest() runs check_ajax_referer above

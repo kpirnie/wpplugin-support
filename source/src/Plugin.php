@@ -202,6 +202,11 @@ if (! class_exists('\KP\Support\Plugin')) {
                 return;
             }
 
+            // an update over the top never fires activate(), so make sure it's scheduled
+            if (! wp_next_scheduled('kpts_daily_maintenance')) {
+                wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', 'kpts_daily_maintenance');
+            }
+
             // rebuild them and stamp the version
             Modules\Roles::addRoles();
             update_option(self::CAPS_VERSION_KEY, KP_SUPPORT_VERSION, false);
@@ -259,12 +264,14 @@ if (! class_exists('\KP\Support\Plugin')) {
                 'attachments'   => Modules\Attachments::class,
                 'replies'       => Modules\Replies::class,
                 'notifications' => Modules\Notifications::class,
+                'smtp'          => Modules\Smtp::class,
                 'accounts'      => Modules\Accounts::class,
                 'portal'        => Modules\Portal::class,
                 'ajax'          => Modules\Ajax::class,
                 'chat_ajax'     => Modules\ChatAjax::class,
                 'chat_widget'   => Modules\ChatWidget::class,
                 'chat_admin'    => Modules\ChatAdmin::class,
+                'updater'       => Modules\Updater::class,
                 'admin'         => Modules\Admin::class,
                 'settings'      => Settings\Settings::class,
             );
@@ -377,6 +384,11 @@ if (! class_exists('\KP\Support\Plugin')) {
             // make sure there's a page for the portal to live on
             Modules\Portal::ensurePage();
 
+            // and get the daily sweep going
+            if (! wp_next_scheduled('kpts_daily_maintenance')) {
+                wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', 'kpts_daily_maintenance');
+            }
+
             // and flush the rewrite rules
             flush_rewrite_rules();
         }
@@ -436,10 +448,44 @@ if (! class_exists('\KP\Support\Plugin')) {
                 'chat_label'                => 'Need help?',
                 'chat_department'           => '',
                 'chat_ticket_prefix'        => 'CHAT - ',
+                'chat_presence_window'      => 5,
+                'chat_offline_message'      => __('Nobody is available right now. Leave us a message and we will get back to you.', 'kp-support'),
                 'status_after_chat_convert' => 'open',
                 'status_after_chat_close'   => 'closed',
                 'chat_rate_limit'           => 20,
                 'notify_new_chat'           => true,
+                'chat_closed_message'       => __('We are closed right now. Leave us a message and we will get back to you as soon as we are available.', 'kp-support'),
+                'chat_hours_enable'         => false,
+                'chat_hours_sun_open'       => false,
+                'chat_hours_sun_from'       => '09:00',
+                'chat_hours_sun_to'         => '17:00',
+                'chat_hours_mon_open'       => true,
+                'chat_hours_mon_from'       => '09:00',
+                'chat_hours_mon_to'         => '17:00',
+                'chat_hours_tue_open'       => true,
+                'chat_hours_tue_from'       => '09:00',
+                'chat_hours_tue_to'         => '17:00',
+                'chat_hours_wed_open'       => true,
+                'chat_hours_wed_from'       => '09:00',
+                'chat_hours_wed_to'         => '17:00',
+                'chat_hours_thu_open'       => true,
+                'chat_hours_thu_from'       => '09:00',
+                'chat_hours_thu_to'         => '17:00',
+                'chat_hours_fri_open'       => true,
+                'chat_hours_fri_from'       => '09:00',
+                'chat_hours_fri_to'         => '17:00',
+                'chat_hours_sat_open'       => false,
+                'chat_hours_sat_from'       => '09:00',
+                'chat_hours_sat_to'         => '17:00',
+                'chat_abandon_hours'        => 24,
+                'chat_waiting_timeout'      => 5,
+                'smtp_enable'               => false,
+                'smtp_host'                 => '',
+                'smtp_port'                 => 587,
+                'smtp_encryption'           => 'tls',
+                'smtp_auth'                 => true,
+                'smtp_username'             => '',
+                'smtp_password'             => '',
             );
 
             // merge ours in underneath whatever is already there and save it back

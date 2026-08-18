@@ -20,7 +20,9 @@ namespace KP\Support\Modules;
 use KP\Support\Helpers\ChatAccess;
 use KP\Support\Plugin;
 use KP\Support\Helpers\Access;
+use KP\Support\Helpers\MailLog;
 use KP\Support\Helpers\Ticket;
+use KP\Support\Modules\Smtp;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
@@ -46,6 +48,9 @@ if (! class_exists('\KP\Support\Modules\Notifications')) {
          */
         public function register(): void
         {
+
+            // start watching for mail failures so send() has something to log
+            MailLog::watch();
 
             // a brand new ticket landed
             add_action('kpts_ticket_created', array($this, 'onTicketCreated'), 10, 2);
@@ -524,6 +529,12 @@ if (! class_exists('\KP\Support\Modules\Notifications')) {
 
             // nobody to send to
             if (empty($to)) {
+                MailLog::record(
+                    'skipped',
+                    '',
+                    wp_specialchars_decode($this->parse($subject, $tokens), ENT_QUOTES),
+                    __('No recipients left after exclusions.', 'kp-support')
+                );
                 return false;
             }
 
@@ -556,8 +567,31 @@ if (! class_exists('\KP\Support\Modules\Notifications')) {
 
             // and off it goes, one message per recipient so nobody sees the others
             $sent = true;
-            foreach ((array) $email['to'] as $_address) {
-                $sent = wp_mail($_address, $email['subject'], $email['body'], $email['headers']) && $sent;
+
+            // flag the whole run as ours so our SMTP settings apply to it
+            Smtp::$sending = true;
+
+            try {
+                foreach ((array) $email['to'] as $_address) {
+
+                    // fire it and see what came back
+                    $ok = wp_mail($_address, $email['subject'], $email['body'], $email['headers']);
+
+                    // log it either way, pulling whatever the mailer complained about
+                    MailLog::record(
+                        $ok ? 'sent' : 'failed',
+                        (string) $_address,
+                        (string) $email['subject'],
+                        $ok ? '' : MailLog::takeError()
+                    );
+
+                    // and keep track of the overall result
+                    $sent = $ok && $sent;
+                }
+            } finally {
+
+                // whatever happened, we're done being us
+                Smtp::$sending = false;
             }
 
             // report back
