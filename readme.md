@@ -55,7 +55,7 @@ Set `production.shouldcopy` to `true` in `package.json` and give it a `productio
 
 ## Installing
 
-Install `distribute` as the plugin directory, or install from the WordPress plugin repository. Activation creates the three roles, registers the post type and its taxonomies, seeds the default terms, and creates a "Support" page holding the portal shortcode.
+Install `distribute` as the plugin directory, or install from the WordPress plugin repository. Activation creates the three roles, registers the post type and its taxonomies, seeds the default terms, creates a "Support" page holding the portal shortcode, and schedules the daily maintenance sweep. Once installed, updates come through the normal WordPress update flow, pulled from this repository's releases.
 
 ## Architecture
 
@@ -77,8 +77,10 @@ Everything under `src/Modules` extends `AbstractModule` and does its work throug
 * `Admin` - the list table, the metaboxes and the admin asset loading
 * `TermFields` - the colour and sort order fields on the taxonomy terms
 * `Settings` - the tabbed options page, built from the field framework
+* `Smtp` - our own SMTP delivery, scoped to this plugin's mail only
+* `Updater` - the GitHub releases update checker
 
-`src/Helpers` holds the stateless pieces the modules lean on: `Access` for every ticket capability and visibility decision, `ChatAccess` for the same on chats, `Ticket` for ticket creation, querying and state changes, `Chat` for chat creation, messages and state, `ChatConvert` for turning a chat into a ticket and building its transcript, and `Template` for locating and rendering the front-end templates.
+`src/Helpers` holds the stateless pieces the modules lean on: `Access` for every ticket capability and visibility decision, `ChatAccess` for the same on chats, `Ticket` for ticket creation, querying and state changes, `Chat` for chat creation, messages and state, `ChatConvert` for turning a chat into a ticket and building its transcript, and `Template` for locating and rendering the front-end template sand `MailLog` for the rolling record of what this plugin tried to email and what came of it. 
 
 ## Data model
 
@@ -132,6 +134,7 @@ Filters:
 | `kpts_email_html` | the rendered email markup |
 | `kpts_default_status_slug` | the status a new ticket opens in |
 | `kpts_default_priority_slug` | the priority a new ticket opens at |
+| `kpts_any_agent_online` | whether anybody is around to take a chat |
 
 ## Coding standards
 
