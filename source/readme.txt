@@ -4,7 +4,7 @@ Tags: support, helpdesk, ticket system, live chat, customer service
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.20
+Stable tag: 1.0.22
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -119,6 +119,10 @@ Every variable a template is handed is prefixed with `kpts_`, and each file docu
 The class names in the markup and the CSS custom properties on the `.kpts-portal` wrapper are the supported styling surface. Keep the `kpts-` classes on the elements the scripts bind to - the reply form, the file input, the internal note toggle and the management selects - or the chat stops working.
 
 == Changelog ==
+
+= 1.0.22 =
+* Fix PSR-4 pathing
+* Move ChatAjax
 
 = 1.0.20 =
 * Added live chat: a corner docked panel on the front end and a Live Chat queue under the Support menu for agents
