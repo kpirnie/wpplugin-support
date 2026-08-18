@@ -61,9 +61,9 @@ if (is_array($kpts_options) && ! empty($kpts_options['keep_data_on_uninstall']))
  */
 do {
 
-    // grab the next batch of tickets
+    // grab the next batch of tickets and chats
     $kpts_tickets = get_posts(array(
-        'post_type'   => 'kpts_ticket',
+        'post_type'   => array('kpts_ticket', 'kpts_chat'),
         'post_status' => 'any',
         'numberposts' => 100,
         'fields'      => 'ids',
@@ -159,6 +159,7 @@ if (class_exists('\KP\Support\Modules\Roles')) {
 
 // drop our settings
 delete_option('kpts_settings');
+delete_option('kpts_caps_version');
 
 // clear anything we had scheduled
 wp_clear_scheduled_hook('kpts_daily_maintenance');

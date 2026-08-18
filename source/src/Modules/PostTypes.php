@@ -39,6 +39,22 @@ if (! class_exists('\KP\Support\Modules\PostTypes')) {
         public const POST_TYPE = 'kpts_ticket';
 
         /**
+         * The chat post type name.
+         *
+         * @since 1.0.0
+         * @var string
+         */
+        public const CHAT_POST_TYPE = 'kpts_chat';
+
+        /**
+         * The comment type chat messages are stored under.
+         *
+         * @since 1.0.0
+         * @var string
+         */
+        public const CHAT_COMMENT_TYPE = 'kpts_chat_msg';
+
+        /**
          * The department taxonomy name.
          *
          * @since 1.0.0
@@ -131,6 +147,38 @@ if (! class_exists('\KP\Support\Modules\PostTypes')) {
                 'menu_icon'           => 'dashicons-sos',
                 'supports'            => array('title', 'editor', 'author'),
                 'capability_type'     => array('kpts_ticket', 'kpts_tickets'),
+                'map_meta_cap'        => true,
+                'delete_with_user'    => false,
+            ));
+
+            // the chat labels, these only ever show up in our own screens
+            $chat_labels = array(
+                'name'          => _x('Chats', 'post type general name', 'kp-support'),
+                'singular_name' => _x('Chat', 'post type singular name', 'kp-support'),
+                'menu_name'     => _x('Chats', 'admin menu', 'kp-support'),
+                'edit_item'     => __('Edit Chat', 'kp-support'),
+                'all_items'     => __('All Chats', 'kp-support'),
+                'search_items'  => __('Search Chats', 'kp-support'),
+                'not_found'     => __('No chats found.', 'kp-support'),
+            );
+
+            // and register it, no UI at all, our own chat screen handles every bit of display
+            register_post_type(self::CHAT_POST_TYPE, array(
+                'labels'              => $chat_labels,
+                'public'              => false,
+                'publicly_queryable'  => false,
+                'show_ui'             => false,
+                'show_in_menu'        => false,
+                'show_in_admin_bar'   => false,
+                'show_in_nav_menus'   => false,
+                'show_in_rest'        => false,
+                'exclude_from_search' => true,
+                'query_var'           => false,
+                'rewrite'             => false,
+                'has_archive'         => false,
+                'hierarchical'        => false,
+                'supports'            => array('title', 'author'),
+                'capability_type'     => array('kpts_chat', 'kpts_chats'),
                 'map_meta_cap'        => true,
                 'delete_with_user'    => false,
             ));

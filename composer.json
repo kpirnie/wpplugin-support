@@ -2,7 +2,7 @@
     "name": "kevinpirnie/kp-support",
     "description": "A full-featured WordPress support ticket system with AJAX chat, threaded replies, departments, priorities, attachments, and a front-end customer portal.",
     "type": "wordpress-plugin",
-    "license": "GPL-3.0-or-later",
+    "license": "MIT",
     "authors": [
         {
             "name": "Kevin Pirnie",

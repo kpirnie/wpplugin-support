@@ -47,6 +47,14 @@ if (! class_exists('\KP\Support\Plugin')) {
         public const FRAMEWORK_ID = 'kp_support';
 
         /**
+         * The option holding the version our roles were last built against.
+         *
+         * @since 1.0.0
+         * @var string
+         */
+        public const CAPS_VERSION_KEY = 'kpts_caps_version';
+
+        /**
          * The singleton instance.
          *
          * @since 1.0.0
@@ -131,6 +139,9 @@ if (! class_exists('\KP\Support\Plugin')) {
             // we don't support network activation, so guard against it
             add_action('admin_init', array($this, 'blockNetworkActivation'));
 
+            // rebuild the roles if they predate the current version
+            add_action('admin_init', array($this, 'maybeUpgradeCaps'));
+
             // boot the field framework, bail out with a notice if it isn't there
             if (! $this->bootFramework()) {
                 add_action('admin_notices', array($this, 'missingFrameworkNotice'));
@@ -168,6 +179,32 @@ if (! class_exists('\KP\Support\Plugin')) {
                 esc_html__('Network Activation Not Supported', 'kp-support'),
                 array('back_link' => true)
             );
+        }
+
+        /**
+         * Rebuild our roles when the plugin has been updated in place.
+         *
+         * Activation only fires on activate, so an update over the top leaves
+         * the old capability set behind. This catches that.
+         *
+         * @since  1.0.0
+         * @access public
+         * @return void
+         */
+        public function maybeUpgradeCaps(): void
+        {
+
+            // what were the roles last built against
+            $built = (string) get_option(self::CAPS_VERSION_KEY, '');
+
+            // nothing to do if they're current
+            if ($built === KP_SUPPORT_VERSION) {
+                return;
+            }
+
+            // rebuild them and stamp the version
+            Modules\Roles::addRoles();
+            update_option(self::CAPS_VERSION_KEY, KP_SUPPORT_VERSION, false);
         }
 
         /**
@@ -225,6 +262,9 @@ if (! class_exists('\KP\Support\Plugin')) {
                 'accounts'      => Modules\Accounts::class,
                 'portal'        => Modules\Portal::class,
                 'ajax'          => Modules\Ajax::class,
+                'chat_ajax'     => Modules\ChatAjax::class,
+                'chat_widget'   => Modules\ChatWidget::class,
+                'chat_admin'    => Modules\ChatAdmin::class,
                 'admin'         => Modules\Admin::class,
                 'settings'      => Settings\Settings::class,
             );
@@ -325,6 +365,9 @@ if (! class_exists('\KP\Support\Plugin')) {
             // build out our roles and capabilities
             Modules\Roles::addRoles();
 
+            // stamp what the roles were built against
+            update_option(self::CAPS_VERSION_KEY, KP_SUPPORT_VERSION, false);
+
             // lock down the attachment upload directory
             Modules\Attachments::protectUploadDir();
 
@@ -388,6 +431,15 @@ if (! class_exists('\KP\Support\Plugin')) {
                 'notify_status_change'  => true,
                 'email_from_name'       => get_bloginfo('name'),
                 'email_from_address'    => get_bloginfo('admin_email'),
+                'enable_chat'               => false,
+                'chat_position'             => 'bottom-right',
+                'chat_label'                => 'Need help?',
+                'chat_department'           => '',
+                'chat_ticket_prefix'        => 'CHAT - ',
+                'status_after_chat_convert' => 'open',
+                'status_after_chat_close'   => 'closed',
+                'chat_rate_limit'           => 20,
+                'notify_new_chat'           => true,
             );
 
             // merge ours in underneath whatever is already there and save it back

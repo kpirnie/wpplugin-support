@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace KP\Support\Modules;
 
+use KP\Support\Helpers\ChatAccess;
 use KP\Support\Plugin;
 use KP\Support\Helpers\Access;
 use KP\Support\Helpers\Ticket;
@@ -48,6 +49,9 @@ if (! class_exists('\KP\Support\Modules\Notifications')) {
 
             // a brand new ticket landed
             add_action('kpts_ticket_created', array($this, 'onTicketCreated'), 10, 2);
+
+            // a chat opening up
+            add_action('kpts_chat_started', array($this, 'onChatStarted'), 10, 2);
 
             // somebody replied
             add_action('kpts_reply_added', array($this, 'onReplyAdded'), 10, 4);
@@ -119,6 +123,75 @@ if (! class_exists('\KP\Support\Modules\Notifications')) {
                 $this->template(
                     'email_new_ticket_agent_body',
                     __("A new ticket has been opened by {customer_name}.\n\n<strong>{ticket_subject}</strong>\nDepartment: {department}\nPriority: {priority}\n\n{ticket_content}\n\nView the ticket:\n{ticket_url}", 'kp-support')
+                ),
+                $tokens
+            );
+        }
+
+        /**
+         * Let the agents know somebody has opened a chat.
+         *
+         * Only the agents get this one, the customer is sitting in the panel
+         * watching it happen so there's nothing to tell them.
+         *
+         * @since  1.0.0
+         * @access public
+         * @param  int $chat_id The chat id.
+         * @param  int $user_id Who started it.
+         * @return void
+         */
+        public function onChatStarted(int $chat_id, int $user_id): void
+        {
+
+            // only if we're set up to do this
+            if (! $this->opt('notify_new_chat', true)) {
+                return;
+            }
+
+            // who started it
+            $visitor = get_userdata($user_id);
+
+            // pull everybody who works chats
+            $agents = get_users(array(
+                'capability' => 'kpts_handle_chats',
+                'fields'     => 'ID',
+            ));
+
+            // narrow them to whoever actually covers chats
+            $eligible = array();
+            foreach ($agents as $_agent_id) {
+                if (ChatAccess::agentCoversChats((int) $_agent_id)) {
+                    $eligible[] = (int) $_agent_id;
+                }
+            }
+
+            // pull their addresses, skipping whoever started it
+            $addresses = $this->addressesFor($eligible, $user_id);
+
+            // nothing to send
+            if (empty($addresses)) {
+                return;
+            }
+
+            // the tokens we'll swap into the templates
+            $tokens = array(
+                '{customer_name}'  => ($visitor instanceof \WP_User) ? $visitor->display_name : __('A customer', 'kp-support'),
+                '{customer_email}' => ($visitor instanceof \WP_User) ? $visitor->user_email : '',
+                '{chat_url}'       => admin_url('edit.php?post_type=' . PostTypes::POST_TYPE . '&page=' . ChatAdmin::MENU_SLUG),
+                '{site_name}'      => get_bloginfo('name'),
+                '{site_url}'       => home_url('/'),
+            );
+
+            // fire it off
+            $this->send(
+                $addresses,
+                $this->template(
+                    'email_new_chat_subject',
+                    __('New chat waiting from {customer_name}', 'kp-support')
+                ),
+                $this->template(
+                    'email_new_chat_body',
+                    __("{customer_name} has started a live chat and is waiting for somebody to pick it up.\n\nOpen the chat queue:\n{chat_url}\n\n- {site_name}", 'kp-support')
                 ),
                 $tokens
             );

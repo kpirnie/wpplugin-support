@@ -28,6 +28,9 @@ class ComposerStaticInit5257ade7c492b6b012b7981d84ee45e9
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'KP\\Support\\Helpers\\Access' => __DIR__ . '/../..' . '/source/src/Helpers/Access.php',
+        'KP\\Support\\Helpers\\Chat' => __DIR__ . '/../..' . '/source/src/Helpers/Chat.php',
+        'KP\\Support\\Helpers\\ChatAccess' => __DIR__ . '/../..' . '/source/src/Helpers/ChatAccess.php',
+        'KP\\Support\\Helpers\\ChatConvert' => __DIR__ . '/../..' . '/source/src/Helpers/ChatConvert.php',
         'KP\\Support\\Helpers\\Template' => __DIR__ . '/../..' . '/source/src/Helpers/Template.php',
         'KP\\Support\\Helpers\\Ticket' => __DIR__ . '/../..' . '/source/src/Helpers/Ticket.php',
         'KP\\Support\\Modules\\AbstractModule' => __DIR__ . '/../..' . '/source/src/Modules/AbstractModule.php',
@@ -35,6 +38,8 @@ class ComposerStaticInit5257ade7c492b6b012b7981d84ee45e9
         'KP\\Support\\Modules\\Admin' => __DIR__ . '/../..' . '/source/src/Modules/Admin.php',
         'KP\\Support\\Modules\\Ajax' => __DIR__ . '/../..' . '/source/src/Modules/Ajax.php',
         'KP\\Support\\Modules\\Attachments' => __DIR__ . '/../..' . '/source/src/Modules/Attachments.php',
+        'KP\\Support\\Modules\\ChatAdmin' => __DIR__ . '/../..' . '/source/src/Modules/ChatAdmin.php',
+        'KP\\Support\\Modules\\ChatWidget' => __DIR__ . '/../..' . '/source/src/Modules/ChatWidget.php',
         'KP\\Support\\Modules\\Notifications' => __DIR__ . '/../..' . '/source/src/Modules/Notifications.php',
         'KP\\Support\\Modules\\Portal' => __DIR__ . '/../..' . '/source/src/Modules/Portal.php',
         'KP\\Support\\Modules\\PostTypes' => __DIR__ . '/../..' . '/source/src/Modules/PostTypes.php',

@@ -24,6 +24,7 @@
 declare(strict_types=1);
 
 use KP\Support\Helpers\Access;
+use KP\Support\Helpers\Chat;
 use KP\Support\Helpers\Ticket;
 use KP\Support\Helpers\Template;
 use KP\Support\Modules\Portal;
@@ -47,6 +48,9 @@ $kpts_status = Ticket::term($kpts_ticket_id, PostTypes::TAX_STATUS);
 $kpts_priority = Ticket::term($kpts_ticket_id, PostTypes::TAX_PRIORITY);
 $kpts_department = Ticket::term($kpts_ticket_id, PostTypes::TAX_DEPARTMENT);
 $kpts_category = Ticket::term($kpts_ticket_id, PostTypes::TAX_CATEGORY);
+
+// did this ticket start life as a chat
+$kpts_chat_source = Chat::sourceOf($kpts_ticket_id);
 
 // who opened it and who has it
 $kpts_requester = get_userdata((int) get_post_meta($kpts_ticket_id, Access::META_REQUESTER, true));
@@ -83,7 +87,8 @@ $kpts_badge = static function (?\WP_Term $kpts_term): string {
 ?>
 <div class="kpts-portal kpts-portal-ticket">
 
-    <?php echo \KP\Support\Modules\Accounts::renderMessages(); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in renderMessages() ?>
+    <?php echo \KP\Support\Modules\Accounts::renderMessages(); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in renderMessages() 
+    ?>
 
     <p class="kpts-back">
         <a href="<?php echo esc_url(Portal::url()); ?>">&larr; <?php esc_html_e('Back to all tickets', 'kp-support'); ?></a>
@@ -95,8 +100,15 @@ $kpts_badge = static function (?\WP_Term $kpts_term): string {
             <h2 class="kpts-ticket-subject"><?php echo esc_html($kpts_ticket->post_title); ?></h2>
         </div>
         <div class="kpts-ticket-badges">
-            <?php echo $kpts_badge($kpts_status); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in the closure ?>
-            <?php echo $kpts_badge($kpts_priority); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in the closure ?>
+            <?php echo $kpts_badge($kpts_status); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in the closure 
+            ?>
+            <?php echo $kpts_badge($kpts_priority); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in the closure 
+            ?>
+            <?php if ($kpts_chat_source > 0) : ?>
+                <a class="kpts-link kpts-transcript-link" href="<?php echo esc_url(Portal::transcriptUrl($kpts_chat_source)); ?>">
+                    <?php esc_html_e('Download chat transcript', 'kp-support'); ?>
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 

@@ -93,19 +93,24 @@ if (! class_exists('\KP\Support\Modules\Replies')) {
             $type = $query->query_vars['type'] ?? '';
             $type_in = $query->query_vars['type__in'] ?? array();
 
-            // if they explicitly asked for ours, hand it straight back
-            if ($type === self::COMMENT_TYPE) {
+            // both of the comment types we own
+            $ours = array(self::COMMENT_TYPE, PostTypes::CHAT_COMMENT_TYPE);
+
+            // if they explicitly asked for one of ours, hand it straight back
+            if (in_array($type, $ours, true)) {
                 return $clauses;
             }
 
-            // same deal if ours is in the list they asked for
-            if (is_array($type_in) && in_array(self::COMMENT_TYPE, $type_in, true)) {
+            // same deal if one of ours is in the list they asked for
+            if (is_array($type_in) && ! empty(array_intersect($ours, $type_in))) {
                 return $clauses;
             }
 
-            // otherwise filter our type right out of it
+            // otherwise filter both of our types right out of it
             global $wpdb;
-            $clauses['where'] .= $wpdb->prepare(" AND {$wpdb->comments}.comment_type != %s", self::COMMENT_TYPE);
+            foreach ($ours as $_type) {
+                $clauses['where'] .= $wpdb->prepare(" AND {$wpdb->comments}.comment_type != %s", $_type);
+            }
 
             // and hand the clauses back
             return $clauses;
@@ -123,8 +128,8 @@ if (! class_exists('\KP\Support\Modules\Replies')) {
         public function filterCommentsNumber($count, $post_id): int
         {
 
-            // tickets don't have a public comment count at all
-            if (get_post_type($post_id) === PostTypes::POST_TYPE) {
+            // tickets and chats don't have a public comment count at all
+            if (in_array(get_post_type($post_id), array(PostTypes::POST_TYPE, PostTypes::CHAT_POST_TYPE), true)) {
                 return 0;
             }
 

@@ -17,13 +17,11 @@ SLUG="kp-support"
 SHOULD_COPY="$(node -p "require('${ROOT}/package.json').production.shouldcopy")"
 PROD_PATH="$(node -p "require('${ROOT}/package.json').production.path")"
 
-# pick up the local minifiers if they've been installed, otherwise let npx grab them
-if [ -x "${ROOT}/node_modules/.bin/terser" ]; then
-    TERSER="${ROOT}/node_modules/.bin/terser"
-    CLEANCSS="${ROOT}/node_modules/.bin/cleancss"
+# pick up the local minifier if it's been installed, otherwise let npx grab it
+if [ -x "${ROOT}/node_modules/.bin/esbuild" ]; then
+    ESBUILD="${ROOT}/node_modules/.bin/esbuild"
 else
-    TERSER="npx --yes terser"
-    CLEANCSS="npx --yes clean-css-cli"
+    ESBUILD="npx --yes esbuild"
 fi
 
 # start clean, we never want stale files shipping
@@ -52,7 +50,7 @@ echo "# Working on Stylesheets"
 for _css in "${SRC}"/assets/css/*.css; do
     [ -e "${_css}" ] || continue
     _name="$(basename "${_css}" .css)"
-    ${CLEANCSS} -O2 -o "${DIST}/assets/css/${_name}.min.css" "${_css}"
+    ${ESBUILD} "${_css}" --minify --outfile="${DIST}/assets/css/${_name}.min.css" --log-level=warning
 done
 
 # minify the javascript
@@ -60,7 +58,7 @@ echo "# Working on JS"
 for _js in "${SRC}"/assets/js/*.js; do
     [ -e "${_js}" ] || continue
     _name="$(basename "${_js}" .js)"
-    ${TERSER} "${_js}" --compress --mangle -o "${DIST}/assets/js/${_name}.min.js"
+    ${ESBUILD} "${_js}" --minify --target=es2017 --outfile="${DIST}/assets/js/${_name}.min.js" --log-level=warning
 done
 
 # generate the translation template off the source tree

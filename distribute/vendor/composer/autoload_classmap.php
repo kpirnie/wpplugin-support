@@ -8,6 +8,9 @@ $baseDir = dirname($vendorDir);
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'KP\\Support\\Helpers\\Access' => $baseDir . '/source/src/Helpers/Access.php',
+    'KP\\Support\\Helpers\\Chat' => $baseDir . '/source/src/Helpers/Chat.php',
+    'KP\\Support\\Helpers\\ChatAccess' => $baseDir . '/source/src/Helpers/ChatAccess.php',
+    'KP\\Support\\Helpers\\ChatConvert' => $baseDir . '/source/src/Helpers/ChatConvert.php',
     'KP\\Support\\Helpers\\Template' => $baseDir . '/source/src/Helpers/Template.php',
     'KP\\Support\\Helpers\\Ticket' => $baseDir . '/source/src/Helpers/Ticket.php',
     'KP\\Support\\Modules\\AbstractModule' => $baseDir . '/source/src/Modules/AbstractModule.php',
@@ -15,6 +18,8 @@ return array(
     'KP\\Support\\Modules\\Admin' => $baseDir . '/source/src/Modules/Admin.php',
     'KP\\Support\\Modules\\Ajax' => $baseDir . '/source/src/Modules/Ajax.php',
     'KP\\Support\\Modules\\Attachments' => $baseDir . '/source/src/Modules/Attachments.php',
+    'KP\\Support\\Modules\\ChatAdmin' => $baseDir . '/source/src/Modules/ChatAdmin.php',
+    'KP\\Support\\Modules\\ChatWidget' => $baseDir . '/source/src/Modules/ChatWidget.php',
     'KP\\Support\\Modules\\Notifications' => $baseDir . '/source/src/Modules/Notifications.php',
     'KP\\Support\\Modules\\Portal' => $baseDir . '/source/src/Modules/Portal.php',
     'KP\\Support\\Modules\\PostTypes' => $baseDir . '/source/src/Modules/PostTypes.php',

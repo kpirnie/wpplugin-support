@@ -9,7 +9,7 @@
 [![WordPress](https://img.shields.io/badge/Min.%20WP-6.8-3858e9?logo=wordpress&logoColor=white&style=for-the-badge&labelColor=000)](https://php.net)
 [![Kevin Pirnie](https://img.shields.io/badge/-KevinPirnie.com-000d2d?style=for-the-badge&labelColor=000&logoColor=white&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz4KICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIxMiIgcng9IjQuNSIgcnk9IjEwIi8+CiAgPGxpbmUgeDE9IjIiIHkxPSIxMiIgeDI9IjIyIiB5Mj0iMTIiLz4KICA8bGluZSB4MT0iNC41IiB5MT0iNi41IiB4Mj0iMTkuNSIgeTI9IjYuNSIvPgogIDxsaW5lIHgxPSI0LjUiIHkxPSIxNy41IiB4Mj0iMTkuNSIgeTI9IjE3LjUiLz4KPC9zdmc+Cg==)](https://kevinpirnie.com/)
 
-A WordPress support ticket system with an AJAX chat thread, threaded replies, internal notes, departments, priorities, protected attachments, and a front-end customer portal.
+A WordPress support ticket system with an AJAX chat thread, live chat, threaded replies, internal notes, departments, priorities, protected attachments, and a front-end customer portal.
 
 Agents can work tickets entirely from the front end. wp-admin is there for list-table triage when you want it, not because anybody needs it to do their job.
 
@@ -68,18 +68,23 @@ Everything under `src/Modules` extends `AbstractModule` and does its work throug
 * `Portal` - the shortcodes, the front-end routing and the portal asset loading
 * `Accounts` - front-end registration, login and profile handling
 * `Replies` - the threaded reply tree, internal notes and the reply markup
-* `Ajax` - every chat endpoint, all behind one nonce check
+* `Ajax` - every ticket thread endpoint, all behind one nonce check
+* `ChatAjax` - every live chat endpoint, split across a visitor nonce and an agent nonce
+* `ChatWidget` - the corner docked launcher and panel on the front end
+* `ChatAdmin` - the agent Live Chat screen and its queue
 * `Attachments` - upload validation, protected storage and gated delivery
 * `Notifications` - the participant emails and their templates
 * `Admin` - the list table, the metaboxes and the admin asset loading
 * `TermFields` - the colour and sort order fields on the taxonomy terms
 * `Settings` - the tabbed options page, built from the field framework
 
-`src/Helpers` holds the stateless pieces the modules lean on: `Access` for every capability and visibility decision, `Ticket` for ticket creation, querying and state changes, and `Template` for locating and rendering the front-end templates.
+`src/Helpers` holds the stateless pieces the modules lean on: `Access` for every ticket capability and visibility decision, `ChatAccess` for the same on chats, `Ticket` for ticket creation, querying and state changes, `Chat` for chat creation, messages and state, `ChatConvert` for turning a chat into a ticket and building its transcript, and `Template` for locating and rendering the front-end templates.
 
 ## Data model
 
 Tickets are a custom post type. Replies are comments on that post, threaded through the standard comment parent, with internal notes flagged in comment meta. Departments, categories, priorities and statuses are taxonomies, so they are managed from the normal term screens and can be reordered and colour coded there.
+
+Chats are their own post type, with messages as a separate comment type on the chat post. A chat is never a ticket while it is running. When an agent converts it, or either side closes it out, the first message becomes a ticket's opening post and everything said after it is re-pointed onto that ticket as a reply with its original timestamp. The chat post is kept afterwards as the archive record and the two point at each other, which is what the transcript download reads.
 
 Attachments never enter the media library. They are written into `wp-content/uploads/kpts-attachments`, which is hardened with an `.htaccess`, a `web.config` and an index file, and they come back out only through a delivery endpoint that re-checks ticket access on every request. Files on an internal note stay restricted to the people who can see internal notes. Executable and script types are refused regardless of the allow list.
 
@@ -98,6 +103,11 @@ Actions:
 | Hook | Arguments |
 | --- | --- |
 | `kpts_ticket_created` | `$ticket_id`, `$requester_id` |
+| `kpts_chat_started` | `$chat_id`, `$visitor_id` |
+| `kpts_chat_message_added` | `$message_id`, `$chat_id`, `$user_id` |
+| `kpts_chat_state_changed` | `$chat_id`, `$state`, `$previous` |
+| `kpts_chat_assigned` | `$chat_id`, `$agent_id` |
+| `kpts_chat_converted` | `$chat_id`, `$ticket_id`, `$state` |
 | `kpts_reply_added` | `$comment_id`, `$ticket_id`, `$user_id`, `$internal` |
 | `kpts_ticket_status_changed` | `$ticket_id`, `$term_id`, `$previous` |
 | `kpts_ticket_assigned` | `$ticket_id`, `$user_id`, `$previous` |
@@ -110,6 +120,9 @@ Filters:
 | --- | --- |
 | `kpts_can_view_ticket` | whether a user can see a ticket |
 | `kpts_can_reply` | whether a user can reply to a ticket |
+| `kpts_can_view_chat` | whether a user can see a chat |
+| `kpts_can_post_chat` | whether a user can post to a chat |
+| `kpts_can_start_chat` | whether a user can open a chat |
 | `kpts_eligible_agents` | the assignable agent pool for a ticket |
 | `kpts_ticket_participants` | everybody attached to a ticket |
 | `kpts_ticket_query_args` | the query args behind the ticket lists |

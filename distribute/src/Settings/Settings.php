@@ -269,6 +269,73 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
             // how the chat polls and what files we take
             return array(
                 array(
+                    'id'          => 'enable_chat',
+                    'type'        => 'switch',
+                    'title'       => __('Enable Live Chat', 'kp-support'),
+                    'description' => __('Show the chat launcher to logged in customers.', 'kp-support'),
+                    'default'     => false,
+                ),
+                array(
+                    'id'          => 'chat_position',
+                    'type'        => 'select',
+                    'title'       => __('Launcher Position', 'kp-support'),
+                    'description' => __('Which corner the chat launcher sits in.', 'kp-support'),
+                    'options'     => array(
+                        'bottom-right' => __('Bottom Right', 'kp-support'),
+                        'bottom-left'  => __('Bottom Left', 'kp-support'),
+                        'top-right'    => __('Top Right', 'kp-support'),
+                        'top-left'     => __('Top Left', 'kp-support'),
+                    ),
+                    'default'     => 'bottom-right',
+                ),
+                array(
+                    'id'          => 'chat_label',
+                    'type'        => 'text',
+                    'title'       => __('Launcher Label', 'kp-support'),
+                    'description' => __('The text shown on the chat launcher.', 'kp-support'),
+                    'default'     => __('Need help?', 'kp-support'),
+                ),
+                array(
+                    'id'          => 'chat_department',
+                    'type'        => 'select',
+                    'title'       => __('Chat Department', 'kp-support'),
+                    'description' => __('The department chats are routed to, and the one converted tickets land in.', 'kp-support'),
+                    'options'     => $this->termOptions(PostTypes::TAX_DEPARTMENT),
+                    'default'     => 0,
+                ),
+                array(
+                    'id'          => 'chat_ticket_prefix',
+                    'type'        => 'text',
+                    'title'       => __('Converted Ticket Prefix', 'kp-support'),
+                    'description' => __('Prefixed to the subject of every ticket built from a chat.', 'kp-support'),
+                    'default'     => 'CHAT - ',
+                ),
+                array(
+                    'id'          => 'status_after_chat_convert',
+                    'type'        => 'select',
+                    'title'       => __('Status After Convert', 'kp-support'),
+                    'description' => __('The status a ticket gets when an agent converts a live chat.', 'kp-support'),
+                    'options'     => $this->termOptions(PostTypes::TAX_STATUS, 'slug'),
+                    'default'     => 'open',
+                ),
+                array(
+                    'id'          => 'status_after_chat_close',
+                    'type'        => 'select',
+                    'title'       => __('Status After Close', 'kp-support'),
+                    'description' => __('The status a ticket gets when either side closes the chat out.', 'kp-support'),
+                    'options'     => $this->termOptions(PostTypes::TAX_STATUS, 'slug'),
+                    'default'     => 'closed',
+                ),
+                array(
+                    'id'          => 'chat_rate_limit',
+                    'type'        => 'number',
+                    'title'       => __('Messages Per Minute', 'kp-support'),
+                    'description' => __('How many messages one person can send in a minute before being throttled.', 'kp-support'),
+                    'default'     => 20,
+                    'min'         => 1,
+                    'max'         => 120,
+                ),
+                array(
                     'id'          => 'poll_interval',
                     'type'        => 'number',
                     'label'       => __('Check For New Replies Every', 'kp-support'),
@@ -358,6 +425,13 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
                     'default'     => true,
                 ),
                 array(
+                    'id'          => 'notify_new_chat',
+                    'type'        => 'switch',
+                    'label'       => __('New Chat', 'kp-support'),
+                    'description' => __('Email the agents when somebody opens a live chat.', 'kp-support'),
+                    'default'     => true,
+                ),
+                array(
                     'id'          => 'notify_new_reply',
                     'type'        => 'switch',
                     'label'       => __('New Reply', 'kp-support'),
@@ -411,7 +485,7 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
                     'id'           => 'template_tokens',
                     'type'         => 'message',
                     'message_type' => 'info',
-                    'content'      => __('Available tokens: {ticket_number}, {ticket_subject}, {ticket_content}, {ticket_url}, {customer_name}, {customer_email}, {reply_author}, {reply_content}, {status}, {priority}, {department}, {category}, {site_name}, {site_url}', 'kp-support'),
+                    'content'      => __('Available tokens: {ticket_number}, {ticket_subject}, {ticket_content}, {ticket_url}, {customer_name}, {customer_email}, {reply_author}, {reply_content}, {status}, {priority}, {department}, {category}, {site_name}, {site_url}. The chat template only supports {customer_name}, {customer_email}, {chat_url}, {site_name} and {site_url}.', 'kp-support'),
                 ),
             );
 
@@ -423,6 +497,7 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
                 'email_internal_note'       => __('Internal Note', 'kp-support'),
                 'email_status_change'       => __('Status Change', 'kp-support'),
                 'email_assignment'          => __('Ticket Assigned', 'kp-support'),
+                'email_new_chat'            => __('New Chat (to agents)', 'kp-support'),
             );
 
             // build a subject and body field for each one

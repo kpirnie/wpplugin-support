@@ -83,10 +83,11 @@ if (! class_exists('\KP\Support\Modules\Roles')) {
         public static function capabilities(): array
         {
 
-            // what a customer can do, which is really just open tickets
+            // what a customer can do, which is really just open tickets and chats
             $customer = array(
                 'read'                 => true,
                 'create_kpts_tickets'  => true,
+                'kpts_start_chat'      => true,
             );
 
             // what an agent can do on top of that
@@ -98,6 +99,14 @@ if (! class_exists('\KP\Support\Modules\Roles')) {
                 'read_private_kpts_tickets'   => true,
                 'kpts_reply_internal'         => true,
                 'kpts_assign_tickets'         => true,
+                'edit_kpts_chats'             => true,
+                'edit_others_kpts_chats'      => true,
+                'edit_published_kpts_chats'   => true,
+                'publish_kpts_chats'          => true,
+                'read_private_kpts_chats'     => true,
+                'kpts_handle_chats'           => true,
+                'kpts_assign_chats'           => true,
+                'kpts_convert_chats'          => true,
             ));
 
             // and what a manager can do on top of that
@@ -107,6 +116,10 @@ if (! class_exists('\KP\Support\Modules\Roles')) {
                 'delete_others_kpts_tickets'    => true,
                 'delete_published_kpts_tickets' => true,
                 'delete_private_kpts_tickets'   => true,
+                'delete_kpts_chats'             => true,
+                'delete_others_kpts_chats'      => true,
+                'delete_published_kpts_chats'   => true,
+                'delete_private_kpts_chats'     => true,
                 'kpts_manage_settings'          => true,
             ));
 

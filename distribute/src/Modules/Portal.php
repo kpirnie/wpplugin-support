@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace KP\Support\Modules;
 
 use KP\Support\Plugin;
+use KP\Support\Helpers\ChatAccess;
+use KP\Support\Helpers\ChatConvert;
 use KP\Support\Helpers\Access;
 use KP\Support\Helpers\Ticket;
 use KP\Support\Helpers\Template;
@@ -61,6 +63,9 @@ if (! class_exists('\KP\Support\Modules\Portal')) {
 
             // load our assets when we're actually on a page that needs them
             add_action('wp_enqueue_scripts', array($this, 'enqueueAssets'));
+
+            // the chat transcript download
+            add_action('init', array($this, 'handleTranscript'));
         }
 
         /**
@@ -535,6 +540,72 @@ if (! class_exists('\KP\Support\Modules\Portal')) {
                 '<div class="kpts-portal"><div class="kpts-notice kpts-notice-%1$s">%2$s</div></div>',
                 esc_attr($type),
                 esc_html($message)
+            );
+        }
+
+        /**
+         * Serve the transcript of a chat.
+         *
+         * @since  1.0.0
+         * @access public
+         * @return void
+         */
+        public function handleTranscript(): void
+        {
+
+            // is this even a transcript request
+            if (! isset($_GET['kpts_transcript'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- the nonce is checked immediately below
+                return;
+            }
+
+            // which chat
+            $chat_id = absint(wp_unslash($_GET['kpts_transcript'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- the nonce is checked immediately below
+
+            // the nonce is tied to this specific chat
+            $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
+            if (! wp_verify_nonce($nonce, 'kpts_chat_transcript_' . $chat_id)) {
+                wp_die(esc_html__('That link has expired. Please reload the page and try again.', 'kp-support'), 403);
+            }
+
+            // they have to be logged in
+            if (! is_user_logged_in()) {
+                wp_die(esc_html__('Please log in to continue.', 'kp-support'), 401);
+            }
+
+            // and allowed at it, which covers the chat being real
+            if (! ChatAccess::canTranscript($chat_id)) {
+                wp_die(esc_html__('You are not allowed to access that transcript.', 'kp-support'), 403);
+            }
+
+            // build it
+            $transcript = ChatConvert::transcript($chat_id);
+
+            // and send it down as a file
+            nocache_headers();
+            header('Content-Type: text/plain; charset=utf-8');
+            header('Content-Disposition: attachment; filename="' . sanitize_file_name('chat-' . $chat_id . '.txt') . '"');
+            header('Content-Length: ' . strlen($transcript));
+
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- plain text file body, headers set above
+            echo $transcript;
+            exit;
+        }
+
+        /**
+         * Build the transcript download url for a chat.
+         *
+         * @since  1.0.0
+         * @access public
+         * @param  int $chat_id The chat id.
+         * @return string The url.
+         */
+        public static function transcriptUrl(int $chat_id): string
+        {
+
+            // nonced and tied to the chat
+            return wp_nonce_url(
+                add_query_arg('kpts_transcript', $chat_id, home_url('/')),
+                'kpts_chat_transcript_' . $chat_id
             );
         }
     }

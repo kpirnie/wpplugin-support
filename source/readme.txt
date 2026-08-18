@@ -4,7 +4,7 @@ Tags: support, helpdesk, ticket system, live chat, customer service
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.13
+Stable tag: 1.0.20
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -28,6 +28,15 @@ KP Support turns WordPress into a proper help desk. Customers open tickets from 
 * Agents can mark any reply as an internal note, which customers never see and never get emailed
 * New replies arrive by polling on a configurable interval, with backoff when the tab is hidden
 * Agents get the same thread inside wp-admin on the ticket edit screen
+
+= Live chat =
+
+* A corner docked chat panel for logged in customers, fixed positioned and non modal, the page underneath stays scrollable and clickable
+* Agents work the queue from a Live Chat screen under the Support menu, with Mine, Waiting and All filters
+* Any chat can be handed to another agent from the queue, and agents can start a chat themselves when they need a second pair of eyes
+* A chat stays a chat until it ends. Hitting Convert To Ticket turns it into an open ticket, and either side closing it archives it as a closed one
+* The opening message becomes the ticket's opening post and everything said after it becomes a reply, timestamps intact
+* Every chat is kept, so the customer can pull a plain text transcript from the ticket it became, whenever they wantf
 
 = Attachments =
 
@@ -93,6 +102,9 @@ Drop a copy of any of these into `wp-content/themes/your-theme/kp-support/` and 
 * `reply.php` - a single reply in the thread, rendered recursively for nested replies
 * `thread.php` - the reply list and the reply form, used by both the portal and wp-admin
 * `ticket.php` - the single ticket view, its meta panel and its management controls
+* `chat-panel.php` - the corner docked launcher and chat panel
+* `chat-message.php` - a single chat message, rendered on its own when one arrives over AJAX
+* `chat-admin.php` - the agent chat screen, its queue and its toolbar
 
 Every variable a template is handed is prefixed with `kpts_`, and each file documents its own in the docblock at the top. The full set:
 
@@ -107,6 +119,15 @@ Every variable a template is handed is prefixed with `kpts_`, and each file docu
 The class names in the markup and the CSS custom properties on the `.kpts-portal` wrapper are the supported styling surface. Keep the `kpts-` classes on the elements the scripts bind to - the reply form, the file input, the internal note toggle and the management selects - or the chat stops working.
 
 == Changelog ==
+
+= 1.0.20 =
+* Added live chat: a corner docked panel on the front end and a Live Chat queue under the Support menu for agents
+* Chats are their own record until they end, then they are archived as a ticket with the opening message as the opening post
+* Agents can convert a live chat into an open ticket, hand it to another agent, or close it out
+* Customers can download a plain text transcript from any ticket that came from a chat
+* Added chat capabilities, and roles are now rebuilt automatically when the plugin is updated in place rather than only on activation
+* Added chat settings for the launcher position and label, the chat department, the converted ticket prefix, the resulting statuses and a per user message rate limit
+* Added an agent notification for a waiting chat, with its own editable subject and body
 
 = 1.0.13 =
 * Restructured the repository into a source and distribute layout, built by build.sh

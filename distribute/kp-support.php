@@ -9,13 +9,13 @@
  * Plugin Name:       KP Support
  * Plugin URI:        https://kevinpirnie.com/
  * Description:       A full-featured support ticket system with AJAX chat, threaded replies, departments, priorities, attachments, and a front-end customer portal.
- * Version:           1.0.13
+ * Version:           1.0.20
  * Requires at least: 6.8
  * Requires PHP:      8.2
  * Author:            Kevin Pirnie
  * Author URI:        https://kevinpirnie.com/
- * License:           MIT
- * License URI:       https://opensource.org/licenses/MIT
+ * License:           GPL-3.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       kp-support
  * Domain Path:       /languages
  *
@@ -30,7 +30,7 @@ declare(strict_types=1);
 defined('ABSPATH') || die('No direct script access allowed');
 
 // setup our constants, only if they're not already there
-defined('KP_SUPPORT_VERSION') || define('KP_SUPPORT_VERSION', '1.0.13');
+defined('KP_SUPPORT_VERSION') || define('KP_SUPPORT_VERSION', '1.0.20');
 defined('KP_SUPPORT_FILE') || define('KP_SUPPORT_FILE', __FILE__);
 defined('KP_SUPPORT_DIR') || define('KP_SUPPORT_DIR', plugin_dir_path(__FILE__));
 defined('KP_SUPPORT_URL') || define('KP_SUPPORT_URL', plugin_dir_url(__FILE__));
