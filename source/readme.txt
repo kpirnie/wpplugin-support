@@ -4,7 +4,7 @@ Tags: support, helpdesk, ticket system, live chat, customer service
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.23
+Stable tag: 1.0.20
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -121,21 +121,19 @@ The class names in the markup and the CSS custom properties on the `.kpts-portal
 
 == Changelog ==
 
-= 1.0.23 =
-* Chat messages accept attachments, which move onto the ticket when the chat is converted or closed
-
-= 1.0.22 =
-* Fix PSR-4 pathing
-* Move ChatAjax
-
 = 1.0.20 =
 * Added live chat: a corner docked panel on the front end and a Live Chat queue under the Support menu for agents
 * Chats are their own record until they end, then they are archived as a ticket with the opening message as the opening post
 * Agents can convert a live chat into an open ticket, hand it to another agent, or close it out
+* Chat messages accept attachments, which move onto the ticket when the chat is converted or closed
 * Customers can download a plain text transcript from any ticket that came from a chat
 * Added chat capabilities, and roles are now rebuilt automatically when the plugin is updated in place rather than only on activation
 * Added chat settings for the launcher position and label, the chat department, the converted ticket prefix, the resulting statuses and a per user message rate limit
 * Added an agent notification for a waiting chat, with its own editable subject and body
+* Fixed replies posting from the wp-admin ticket screen, where the reply form was nested inside the post edit form and never submitted
+* The ticket's opening message now renders at the top of the wp-admin conversation, along with any files that came with it
+* Removed the editor, comment and author boxes from the ticket screen, so replies only ever go through the conversation
+* Switched asset minification to esbuild, dropping the deprecated dependencies the old toolchain pulled in
 
 = 1.0.13 =
 * Restructured the repository into a source and distribute layout, built by build.sh
