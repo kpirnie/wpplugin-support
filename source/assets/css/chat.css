@@ -210,12 +210,17 @@
 /* ---------- messages ---------- */
 
 .kpts-chat-messages {
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;
     margin: 0;
     padding: 12px;
     list-style: none;
     overflow-y: auto;
     background: var(--kpts-chat-bg-alt);
+}
+
+.kpts-chat-messages:empty {
+    display: none;
 }
 
 .kpts-chat-message {
@@ -617,18 +622,94 @@
 
 /* ---------- offline form ---------- */
 
-.kpts-chat-offline-form {
+/* ---------- pre-chat form ---------- */
+
+/* hidden has to win over our own display rules */
+.kpts-chat [hidden] {
+    display: none !important;
+}
+
+.kpts-chat-name-row {
     display: flex;
+    gap: 8px;
+}
+
+.kpts-chat-name-row > input {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.kpts-chat-start-form {
+    display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
     gap: 8px;
+    min-height: 0;
     padding: 12px;
+    overflow-y: auto;
     border-top: 1px solid var(--kpts-chat-border);
+}
+
+.kpts-chat-start-form .kpts-chat-start-message {
+    flex: 0 0 auto;
+    min-height: 70px;
+    resize: vertical;
+}
+
+.kpts-chat-start-send {
+    flex: 0 0 auto;
+}
+
+.kpts-chat-start-intro {
+    margin: 0;
+}
+
+.kpts-chat-start-first,
+.kpts-chat-start-last,
+.kpts-chat-start-email,
+.kpts-chat-start-message {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--kpts-chat-border);
+    border-radius: 6px;
+    font: inherit;
+}
+
+.kpts-chat-start-first[readonly],
+.kpts-chat-start-last[readonly],
+.kpts-chat-start-email[readonly] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.kpts-chat-offline-form {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    padding: 12px;
+    overflow-y: auto;
+    border-top: 1px solid var(--kpts-chat-border);
+}
+
+.kpts-chat-offline-form .kpts-chat-offline-body {
+    flex: 0 0 auto;
+    min-height: 70px;
+    resize: vertical;
+}
+
+.kpts-chat-offline-form button[type="submit"] {
+    flex: 0 0 auto;
 }
 
 .kpts-chat-offline-message {
     margin: 0;
 }
 
+.kpts-chat-offline-first,
+.kpts-chat-offline-last,
+.kpts-chat-offline-email,
 .kpts-chat-offline-subject,
 .kpts-chat-offline-body {
     width: 100%;

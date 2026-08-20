@@ -128,11 +128,18 @@ if (! class_exists('\KP\Support\Helpers\Chat')) {
          *
          * @since  1.0.0
          * @access public
-         * @param  int $user_id The visitor's user id.
-         * @return int|\WP_Error The new chat id, or an error.
+         * @param  int  $user_id   The visitor.
+         * @param  bool $reuse_open True to hand back a chat they already have going.
+         * @return int|\WP_Error The chat id, or an error.
          */
-        public static function create(int $user_id): int|\WP_Error
+        public static function create(int $user_id, bool $reuse_open = true): int|\WP_Error
         {
+
+            // if they already have one going, that's the one they get
+            $open = self::openForUser($user_id);
+            if ($reuse_open && $open > 0) {
+                return $open;
+            }
 
             // we need somebody to own it
             if ($user_id < 1) {
@@ -148,7 +155,7 @@ if (! class_exists('\KP\Support\Helpers\Chat')) {
             // grab them so we can title the chat
             $user = get_userdata($user_id);
             if (! $user instanceof \WP_User) {
-                return new \WP_Error('kpts_bad_user', __('You must be logged in to start a chat.', 'kp-support'));
+                return new \WP_Error('kpts_bad_user', __('We could not work out who this chat belongs to.', 'kp-support'));
             }
 
             // drop the chat in
@@ -434,7 +441,7 @@ if (! class_exists('\KP\Support\Helpers\Chat')) {
          * @since  1.0.0
          * @access public
          * @param  int    $chat_id The chat id.
-         * @param  string $since   Only return messages newer than this GMT datetime.
+         * @param  string $since   Only return messages from this GMT datetime on, inclusive.
          * @return array<int, \WP_Comment> The messages, oldest first.
          */
         public static function messages(int $chat_id, string $since = ''): array
@@ -449,13 +456,15 @@ if (! class_exists('\KP\Support\Helpers\Chat')) {
                 'order'   => 'ASC',
             );
 
-            // if we were given a cutoff, only pull what came after it
+            // if we were given a cutoff, only pull what came after it, and take
+            // that second back in again so a message posted in the same second
+            // as the one we last saw isn't skipped over for good
             if ($since !== '') {
                 $args['date_query'] = array(
                     array(
                         'after'     => $since,
                         'column'    => 'comment_date_gmt',
-                        'inclusive' => false,
+                        'inclusive' => true,
                     ),
                 );
             }

@@ -310,6 +310,13 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
                     'default'     => __('Need help?', 'kp-support'),
                 ),
                 array(
+                    'id'          => 'chat_active_label',
+                    'type'        => 'text',
+                    'title'       => __('Active Chat Label', 'kp-support'),
+                    'description' => __('The text shown on the launcher while a chat is already going.', 'kp-support'),
+                    'default'     => __('Chat in progress...', 'kp-support'),
+                ),
+                array(
                     'id'          => 'chat_department',
                     'type'        => 'select',
                     'title'       => __('Chat Department', 'kp-support'),

@@ -446,6 +446,7 @@ if (! class_exists('\KP\Support\Plugin')) {
                 'enable_chat'               => false,
                 'chat_position'             => 'bottom-right',
                 'chat_label'                => 'Need help?',
+                'chat_active_label'         => 'Chat in progress...',
                 'chat_department'           => '',
                 'chat_ticket_prefix'        => 'CHAT - ',
                 'chat_presence_window'      => 5,

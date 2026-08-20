@@ -4,7 +4,7 @@ Tags: support, helpdesk, ticket system, live chat, customer service
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.39
+Stable tag: 1.0.46
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -120,6 +120,15 @@ Every variable a template is handed is prefixed with `kpts_`, and each file docu
 The class names in the markup and the CSS custom properties on the `.kpts-portal` wrapper are the supported styling surface. Keep the `kpts-` classes on the elements the scripts bind to - the reply form, the file input, the internal note toggle and the management selects - or the chat stops working.
 
 == Changelog ==
+
+= 1.0.46 =
+* Added: a pre-chat form, so a chat starts with a name, email address and opening message rather than opening straight away
+* Added: visitors without an account can now chat, an account is created quietly behind the scenes and they are never logged in
+* Added: an Active Chat Label setting, so the launcher says a chat is already going while one is running
+* Changed: Quick Edit now offers status, priority, department and assignment as dropdowns, and no longer shows the post status field
+* Changed: participants sit alongside the requester in the Ticket Details metabox
+* Fixed: a message sent in the same second as the other party's no longer stays hidden until the page is reloaded
+* Fixed: the chat panel no longer clips its own forms, and the business hours time fields are wide enough to read
 
 = 1.0.39 =
 * Added: updates now come through the normal WordPress update flow, pulled from GitHub releases

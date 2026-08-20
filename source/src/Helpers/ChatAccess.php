@@ -18,6 +18,7 @@ namespace KP\Support\Helpers;
 
 use KP\Support\Plugin;
 use KP\Support\Modules\PostTypes;
+use KP\Support\Modules\Roles;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
@@ -314,6 +315,35 @@ if (! class_exists('\KP\Support\Helpers\ChatAccess')) {
 
             // let people hook in and adjust the decision
             return (bool) apply_filters('kpts_can_start_chat', true, $user_id);
+        }
+
+
+        /**
+         * Work out whether somebody with no account yet can open a chat.
+         *
+         * They get one built for them off the pre-chat form, so the question is
+         * whether the customer role they'd land in is allowed to chat at all.
+         *
+         * @since  1.0.40
+         * @access public
+         * @return bool True if a guest can start one.
+         */
+        public static function guestsCanStart(): bool
+        {
+
+            // chat has to be switched on before anything else
+            if (! Plugin::opt('enable_chat', false)) {
+                return false;
+            }
+
+            // grab the role they'd be created into
+            $role = get_role(Roles::ROLE_CUSTOMER);
+
+            // and it has to carry the capability
+            $allowed = ($role instanceof \WP_Role) && $role->has_cap('kpts_start_chat');
+
+            // let people hook in and adjust the decision
+            return (bool) apply_filters('kpts_guests_can_start_chat', $allowed);
         }
 
         /**

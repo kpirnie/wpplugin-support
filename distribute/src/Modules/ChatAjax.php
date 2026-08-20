@@ -22,6 +22,7 @@ namespace KP\Support\Modules;
 use KP\Support\Helpers\Chat;
 use KP\Support\Helpers\ChatAccess;
 use KP\Support\Helpers\ChatConvert;
+use KP\Support\Helpers\ChatGuest;
 use KP\Support\Helpers\Ticket;
 
 // We don't want to allow direct access to this
@@ -65,7 +66,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
         public function register(): void
         {
 
-            // the endpoints we expose, all of them logged in only
+            // the endpoints we expose
             $actions = array(
                 'kpts_chat_start'  => 'startChat',
                 'kpts_chat_send'   => 'sendMessage',
@@ -77,23 +78,42 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
                 'kpts_chat_offline_ticket' => 'offlineTicket',
             );
 
+            // the ones a guest reaches, carrying their signed chat cookie rather
+            // than a login, everything else stays logged in only
+            $guest = array(
+                'kpts_chat_start',
+                'kpts_chat_send',
+                'kpts_chat_poll',
+                'kpts_chat_close',
+                'kpts_chat_offline_ticket',
+            );
+
             // wire each one up
             foreach ($actions as $_action => $_method) {
                 add_action('wp_ajax_' . $_action, array($this, $_method));
+
+                // and again for the logged out side where it applies
+                if (in_array($_action, $guest, true)) {
+                    add_action('wp_ajax_nopriv_' . $_action, array($this, $_method));
+                }
             }
         }
 
         /**
-         * Check the nonce and make sure somebody is actually logged in.
+         * Check the nonce and work out who we're dealing with.
          *
          * Either nonce is accepted here because both sides hit the shared
          * endpoints. The agent only endpoints call requireAgentNonce() instead.
          *
+         * A logged out caller is fine as long as they carry a guest chat cookie,
+         * or are starting a chat and about to be issued one.
+         *
          * @since  1.0.0
          * @access private
+         * @param  bool $allow_new True when a guest without a cookie yet is fine.
          * @return void
          */
-        private function verifyRequest(): void
+        private function verifyRequest(bool $allow_new = false): void
         {
 
             // one of our two actions has to check out, and we handle the failure
@@ -109,13 +129,45 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
                 ), 403);
             }
 
-            // and they have to be logged in
-            if (! is_user_logged_in()) {
-                wp_send_json_error(array(
-                    'message' => __('Please log in to continue.', 'kp-support'),
-                    'code'    => 'logged_out',
-                ), 401);
+            // a login is one way in
+            if (is_user_logged_in()) {
+                return;
             }
+
+            // a guest session is the other, and starting a chat comes before one
+            if ($allow_new || ChatGuest::userId() > 0) {
+                return;
+            }
+
+            // and that's everybody
+            wp_send_json_error(array(
+                'message' => __('Please log in to continue.', 'kp-support'),
+                'code'    => 'logged_out',
+            ), 401);
+        }
+
+        /**
+         * Who this request is acting as.
+         *
+         * A logged in user is themselves. A guest is the account their signed
+         * cookie points at, which is never a login of any kind.
+         *
+         * @since  1.0.40
+         * @access private
+         * @param  int $chat_id The chat being worked on, 0 for any.
+         * @return int The user id, or 0.
+         */
+        private function actorId(int $chat_id = 0): int
+        {
+
+            // a login always wins
+            $user_id = get_current_user_id();
+            if ($user_id > 0) {
+                return $user_id;
+            }
+
+            // otherwise it comes off the cookie
+            return ChatGuest::userId($chat_id);
         }
 
         /**
@@ -167,7 +219,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             $chat_id = isset($_POST['chat_id']) ? absint(wp_unslash($_POST['chat_id'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer before any handler reaches this
 
             // they have to be allowed on it, and this covers the chat being real
-            if (! ChatAccess::canView($chat_id)) {
+            if (! ChatAccess::canView($chat_id, $this->actorId($chat_id))) {
                 wp_send_json_error(array(
                     'message' => __('You are not allowed to access that chat.', 'kp-support'),
                     'code'    => 'forbidden',
@@ -197,7 +249,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             }
 
             // the key is per user and rolls with the transient
-            $key = 'kpts_chat_rate_' . get_current_user_id();
+            $key = 'kpts_chat_rate_' . $this->actorId();
 
             // what have they sent so far this window
             $sent = absint(get_transient($key));
@@ -215,7 +267,11 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
         }
 
         /**
-         * Start a chat for whoever is asking.
+         * Start a chat off the pre-chat form.
+         *
+         * The form carries who they are, which either matches an account we
+         * already have or quietly builds one. Nobody is logged in either way,
+         * a guest leaves with a signed cookie good for this chat alone.
          *
          * @since  1.0.0
          * @access public
@@ -224,11 +280,59 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
         public function startChat(): void
         {
 
-            // nonce and login
-            $this->verifyRequest();
+            // nonce, and a guest with no cookie yet is exactly who this is for
+            $this->verifyRequest(true);
+
+            // what they told us about themselves
+            $email = isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+            $first = isset($_POST['first_name']) ? sanitize_text_field(wp_unslash($_POST['first_name'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+            $last = isset($_POST['last_name']) ? sanitize_text_field(wp_unslash($_POST['last_name'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+            $message = isset($_POST['message']) ? wp_unslash($_POST['message']) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput,WordPress.Security.NonceVerification.Missing -- sanitized with wp_kses in Chat::addMessage()
+
+            // who is this
+            $user_id = get_current_user_id();
+
+            // a logged out visitor comes in off the form
+            if ($user_id < 1) {
+
+                // guests have to be allowed in the first place
+                if (! ChatAccess::guestsCanStart()) {
+                    wp_send_json_error(array(
+                        'message' => __('Please log in to start a chat.', 'kp-support'),
+                        'code'    => 'forbidden',
+                    ), 403);
+                }
+
+                // we need a name to go with the address
+                if ($first === '' || $last === '') {
+                    wp_send_json_error(array(
+                        'message' => __('Please enter your first and last name.', 'kp-support'),
+                        'code'    => 'empty',
+                    ), 400);
+                }
+
+                // find them, or stand an account up for them
+                $user_id = ChatGuest::resolve($email, $first, $last);
+
+                // if that failed, hand the reason back
+                if (is_wp_error($user_id)) {
+                    wp_send_json_error(array(
+                        'message' => $user_id->get_error_message(),
+                        'code'    => $user_id->get_error_code(),
+                    ), 400);
+                }
+            }
+
+            // the opening message is the whole point of the form
+            if (trim(wp_strip_all_tags((string) $message)) === '') {
+                wp_send_json_error(array(
+                    'message' => __('Please enter a message.', 'kp-support'),
+                    'code'    => 'empty',
+                ), 400);
+            }
 
             // chat has to be on and they have to be allowed to open one
-            if (! ChatAccess::canStart()) {
+            if (! ChatAccess::canStart($user_id)) {
                 wp_send_json_error(array(
                     'message' => __('You are not allowed to start a chat.', 'kp-support'),
                     'code'    => 'forbidden',
@@ -251,14 +355,38 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
                 ), 409);
             }
 
+            // whatever chat their own cookie already vouches for
+            $session = ChatGuest::current();
+
+            // a guest only picks an existing chat back up when their cookie already
+            // points at it, otherwise anyone typing a known address would walk
+            // straight into somebody else's conversation
+            $reuse = is_user_logged_in() || ($session['user_id'] === $user_id && $session['chat_id'] > 0);
+
             // open it, or pick up the one they already have going
-            $chat_id = Chat::create(get_current_user_id());
+            $chat_id = Chat::create($user_id, $reuse);
 
             // if that failed, hand the reason back
             if (is_wp_error($chat_id)) {
                 wp_send_json_error(array(
                     'message' => $chat_id->get_error_message(),
                     'code'    => $chat_id->get_error_code(),
+                ), 400);
+            }
+
+            // a guest gets the cookie that lets them carry on
+            if (! is_user_logged_in()) {
+                ChatGuest::issue($chat_id, $user_id);
+            }
+
+            // and their opening message goes straight on
+            $message_id = Chat::addMessage($chat_id, $user_id, (string) $message);
+
+            // which is nobody's fault but ours if it didn't land
+            if (is_wp_error($message_id)) {
+                wp_send_json_error(array(
+                    'message' => $message_id->get_error_message(),
+                    'code'    => $message_id->get_error_code(),
                 ), 400);
             }
 
@@ -276,11 +404,50 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
         public function offlineTicket(): void
         {
 
-            // nonce and login
-            $this->verifyRequest();
+            // nonce, and a guest leaving a message has no cookie yet either
+            $this->verifyRequest(true);
 
-            // they still need to be allowed to open a chat to use this
-            if (! ChatAccess::canStart()) {
+            // who they are, off the form when they aren't logged in
+            $user_id = get_current_user_id();
+
+            // a guest gets the same find-or-create treatment a chat would give them
+            if ($user_id < 1) {
+
+                // guests have to be allowed in the first place
+                if (! ChatAccess::guestsCanStart()) {
+                    wp_send_json_error(array(
+                        'message' => __('You are not allowed to do that.', 'kp-support'),
+                        'code'    => 'forbidden',
+                    ), 403);
+                }
+
+                // what they told us about themselves
+                $email = isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+                $first = isset($_POST['first_name']) ? sanitize_text_field(wp_unslash($_POST['first_name'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+                $last = isset($_POST['last_name']) ? sanitize_text_field(wp_unslash($_POST['last_name'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
+
+                // we need a name to go with the address
+                if ($first === '' || $last === '') {
+                    wp_send_json_error(array(
+                        'message' => __('Please enter your first and last name.', 'kp-support'),
+                        'code'    => 'empty',
+                    ), 400);
+                }
+
+                // find them, or stand an account up for them
+                $user_id = ChatGuest::resolve($email, $first, $last);
+
+                // if that failed, hand the reason back
+                if (is_wp_error($user_id)) {
+                    wp_send_json_error(array(
+                        'message' => $user_id->get_error_message(),
+                        'code'    => $user_id->get_error_code(),
+                    ), 400);
+                }
+            }
+
+            // and they still need to be allowed to open a chat to use this
+            if (! ChatAccess::canStart($user_id)) {
                 wp_send_json_error(array(
                     'message' => __('You are not allowed to do that.', 'kp-support'),
                     'code'    => 'forbidden',
@@ -300,7 +467,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             }
 
             // take whatever came with it
-            $attachments = Attachments::processUploads('kpts_files', get_current_user_id());
+            $attachments = Attachments::processUploads('kpts_files', $user_id);
 
             // if any file was rejected, stop right here and say why
             if (is_wp_error($attachments)) {
@@ -314,7 +481,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             $ticket_id = Ticket::create(array(
                 'subject'     => $subject,
                 'message'     => $message,
-                'requester'   => get_current_user_id(),
+                'requester'   => $user_id,
                 'department'  => Ticket::termIdBySlug(PostTypes::TAX_DEPARTMENT, (string) $this->opt('chat_department', '')),
                 'attachments' => $attachments,
             ));
@@ -352,8 +519,11 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             // and access to the chat itself
             $chat_id = $this->requireChat();
 
+            // who's posting
+            $user_id = $this->actorId($chat_id);
+
             // posting is a different check to viewing, and it covers the chat being closed
-            if (! ChatAccess::canPost($chat_id)) {
+            if (! ChatAccess::canPost($chat_id, $user_id)) {
                 wp_send_json_error(array(
                     'message' => __('This chat is no longer open.', 'kp-support'),
                     'code'    => 'closed',
@@ -367,7 +537,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             $content = wp_unslash($_POST['content'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized with wp_kses in Chat::addMessage()
 
             // take whatever files came along with it
-            $attachments = Attachments::processUploads('kpts_files', get_current_user_id());
+            $attachments = Attachments::processUploads('kpts_files', $user_id);
 
             // if any file was rejected, stop right here and say why
             if (is_wp_error($attachments)) {
@@ -378,7 +548,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             }
 
             // drop it in
-            $message_id = Chat::addMessage($chat_id, get_current_user_id(), (string) $content, $attachments);
+            $message_id = Chat::addMessage($chat_id, $user_id, (string) $content, $attachments);
 
             // if that failed, hand the reason back
             if (is_wp_error($message_id)) {
@@ -391,11 +561,11 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             // an agent answering picks the chat up if nobody had it, though
             // never their own chat, an agent asking for help is the customer here
             if (
-                ChatAccess::isChatAgent()
+                ChatAccess::isChatAgent($user_id)
                 && Chat::agent($chat_id) < 1
-                && Chat::visitor($chat_id) !== get_current_user_id()
+                && Chat::visitor($chat_id) !== $user_id
             ) {
-                Chat::setAgent($chat_id, get_current_user_id());
+                Chat::setAgent($chat_id, $user_id);
             }
 
             // grab it back so we can render it
@@ -581,11 +751,12 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             // and access to the chat itself
             $chat_id = $this->requireChat();
 
-            // who's closing it decides the state it lands in
-            $is_agent = ChatAccess::canManage($chat_id);
+            // who's asking, and whether that makes them the agent side
+            $user_id = $this->actorId($chat_id);
+            $is_agent = ChatAccess::canManage($chat_id, $user_id);
 
             // the customer can only close their own
-            if (! $is_agent && Chat::visitor($chat_id) !== get_current_user_id()) {
+            if (! $is_agent && Chat::visitor($chat_id) !== $user_id) {
                 wp_send_json_error(array(
                     'message' => __('You are not allowed to close this chat.', 'kp-support'),
                     'code'    => 'forbidden',
@@ -611,6 +782,11 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
                     'message' => $ticket_id->get_error_message(),
                     'code'    => $ticket_id->get_error_code(),
                 ), 400);
+            }
+
+            // a guest's session dies with the chat
+            if (! is_user_logged_in()) {
+                ChatGuest::clear();
             }
 
             // hand back where things stand now
@@ -701,7 +877,7 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
                 'author'      => $comment->comment_author,
                 'avatar'      => get_avatar_url($user_id, array('size' => 48)),
                 'isAgent'     => $user_id !== Chat::visitor($chat_id),
-                'isMine'      => $user_id === get_current_user_id(),
+                'isMine'      => $user_id === $this->actorId($chat_id),
                 'date'        => mysql2date(get_option('time_format'), $comment->comment_date),
                 'gmt'         => $comment->comment_date_gmt,
                 'attachments' => $files,

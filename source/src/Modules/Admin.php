@@ -65,6 +65,11 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             // drop the boxes we don't want on a ticket
             add_action('add_meta_boxes', array($this, 'removeMetaBoxes'), 99);
 
+            // the quick edit row
+            add_action('quick_edit_custom_box', array($this, 'quickEditBox'), 10, 2);
+            add_action('save_post_' . PostTypes::POST_TYPE, array($this, 'saveQuickEdit'), 10, 2);
+            add_filter('quick_edit_show_taxonomy', array($this, 'hideQuickEditTaxonomies'), 10, 3);
+
             // and our admin assets
             add_action('admin_enqueue_scripts', array($this, 'enqueueAssets'));
 
@@ -117,6 +122,7 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             switch ($column) {
                 case 'kpts_number':
                     echo '<strong>' . esc_html(Ticket::number($ticket_id)) . '</strong>';
+                    $this->renderInlineData($ticket_id);
                     break;
 
                 case 'kpts_requester':
@@ -322,6 +328,227 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
         }
 
         /**
+         * Stash a ticket's current values on its row for the quick editor.
+         *
+         * @since  1.0.40
+         * @access private
+         * @param  int $ticket_id The ticket id.
+         * @return void
+         */
+        private function renderInlineData(int $ticket_id): void
+        {
+
+            // everything the quick edit row needs to set itself up
+            printf(
+                '<div class="hidden kpts-inline-data" id="kpts-inline-%1$d" data-status="%2$d" data-priority="%3$d" data-dept="%4$d" data-assignee="%5$d"></div>',
+                (int) $ticket_id,
+                (int) Ticket::termId($ticket_id, PostTypes::TAX_STATUS),
+                (int) Ticket::termId($ticket_id, PostTypes::TAX_PRIORITY),
+                (int) Ticket::termId($ticket_id, PostTypes::TAX_DEPARTMENT),
+                (int) get_post_meta($ticket_id, Access::META_ASSIGNEE, true)
+            );
+        }
+
+        /**
+         * Keep our taxonomies out of the stock quick edit boxes.
+         *
+         * @since  1.0.40
+         * @access public
+         * @param  bool   $show      Whether core would show it.
+         * @param  string $taxonomy  The taxonomy.
+         * @param  string $post_type The post type being listed.
+         * @return bool True if core should render its own box.
+         */
+        public function hideQuickEditTaxonomies($show, $taxonomy, $post_type): bool
+        {
+
+            // anything that isn't ours is none of our business
+            if ($post_type !== PostTypes::POST_TYPE) {
+                return (bool) $show;
+            }
+
+            // ours get dropdowns of our own instead of core's free text
+            $ours = array(PostTypes::TAX_STATUS, PostTypes::TAX_PRIORITY, PostTypes::TAX_DEPARTMENT);
+
+            // and out they go
+            return in_array($taxonomy, $ours, true) ? false : (bool) $show;
+        }
+
+        /**
+         * Render our fields into the quick edit row.
+         *
+         * @since  1.0.40
+         * @access public
+         * @param  string $column    The column being rendered against.
+         * @param  string $post_type The post type being listed.
+         * @return void
+         */
+        public function quickEditBox($column, $post_type): void
+        {
+
+            // only our own list, and only once
+            if ($post_type !== PostTypes::POST_TYPE || $column !== 'kpts_status') {
+                return;
+            }
+
+            // and only for somebody who can actually change any of it
+            if (! current_user_can('edit_kpts_tickets')) {
+                return;
+            }
+
+            // our nonce rides along with the row
+            echo '<fieldset class="inline-edit-col-right kpts-quick-edit">';
+            echo '<div class="inline-edit-col">';
+            wp_nonce_field('kpts_quick_edit', 'kpts_quick_nonce');
+
+            // the three taxonomies, one term each
+            $this->renderQuickSelect(PostTypes::TAX_STATUS, __('Status', 'kp-support'), 'kpts_status', 'status');
+            $this->renderQuickSelect(PostTypes::TAX_PRIORITY, __('Priority', 'kp-support'), 'kpts_priority', 'priority');
+            $this->renderQuickSelect(PostTypes::TAX_DEPARTMENT, __('Department', 'kp-support'), 'kpts_dept', 'dept');
+
+            // and the assignment, which needs its own capability
+            if (current_user_can('kpts_assign_tickets')) {
+
+                // open the field
+                echo '<label class="inline-edit-group">';
+                echo '<span class="title">' . esc_html__('Assigned To', 'kp-support') . '</span>';
+                echo '<select name="kpts_assignee" class="kpts-quick-assignee">';
+                echo '<option value="0">' . esc_html__('Unassigned', 'kp-support') . '</option>';
+
+                // every agent who could take it
+                foreach (Ticket::eligibleAgents(0) as $_agent_id) {
+
+                    // grab them
+                    $agent = get_userdata($_agent_id);
+
+                    // and list them if they're real
+                    if ($agent instanceof \WP_User) {
+                        printf(
+                            '<option value="%1$d">%2$s</option>',
+                            (int) $agent->ID,
+                            esc_html($agent->display_name)
+                        );
+                    }
+                }
+
+                // close it up
+                echo '</select></label>';
+            }
+
+            // close the row out
+            echo '</div></fieldset>';
+        }
+
+        /**
+         * Render one of our taxonomy dropdowns into the quick edit row.
+         *
+         * @since  1.0.40
+         * @access private
+         * @param  string $taxonomy The taxonomy to pull terms from.
+         * @param  string $label    The label to put on it.
+         * @param  string $name     The field name to post under.
+         * @param  string $key      The data key the script matches it up with.
+         * @return void
+         */
+        private function renderQuickSelect(string $taxonomy, string $label, string $name, string $key): void
+        {
+
+            // everything they could pick
+            $terms = get_terms(array(
+                'taxonomy'   => $taxonomy,
+                'hide_empty' => false,
+            ));
+
+            // nothing to show
+            if (is_wp_error($terms) || empty($terms)) {
+                return;
+            }
+
+            // open the field up
+            printf(
+                '<label class="inline-edit-group"><span class="title">%1$s</span><select name="%2$s" class="kpts-quick-%3$s">',
+                esc_html($label),
+                esc_attr($name),
+                esc_attr($key)
+            );
+
+            // an empty first option so it can be cleared
+            printf(
+                '<option value="0">%s</option>',
+                esc_html__('None', 'kp-support')
+            );
+
+            // and every term we found
+            foreach ($terms as $_term) {
+                printf(
+                    '<option value="%1$d">%2$s</option>',
+                    (int) $_term->term_id,
+                    esc_html($_term->name)
+                );
+            }
+
+            // close it up
+            echo '</select></label>';
+        }
+
+        /**
+         * Save what came off the quick edit row.
+         *
+         * @since  1.0.40
+         * @access public
+         * @param  int      $post_id The ticket id.
+         * @param  \WP_Post $post    The ticket.
+         * @return void
+         */
+        public function saveQuickEdit($post_id, $post): void
+        {
+
+            // don't fight with autosave
+            if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+                return;
+            }
+
+            // the nonce our row carried has to check out
+            if (! isset($_POST['kpts_quick_nonce']) || ! wp_verify_nonce(sanitize_key(wp_unslash($_POST['kpts_quick_nonce'])), 'kpts_quick_edit')) {
+                return;
+            }
+
+            // cast it down
+            $post_id = absint($post_id);
+
+            // they have to be allowed to edit this specific ticket
+            if (! current_user_can('edit_kpts_ticket', $post_id)) {
+                return;
+            }
+
+            // the status, one term only
+            if (isset($_POST['kpts_status'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                $status_id = absint(wp_unslash($_POST['kpts_status'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                if ($status_id > 0) {
+                    Ticket::setStatus($post_id, $status_id);
+                }
+            }
+
+            // the priority, same again
+            if (isset($_POST['kpts_priority'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                $priority_id = absint(wp_unslash($_POST['kpts_priority'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                if ($priority_id > 0) {
+                    Ticket::setTerm($post_id, PostTypes::TAX_PRIORITY, $priority_id);
+                }
+            }
+
+            // the department, which can be cleared right back off
+            if (isset($_POST['kpts_dept'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                Ticket::setTerm($post_id, PostTypes::TAX_DEPARTMENT, absint(wp_unslash($_POST['kpts_dept']))); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+            }
+
+            // and the assignment, which needs its own capability on top
+            if (isset($_POST['kpts_assignee']) && current_user_can('kpts_assign_tickets')) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+                Ticket::setAssignee($post_id, absint(wp_unslash($_POST['kpts_assignee']))); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at the top of this method
+            }
+        }
+
+        /**
          * Add our metaboxes to the ticket edit screen.
          *
          * @since  1.0.0
@@ -410,7 +637,9 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
 
             // and out it goes, along with the visibility row in the status box
             echo '<style>#postdivrich, #post-body-content { display: none; }'
-                . '#submitdiv .misc-pub-visibility { display: none; }</style>';
+                . '#submitdiv .misc-pub-visibility { display: none; }'
+                . '.inline-edit-row .inline-edit-status,'
+                . '.inline-edit-row .inline-edit-password-input { display: none; }</style>';
         }
 
         /**
@@ -542,12 +771,35 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             $this->renderTermSelect($ticket_id, PostTypes::TAX_STATUS, __('Status', 'kp-support'), 'kpts_status');
             $this->renderTermSelect($ticket_id, PostTypes::TAX_PRIORITY, __('Priority', 'kp-support'), 'kpts_priority');
 
-            // who it's from
+            // who it's from, with everybody else on it sat alongside
+            echo '<div class="kpts-details-people">';
+
+            // the requester side
+            echo '<div class="kpts-details-person">';
             if ($requester instanceof \WP_User) {
-                echo '<p><strong>' . esc_html__('Requester', 'kp-support') . ':</strong><br />'
+                echo '<strong>' . esc_html__('Requester', 'kp-support') . ':</strong><br />'
                     . esc_html($requester->display_name) . '<br />'
-                    . '<a href="mailto:' . esc_attr($requester->user_email) . '">' . esc_html($requester->user_email) . '</a></p>';
+                    . '<a href="mailto:' . esc_attr($requester->user_email) . '">' . esc_html($requester->user_email) . '</a>';
             }
+            echo '</div>';
+
+            // and the participant list beside it
+            echo '<div class="kpts-details-person">';
+            echo '<strong>' . esc_html__('Participants', 'kp-support') . ':</strong><br />';
+            foreach (Access::participants($ticket_id) as $_user_id) {
+
+                // grab them
+                $participant = get_userdata($_user_id);
+
+                // and list them
+                if ($participant instanceof \WP_User) {
+                    echo esc_html($participant->display_name) . '<br />';
+                }
+            }
+            echo '</div>';
+
+            // close the pair out
+            echo '</div>';
 
             // the assignment dropdown, if they're allowed to change it
             if (current_user_can('kpts_assign_tickets')) {
@@ -584,20 +836,6 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 esc_url(Portal::ticketUrl($ticket_id)),
                 esc_html__('Open in Portal', 'kp-support')
             );
-
-            // and the participant list
-            echo '<p><strong>' . esc_html__('Participants', 'kp-support') . ':</strong><br />';
-            foreach (Access::participants($ticket_id) as $_user_id) {
-
-                // grab them
-                $participant = get_userdata($_user_id);
-
-                // and list them
-                if ($participant instanceof \WP_User) {
-                    echo esc_html($participant->display_name) . '<br />';
-                }
-            }
-            echo '</p>';
         }
 
         /**
@@ -796,6 +1034,17 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 array(),
                 KP_SUPPORT_VERSION
             );
+
+            // the quick edit row needs a hand filling itself in
+            if ($hook === 'edit.php') {
+                wp_enqueue_script(
+                    'kpts-admin',
+                    KP_SUPPORT_URL . 'assets/js/admin.min.js',
+                    array('jquery', 'inline-edit-post'),
+                    KP_SUPPORT_VERSION,
+                    true
+                );
+            }
 
             // on the ticket edit screen we run the same chat script the portal does
             if (in_array($hook, array('post.php', 'post-new.php'), true)) {

@@ -193,3 +193,24 @@
 .kpts_ticket_page_kp-support-settings .kp-wsf-tab-nav {
     margin-bottom: 0;
 }
+
+
+/* the requester and the participant list sit side by side in the details box */
+#kpts_details .kpts-details-people {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 1em 0;
+}
+
+#kpts_details .kpts-details-person {
+    flex: 1 1 45%;
+    min-width: 0;
+    word-break: break-word;
+}
+
+/* the framework's time inputs come out too narrow to read the value in */
+.kpts_ticket_page_kp-support-settings input[type="time"] {
+    width: 160px;
+    max-width: 100%;
+}

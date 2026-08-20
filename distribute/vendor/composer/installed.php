@@ -3,7 +3,7 @@
         'name' => 'kevinpirnie/kp-support',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => '4a0ea9f75a553aa27b5ced64dad40c9c0a7b217e',
+        'reference' => '3e0f96a8624db500c7545e9c15f340e1eadc45d0',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'kevinpirnie/kp-support' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => '4a0ea9f75a553aa27b5ced64dad40c9c0a7b217e',
+            'reference' => '3e0f96a8624db500c7545e9c15f340e1eadc45d0',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

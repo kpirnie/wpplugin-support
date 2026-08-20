@@ -16,9 +16,11 @@
  * @var string                  $kpts_position Which corner it docks into.
  * @var string                  $kpts_label    The launcher label.
  * @var array<int, \WP_Comment> $kpts_messages Whatever has been said so far.
- * @var int                     $kpts_visitor  The current user's id.
+ * @var int                     $kpts_visitor  The visitor's user id, guest or logged in.
  * @var string                  $kpts_state    The chat's state.
  * @var bool                    $kpts_online   Whether an agent is around.
+ * @var bool                    $kpts_locked   Whether their details are fixed by a login.
+ * @var array<string, string>   $kpts_prefill  What the pre-chat form starts out holding.
  * @var string                  $kpts_offline_message What to say when nobody is.
  */
 
@@ -40,6 +42,8 @@ $kpts_messages = isset($kpts_messages) && is_array($kpts_messages) ? $kpts_messa
 $kpts_visitor = isset($kpts_visitor) ? (int) $kpts_visitor : 0;
 $kpts_state = isset($kpts_state) ? (string) $kpts_state : '';
 $kpts_online = isset($kpts_online) ? (bool) $kpts_online : true;
+$kpts_locked = isset($kpts_locked) ? (bool) $kpts_locked : false;
+$kpts_prefill = isset($kpts_prefill) && is_array($kpts_prefill) ? $kpts_prefill : array();
 $kpts_offline_message = isset($kpts_offline_message) ? (string) $kpts_offline_message : '';
 
 // work out the newest message we're rendering, the poller picks up from here
@@ -76,7 +80,7 @@ $kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
     <section id="kpts-chat-panel" class="kpts-chat-panel" hidden aria-label="<?php esc_attr_e('Live chat', 'kp-support'); ?>">
 
         <header class="kpts-chat-header">
-            <span class="kpts-chat-title"><?php echo esc_html($kpts_label); ?></span>
+            <span class="kpts-chat-title"><?php echo esc_html((string) Plugin::opt('chat_label', __('Need help?', 'kp-support'))); ?></span>
             <span class="kpts-chat-status" role="status"></span>
             <button type="button" class="kpts-chat-end" hidden>
                 <?php esc_html_e('End chat', 'kp-support'); ?>
@@ -127,6 +131,41 @@ $kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
 
                 <p class="kpts-chat-offline-message"><?php echo esc_html($kpts_offline_message); ?></p>
 
+
+                <?php if (! $kpts_locked) : ?>
+                    <div class="kpts-chat-name-row">
+                        <label class="screen-reader-text" for="kpts-chat-offline-first">
+                            <?php esc_html_e('First name', 'kp-support'); ?>
+                        </label>
+                        <input type="text"
+                            id="kpts-chat-offline-first"
+                            class="kpts-chat-offline-first"
+                            name="first_name"
+                            autocomplete="given-name"
+                            placeholder="<?php esc_attr_e('First name', 'kp-support'); ?>" />
+
+                        <label class="screen-reader-text" for="kpts-chat-offline-last">
+                            <?php esc_html_e('Last name', 'kp-support'); ?>
+                        </label>
+                        <input type="text"
+                            id="kpts-chat-offline-last"
+                            class="kpts-chat-offline-last"
+                            name="last_name"
+                            autocomplete="family-name"
+                            placeholder="<?php esc_attr_e('Last name', 'kp-support'); ?>" />
+                    </div>
+
+                    <label class="screen-reader-text" for="kpts-chat-offline-email">
+                        <?php esc_html_e('Email address', 'kp-support'); ?>
+                    </label>
+                    <input type="email"
+                        id="kpts-chat-offline-email"
+                        class="kpts-chat-offline-email"
+                        name="email"
+                        autocomplete="email"
+                        placeholder="<?php esc_attr_e('Email address', 'kp-support'); ?>" />
+                <?php endif; ?>
+
                 <label class="screen-reader-text" for="kpts-chat-offline-subject">
                     <?php esc_html_e('Subject', 'kp-support'); ?>
                 </label>
@@ -161,8 +200,66 @@ $kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
 
         <p class="kpts-chat-notice" role="alert" hidden></p>
 
+        <?php if ($kpts_online) : ?>
+            <form class="kpts-chat-start-form" novalidate<?php echo ($kpts_chat_id > 0) ? ' hidden' : ''; ?>>
+
+                <p class="kpts-chat-start-intro"><?php esc_html_e('Tell us who you are and we will get somebody with you.', 'kp-support'); ?></p>
+
+                <div class="kpts-chat-name-row">
+                    <label class="screen-reader-text" for="kpts-chat-start-first">
+                        <?php esc_html_e('First name', 'kp-support'); ?>
+                    </label>
+                    <input type="text"
+                        id="kpts-chat-start-first"
+                        class="kpts-chat-start-first"
+                        name="first_name"
+                        autocomplete="given-name"
+                        value="<?php echo esc_attr((string) ($kpts_prefill['first_name'] ?? '')); ?>"
+                        placeholder="<?php esc_attr_e('First name', 'kp-support'); ?>"
+                        <?php echo $kpts_locked ? 'readonly' : ''; ?> />
+
+                    <label class="screen-reader-text" for="kpts-chat-start-last">
+                        <?php esc_html_e('Last name', 'kp-support'); ?>
+                    </label>
+                    <input type="text"
+                        id="kpts-chat-start-last"
+                        class="kpts-chat-start-last"
+                        name="last_name"
+                        autocomplete="family-name"
+                        value="<?php echo esc_attr((string) ($kpts_prefill['last_name'] ?? '')); ?>"
+                        placeholder="<?php esc_attr_e('Last name', 'kp-support'); ?>"
+                        <?php echo $kpts_locked ? 'readonly' : ''; ?> />
+                </div>
+
+                <label class="screen-reader-text" for="kpts-chat-start-email">
+                    <?php esc_html_e('Email address', 'kp-support'); ?>
+                </label>
+                <input type="email"
+                    id="kpts-chat-start-email"
+                    class="kpts-chat-start-email"
+                    name="email"
+                    autocomplete="email"
+                    value="<?php echo esc_attr((string) ($kpts_prefill['email'] ?? '')); ?>"
+                    placeholder="<?php esc_attr_e('Email address', 'kp-support'); ?>"
+                    <?php echo $kpts_locked ? 'readonly' : ''; ?> />
+
+                <label class="screen-reader-text" for="kpts-chat-start-message">
+                    <?php esc_html_e('Your message', 'kp-support'); ?>
+                </label>
+                <textarea id="kpts-chat-start-message"
+                    class="kpts-chat-start-message"
+                    name="message"
+                    rows="3"
+                    placeholder="<?php esc_attr_e('How can we help?', 'kp-support'); ?>"></textarea>
+
+                <button type="submit" class="kpts-chat-start-send">
+                    <?php esc_html_e('Start chat', 'kp-support'); ?>
+                </button>
+            </form>
+        <?php endif; ?>
+
         <?php if ($kpts_online || $kpts_chat_id > 0) : ?>
-            <form class="kpts-chat-form" novalidate>
+            <form class="kpts-chat-form" novalidate<?php echo ($kpts_chat_id > 0) ? '' : ' hidden'; ?>>
 
                 <?php if ($kpts_allow_files) : ?>
                     <ul class="kpts-chat-file-list" hidden></ul>

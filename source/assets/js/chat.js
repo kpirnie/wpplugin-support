@@ -242,8 +242,11 @@
             return;
         }
 
-                // hang on to whether it's still running
+        // hang on to whether it's still running
         state.live = !!chatState.live;
+
+        // the launcher says which of the two it is
+        setLauncherLabel(state.live && !!state.chatId);
 
         // track how long they've been sat in the queue
         if (state.live && !chatState.agentName) {
@@ -294,6 +297,15 @@
             form.hidden = !state.live || !state.chatId;
         }
 
+        // and the pre-chat form is only for when they haven't got one at all
+        var starter = document.querySelector('.kpts-chat-start-form');
+        if (starter && !cfg.isAgent) {
+            starter.hidden = !!state.chatId;
+        }
+
+        // the launcher says which of the two it is
+        setLauncherLabel(!!state.chatId && !!state.live);
+
         // the agent screen has a toolbar to keep in step, the visitor just has the end button
         if (cfg.isAgent) {
             updateAgentControls(chatState);
@@ -308,6 +320,31 @@
         if (!state.live) {
             stopPolling();
         }
+    }
+
+    /**
+     * Say on the launcher whether there's a chat going.
+     *
+     * @param {boolean} active Whether one is running.
+     * @return {void}
+     */
+    function setLauncherLabel(active) {
+
+        // the agent screen has no launcher
+        if (cfg.isAgent) {
+            return;
+        }
+
+        // go find it
+        var label = document.querySelector('.kpts-chat-launcher-label');
+
+        // nothing to write into
+        if (!label) {
+            return;
+        }
+
+        // and swap the wording over
+        label.textContent = active ? (cfg.activeLabel || label.textContent) : (cfg.label || label.textContent);
     }
 
     /**
@@ -567,6 +604,46 @@
     }
 
     /**
+     * Read the identity fields off one of our forms.
+     *
+     * A logged in visitor gets them filled in and locked, so we fall back to
+     * what came down with the page either way.
+     *
+     * @param {HTMLFormElement} form The form to read.
+     * @param {string} prefix Which set of fields they are.
+     * @return {Object} What they gave us.
+     */
+    function readDetails(form, prefix) {
+
+        // whatever the page already knows about them
+        var known = cfg.prefill || {};
+
+        // nothing to read off
+        if (!form) {
+            return {
+                firstName: known.firstName || '',
+                lastName: known.lastName || '',
+                email: known.email || '',
+                message: ''
+            };
+        }
+
+        // go find each of them
+        var first = form.querySelector('.kpts-chat-' + prefix + '-first');
+        var last = form.querySelector('.kpts-chat-' + prefix + '-last');
+        var email = form.querySelector('.kpts-chat-' + prefix + '-email');
+        var message = form.querySelector('.kpts-chat-' + prefix + '-message');
+
+        // and hand back what's in them, falling back to what we were given
+        return {
+            firstName: first ? first.value.trim() : (known.firstName || ''),
+            lastName: last ? last.value.trim() : (known.lastName || ''),
+            email: email ? email.value.trim() : (known.email || ''),
+            message: message ? message.value.trim() : ''
+        };
+    }
+
+    /**
      * Send whatever is in the box.
      *
      * @param {HTMLFormElement} form The chat form.
@@ -670,15 +747,31 @@
     }
 
     /**
-     * Open a chat, or pick up the one already going.
+     * Open a chat off the pre-chat form, or pick up the one already going.
      *
+     * @param {HTMLFormElement} form The pre-chat form.
      * @return {Promise} Resolves once we have a chat.
      */
-    function start() {
+    function start(form) {
 
         // already got one
         if (state.chatId) {
             return Promise.resolve(true);
+        }
+
+        // who they say they are, and what they want
+        var details = readDetails(form, 'start');
+
+        // and it all has to be there
+        if (!details.firstName || !details.lastName || !details.email || !details.message) {
+            showNotice(strings.emptyDetails);
+            return Promise.resolve(false);
+        }
+
+        // the address has to at least look like one
+        if (details.email.indexOf('@') < 1) {
+            showNotice(strings.badEmail);
+            return Promise.resolve(false);
         }
 
         // say what we're doing
@@ -687,6 +780,10 @@
         // build the request
         var data = new FormData();
         data.append('action', 'kpts_chat_start');
+        data.append('first_name', details.firstName);
+        data.append('last_name', details.lastName);
+        data.append('email', details.email);
+        data.append('message', details.message);
 
         // off it goes
         return request(data).then(function (response) {
@@ -710,6 +807,18 @@
             if (wrap) {
                 wrap.setAttribute('data-chat-id', state.chatId);
             }
+
+            // the form has done its job
+            if (form) {
+                form.hidden = true;
+                var messageField = form.querySelector('.kpts-chat-start-message');
+                if (messageField) {
+                    messageField.value = '';
+                }
+            }
+
+            // and say on the launcher that they've got one going
+            setLauncherLabel(true);
 
             // render anything already on it
             if (response.data.messages && response.data.messages.length) {
@@ -814,8 +923,13 @@
         }
 
         // build it up
+        var details = readDetails(form, 'offline');
+
         var data = new FormData();
         data.append('action', 'kpts_chat_offline_ticket');
+        data.append('first_name', details.firstName);
+        data.append('last_name', details.lastName);
+        data.append('email', details.email);
         data.append('subject', subject.value.trim());
         data.append('message', body.value.trim());
 
@@ -895,6 +1009,7 @@
         var panel = wrap.querySelector('.kpts-chat-panel');
         var form = wrap.querySelector('.kpts-chat-form');
         var offline = wrap.querySelector('.kpts-chat-offline-form');
+        var starter = wrap.querySelector('.kpts-chat-start-form');
 
         // opening it starts a chat if they haven't got one going
         if (launcher && panel) {
@@ -917,7 +1032,7 @@
                     list.scrollTop = list.scrollHeight;
                 }
 
-                // and get a chat going, unless there's nobody to talk to
+                // nobody to talk to, so it's the offline form they want
                 if (offline) {
                     var subject = wrap.querySelector('.kpts-chat-offline-subject');
                     if (subject) {
@@ -925,10 +1040,34 @@
                     }
                     return;
                 }
-                start().then(function () {
-                    var input = wrap.querySelector('.kpts-chat-input');
-                    if (input) {
-                        input.focus();
+
+                // no chat yet, so they fill the pre-chat form in first
+                if (!state.chatId && starter) {
+                    var firstEmpty = starter.querySelector('input:not([readonly])') || starter.querySelector('.kpts-chat-start-message');
+                    if (firstEmpty) {
+                        firstEmpty.focus();
+                    }
+                    return;
+                }
+
+                // otherwise straight into the box
+                var input = wrap.querySelector('.kpts-chat-input');
+                if (input) {
+                    input.focus();
+                }
+            });
+        }
+
+        // the pre-chat form is what actually opens a chat now
+        if (starter) {
+            starter.addEventListener('submit', function (event) {
+                event.preventDefault();
+                start(starter).then(function (started) {
+                    if (started) {
+                        var input = wrap.querySelector('.kpts-chat-input');
+                        if (input) {
+                            input.focus();
+                        }
                     }
                 });
             });
