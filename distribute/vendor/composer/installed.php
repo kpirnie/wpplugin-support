@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'kevinpirnie/kp-support',
-        'pretty_version' => 'dev-develop',
-        'version' => 'dev-develop',
-        'reference' => '07560df5380b5afdb1d7ae996df08e03ae00790c',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '75980822ad85c9c2baa6033d7e89114318baf038',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'kevinpirnie/kp-support' => array(
-            'pretty_version' => 'dev-develop',
-            'version' => 'dev-develop',
-            'reference' => '07560df5380b5afdb1d7ae996df08e03ae00790c',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '75980822ad85c9c2baa6033d7e89114318baf038',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

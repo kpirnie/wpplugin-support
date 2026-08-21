@@ -4,7 +4,7 @@ Tags: support, helpdesk, ticket system, live chat, customer service
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.48
+Stable tag: 1.0.59
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -120,6 +120,19 @@ Every variable a template is handed is prefixed with `kpts_`, and each file docu
 The class names in the markup and the CSS custom properties on the `.kpts-portal` wrapper are the supported styling surface. Keep the `kpts-` classes on the elements the scripts bind to - the reply form, the file input, the internal note toggle and the management selects - or the chat stops working.
 
 == Changelog ==
+
+= 1.0.59 =
+* Added: a Take This Ticket button in Ticket Details, and a matching icon on the ticket list, which assigns the ticket to whoever clicks it
+* Added: a Close Ticket button in Ticket Details, and a matching icon on the ticket list
+* Added: a Create Ticket / Update Ticket button in the Ticket Details metabox
+* Added: a Date Posted column on the ticket list
+* Added: requester and assignee filters on the ticket list
+* Changed: every ticket list column except the reply count is now sortable, with statuses, priorities and departments ordering by name and people by display name
+* Changed: tickets are now deleted outright rather than sent to the trash, taking their replies and attachments with them
+* Changed: the status links above the ticket list, and the date filter alongside it, are gone
+* Fixed: the leave-a-message form no longer fails silently when nobody is available to chat
+* Fixed: the subject field is back on the ticket create and edit screens
+* Fixed: the opening message field is no longer flush against the edges of its metabox
 
 = 1.0.48 =
 * Added: the update details modal now pulls its description and changelog straight out of the readme that shipped with the release
