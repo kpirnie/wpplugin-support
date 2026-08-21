@@ -273,6 +273,7 @@ if (! class_exists('\KP\Support\Plugin')) {
                 'chat_admin'    => Modules\ChatAdmin::class,
                 'updater'       => Modules\Updater::class,
                 'admin'         => Modules\Admin::class,
+                'dashboard'     => Modules\Dashboard::class,
                 'settings'      => Settings\Settings::class,
             );
 

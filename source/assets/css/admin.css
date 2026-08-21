@@ -250,3 +250,32 @@
     width: 160px;
     max-width: 100%;
 }
+
+/* ==========================================================================
+   Dashboard widgets
+   ========================================================================== */
+.kpts-dashboard-list {
+    margin: 0;
+}
+
+.kpts-dashboard-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f1;
+    margin: 0;
+}
+
+.kpts-dashboard-list li:last-child {
+    border-bottom: 0;
+}
+
+.kpts-dashboard-meta {
+    color: #646970;
+    white-space: nowrap;
+}
+
+.kpts-dashboard-more {
+    margin: 12px 0 0;
+}

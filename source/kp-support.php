@@ -9,7 +9,7 @@
  * Plugin Name:       KP Support
  * Plugin URI:        https://kevinpirnie.com/
  * Description:       A full-featured support ticket system with AJAX chat, threaded replies, departments, priorities, attachments, and a front-end customer portal.
- * Version:           1.1.0
+ * Version:           1.1.03
  * Requires at least: 6.8
  * Requires PHP:      8.2
  * Author:            Kevin Pirnie
@@ -30,7 +30,13 @@ declare(strict_types=1);
 defined('ABSPATH') || die('No direct script access allowed');
 
 // setup our constants, only if they're not already there
-defined('KP_SUPPORT_VERSION') || define('KP_SUPPORT_VERSION', '1.0.48');
+// the version comes off our own header, so there's only ever one place to change it
+if (! defined('KP_SUPPORT_VERSION')) {
+    if (! function_exists('get_plugin_data')) {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    }
+    define('KP_SUPPORT_VERSION', get_plugin_data(__FILE__, false, false)['Version']);
+}
 defined('KP_SUPPORT_FILE') || define('KP_SUPPORT_FILE', __FILE__);
 defined('KP_SUPPORT_DIR') || define('KP_SUPPORT_DIR', plugin_dir_path(__FILE__));
 defined('KP_SUPPORT_URL') || define('KP_SUPPORT_URL', plugin_dir_url(__FILE__));

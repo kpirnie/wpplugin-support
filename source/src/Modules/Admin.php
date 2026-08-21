@@ -1490,8 +1490,8 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 return;
             }
 
-            // only our own screens
-            if ($screen->post_type !== PostTypes::POST_TYPE && ! str_contains((string) $screen->id, 'kp-support')) {
+            // only our own screens, plus the dashboard where our widgets sit
+            if ($screen->id !== 'dashboard' && $screen->post_type !== PostTypes::POST_TYPE && ! str_contains((string) $screen->id, 'kp-support')) {
                 return;
             }
 
