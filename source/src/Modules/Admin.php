@@ -52,8 +52,14 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             // the filter dropdowns above it
             add_action('restrict_manage_posts', array($this, 'renderFilters'));
 
+            // and drop the date dropdown, tickets are filtered by status not month
+            add_filter('disable_months_dropdown', array($this, 'disableMonths'), 10, 2);
+
             // scope and order the list itself
             add_action('pre_get_posts', array($this, 'filterAdminQuery'));
+
+            // and the joins the name based sorts need
+            add_filter('posts_clauses', array($this, 'sortClauses'), 10, 2);
 
             // the ticket edit screen
             add_action('add_meta_boxes', array($this, 'addMetaBoxes'));
@@ -70,11 +76,21 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             add_action('save_post_' . PostTypes::POST_TYPE, array($this, 'saveQuickEdit'), 10, 2);
             add_filter('quick_edit_show_taxonomy', array($this, 'hideQuickEditTaxonomies'), 10, 3);
 
+            // taking a ticket, from the details box or the list row
+            add_action('admin_post_kpts_take_ticket', array($this, 'takeTicket'));
+            add_action('admin_post_kpts_close_ticket', array($this, 'closeTicket'));
+
             // and our admin assets
             add_action('admin_enqueue_scripts', array($this, 'enqueueAssets'));
 
             // and hide the editor outright, supports alone doesn't always do it
             add_action('admin_head', array($this, 'hideEditor'));
+
+            // tickets don't go to the trash, they go away
+            add_filter('post_row_actions', array($this, 'rowActions'), 20, 2);
+            add_filter('bulk_actions-edit-' . PostTypes::POST_TYPE, array($this, 'bulkActions'), 20);
+            add_filter('views_edit-' . PostTypes::POST_TYPE, '__return_empty_array');
+            add_filter('pre_trash_post', array($this, 'deleteInsteadOfTrash'), 10, 2);
         }
 
         /**
@@ -94,12 +110,14 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 'kpts_number'    => __('Ticket', 'kp-support'),
                 'title'          => __('Subject', 'kp-support'),
                 'kpts_requester' => __('Requester', 'kp-support'),
+                'kpts_assignee'  => __('Assigned To', 'kp-support'),
+                'kpts_dept'      => __('Department', 'kp-support'),
+                'kpts_replies'   => __('Replies', 'kp-support'),
+                'kpts_activity'  => __('Last Post', 'kp-support'),
+                'kpts_posted'    => __('Created', 'kp-support'),
                 'kpts_status'    => __('Status', 'kp-support'),
                 'kpts_priority'  => __('Priority', 'kp-support'),
-                'kpts_dept'      => __('Department', 'kp-support'),
-                'kpts_assignee'  => __('Assigned To', 'kp-support'),
-                'kpts_replies'   => __('Replies', 'kp-support'),
-                'kpts_activity'  => __('Last Activity', 'kp-support'),
+                'kpts_actions'   => __('Actions', 'kp-support'),
             );
         }
 
@@ -167,6 +185,15 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                         ? esc_html(human_time_diff(strtotime($activity), current_time('timestamp')) . ' ' . __('ago', 'kp-support'))
                         : '&mdash;';
                     break;
+
+                case 'kpts_posted':
+                    // when it was opened
+                    echo esc_html(get_the_date(get_option('date_format') . ' ' . get_option('time_format'), $ticket_id));
+                    break;
+
+                case 'kpts_actions':
+                    $this->renderRowActions($ticket_id);
+                    break;
             }
         }
 
@@ -204,7 +231,130 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
         }
 
         /**
-         * Mark our activity column as sortable.
+         * Render the quick action icons on a list row.
+         *
+         * @since  1.0.49
+         * @access private
+         * @param  int $ticket_id The ticket id.
+         * @return void
+         */
+        private function renderRowActions(int $ticket_id): void
+        {
+
+            // who has it now
+            $assignee = (int) get_post_meta($ticket_id, Access::META_ASSIGNEE, true);
+
+            // taking it, unless it's already theirs
+            if ($assignee !== get_current_user_id() && current_user_can('kpts_assign_tickets')) {
+                printf(
+                    '<a href="%1$s" class="kpts-row-action kpts-row-take" title="%2$s"><span class="dashicons dashicons-businessperson"></span><span class="screen-reader-text">%2$s</span></a>',
+                    esc_url(self::takeUrl($ticket_id)),
+                    esc_attr__('Take this ticket', 'kp-support')
+                );
+            }
+
+            // and closing it out, unless it's already sat in a closed status
+            if (! Access::ticketIsClosed($ticket_id) && current_user_can('edit_kpts_ticket', $ticket_id)) {
+                printf(
+                    '<a href="%1$s" class="kpts-row-action kpts-row-close" title="%2$s"><span class="dashicons dashicons-yes-alt"></span><span class="screen-reader-text">%2$s</span></a>',
+                    esc_url(self::closeUrl($ticket_id)),
+                    esc_attr__('Close this ticket', 'kp-support')
+                );
+            }
+        }
+
+        /**
+         * Swap the trash link out for a permanent delete.
+         *
+         * @since  1.0.49
+         * @access public
+         * @param  array<string, string> $actions The row actions.
+         * @param  \WP_Post              $post    The post the row is for.
+         * @return array<string, string> The adjusted actions.
+         */
+        public function rowActions($actions, $post): array
+        {
+
+            // cast it down
+            $actions = (array) $actions;
+
+            // leave everything else alone
+            if (! $post instanceof \WP_Post || $post->post_type !== PostTypes::POST_TYPE) {
+                return $actions;
+            }
+
+            // out goes the trash
+            unset($actions['trash'], $actions['untrash']);
+
+            // and in comes the real thing
+            if (current_user_can('delete_kpts_ticket', $post->ID)) {
+                $actions['delete'] = sprintf(
+                    '<a href="%1$s" class="submitdelete" onclick="return confirm(\'%2$s\');">%3$s</a>',
+                    esc_url((string) get_delete_post_link($post->ID, '', true)),
+                    esc_js(__('This permanently deletes the ticket and everything on it. Continue?', 'kp-support')),
+                    esc_html__('Delete Permanently', 'kp-support')
+                );
+            }
+
+            // hand them back
+            return $actions;
+        }
+
+        /**
+         * Swap the trash bulk action out for a permanent delete.
+         *
+         * @since  1.0.49
+         * @access public
+         * @param  array<string, string> $actions The bulk actions.
+         * @return array<string, string> The adjusted actions.
+         */
+        public function bulkActions($actions): array
+        {
+
+            // cast it down
+            $actions = (array) $actions;
+
+            // out goes the trash
+            unset($actions['trash'], $actions['untrash']);
+
+            // and in comes the real thing
+            $actions['delete'] = __('Delete Permanently', 'kp-support');
+
+            // hand them back
+            return $actions;
+        }
+
+        /**
+         * Delete a ticket outright when something tries to trash it.
+         *
+         * @since  1.0.49
+         * @access public
+         * @param  bool|null $check Short circuit value, null to carry on.
+         * @param  \WP_Post  $post  The post being trashed.
+         * @return bool|null True once it's gone, otherwise the value we were handed.
+         */
+        public function deleteInsteadOfTrash($check, $post)
+        {
+
+            // leave everything else alone
+            if (! $post instanceof \WP_Post || $post->post_type !== PostTypes::POST_TYPE) {
+                return $check;
+            }
+
+            // somebody else already handled it
+            if (null !== $check) {
+                return $check;
+            }
+
+            // gone for good, which fires the attachment cleanup on the way out
+            wp_delete_post($post->ID, true);
+
+            // and tell core there's nothing left to trash
+            return true;
+        }
+
+        /**
+         * Mark our sortable columns.
          *
          * @since  1.0.0
          * @access public
@@ -214,11 +364,21 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
         public function sortableColumns($columns): array
         {
 
-            // let them sort on last activity
+            // cast it down
+            $columns = (array) $columns;
+
+            // everything but the reply count is sortable
+            $columns['kpts_number'] = 'ID';
+            $columns['kpts_requester'] = 'kpts_requester';
+            $columns['kpts_status'] = 'kpts_status';
+            $columns['kpts_priority'] = 'kpts_priority';
+            $columns['kpts_dept'] = 'kpts_dept';
+            $columns['kpts_assignee'] = 'kpts_assignee';
             $columns['kpts_activity'] = 'kpts_activity';
+            $columns['kpts_posted'] = 'date';
 
             // hand them back
-            return (array) $columns;
+            return $columns;
         }
 
         /**
@@ -266,6 +426,81 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 // close it up
                 echo '</select>';
             }
+
+            // and the two people filters
+            $this->renderUserFilter('kpts_requester', __('All requesters', 'kp-support'), Access::META_REQUESTER);
+            $this->renderUserFilter('kpts_assignee', __('Anyone assigned', 'kp-support'), Access::META_ASSIGNEE);
+        }
+
+        /**
+         * Render a dropdown of the people sitting on one of our meta keys.
+         *
+         * @since  1.0.49
+         * @access private
+         * @param  string $name     The query arg to filter on.
+         * @param  string $label    The empty option's label.
+         * @param  string $meta_key The meta key the ids live under.
+         * @return void
+         */
+        private function renderUserFilter(string $name, string $label, string $meta_key): void
+        {
+
+            // we need the database object to pull the distinct ids
+            global $wpdb;
+
+            // everybody who actually appears on a ticket, so the list stays short
+            $ids = $wpdb->get_col($wpdb->prepare(
+                "SELECT DISTINCT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value > 0",
+                $meta_key
+            )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- a distinct id list for a list table filter, no core api covers it
+
+            // nothing to filter on
+            if (empty($ids)) {
+                return;
+            }
+
+            // what's currently selected
+            $selected = isset($_GET[$name]) ? absint(wp_unslash($_GET[$name])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only list table filter state
+
+            // pull them in one go, ordered the way they'll be shown
+            $users = get_users(array(
+                'include' => array_map('absint', $ids),
+                'orderby' => 'display_name',
+                'order'   => 'ASC',
+                'fields'  => array('ID', 'display_name'),
+            ));
+
+            // open the select
+            printf('<select name="%1$s"><option value="0">%2$s</option>', esc_attr($name), esc_html($label));
+
+            // and add each of them
+            foreach ($users as $_user) {
+                printf(
+                    '<option value="%1$d" %2$s>%3$s</option>',
+                    (int) $_user->ID,
+                    selected($selected, (int) $_user->ID, false),
+                    esc_html($_user->display_name)
+                );
+            }
+
+            // close it up
+            echo '</select>';
+        }
+
+        /**
+         * Drop the months dropdown off our list table.
+         *
+         * @since  1.0.49
+         * @access public
+         * @param  bool   $disable   Whether core would hide it.
+         * @param  string $post_type The post type being listed.
+         * @return bool True to hide it.
+         */
+        public function disableMonths($disable, $post_type): bool
+        {
+
+            // ours goes, everything else is left alone
+            return ($post_type === PostTypes::POST_TYPE) ? true : (bool) $disable;
         }
 
         /**
@@ -302,6 +537,30 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 $query->set('orderby', 'meta_value');
             }
 
+            // the people filters, both straight meta comparisons
+            $people = array(
+                'kpts_requester' => Access::META_REQUESTER,
+                'kpts_assignee'  => Access::META_ASSIGNEE,
+            );
+
+            // apply whichever was asked for
+            foreach ($people as $_arg => $_meta_key) {
+
+                // skip anything they didn't pick
+                $_user_id = isset($_GET[$_arg]) ? absint(wp_unslash($_GET[$_arg])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only list table filter state
+                if ($_user_id < 1) {
+                    continue;
+                }
+
+                // and stack it onto whatever is already there
+                $meta_query = (array) $query->get('meta_query');
+                $meta_query[] = array(
+                    'key'   => $_meta_key,
+                    'value' => $_user_id,
+                );
+                $query->set('meta_query', $meta_query); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- filtering the ticket list by who is on it requires it
+            }
+
             // now scope it down, managers and admins see everything
             $user_id = get_current_user_id();
             if (Access::isManager($user_id) || ! $this->opt('restrict_agents_by_department', false)) {
@@ -325,6 +584,83 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 'operator' => 'IN',
             );
             $query->set('tax_query', $tax_query);
+        }
+
+        /**
+         * Join in what the name based sorts need to order on.
+         *
+         * The taxonomy columns sort on the term name and the people columns on
+         * the display name, neither of which is anywhere WP_Query can reach on
+         * its own.
+         *
+         * @since  1.0.49
+         * @access public
+         * @param  array<string, string> $clauses The query clauses.
+         * @param  \WP_Query             $query   The query about to run.
+         * @return array<string, string> The adjusted clauses.
+         */
+        public function sortClauses($clauses, $query): array
+        {
+
+            // only the main query, on our list table, in the admin
+            if (! is_admin() || ! $query instanceof \WP_Query || ! $query->is_main_query()) {
+                return (array) $clauses;
+            }
+
+            // and only for our post type
+            if (($query->get('post_type') ?: '') !== PostTypes::POST_TYPE) {
+                return (array) $clauses;
+            }
+
+            // what did they click
+            $orderby = (string) $query->get('orderby');
+
+            // the taxonomy columns, and the meta the people columns hang off
+            $taxonomies = array(
+                'kpts_status'   => PostTypes::TAX_STATUS,
+                'kpts_priority' => PostTypes::TAX_PRIORITY,
+                'kpts_dept'     => PostTypes::TAX_DEPARTMENT,
+            );
+            $people = array(
+                'kpts_requester' => Access::META_REQUESTER,
+                'kpts_assignee'  => Access::META_ASSIGNEE,
+            );
+
+            // nothing of ours
+            if (! isset($taxonomies[$orderby]) && ! isset($people[$orderby])) {
+                return (array) $clauses;
+            }
+
+            // which way round
+            $order = (strtoupper((string) $query->get('order')) === 'ASC') ? 'ASC' : 'DESC';
+
+            // we need the database object for the table names
+            global $wpdb;
+
+            // a term name sort walks the relationship tables out to the term
+            if (isset($taxonomies[$orderby])) {
+                $clauses['join'] .= $wpdb->prepare(
+                    " LEFT JOIN {$wpdb->term_relationships} AS kpts_tr ON {$wpdb->posts}.ID = kpts_tr.object_id"
+                        . " LEFT JOIN {$wpdb->term_taxonomy} AS kpts_tt ON kpts_tr.term_taxonomy_id = kpts_tt.term_taxonomy_id AND kpts_tt.taxonomy = %s"
+                        . " LEFT JOIN {$wpdb->terms} AS kpts_t ON kpts_tt.term_id = kpts_t.term_id",
+                    $taxonomies[$orderby]
+                );
+                $clauses['orderby'] = "kpts_t.name {$order}";
+                $clauses['groupby'] = "{$wpdb->posts}.ID";
+
+                return (array) $clauses;
+            }
+
+            // and a person sort goes out through the meta row to the user
+            $clauses['join'] .= $wpdb->prepare(
+                " LEFT JOIN {$wpdb->postmeta} AS kpts_pm ON {$wpdb->posts}.ID = kpts_pm.post_id AND kpts_pm.meta_key = %s"
+                    . " LEFT JOIN {$wpdb->users} AS kpts_u ON kpts_pm.meta_value = kpts_u.ID",
+                $people[$orderby]
+            );
+            $clauses['orderby'] = "kpts_u.display_name {$order}";
+            $clauses['groupby'] = "{$wpdb->posts}.ID";
+
+            return (array) $clauses;
         }
 
         /**
@@ -636,7 +972,7 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             }
 
             // and out it goes, along with the visibility row in the status box
-            echo '<style>#postdivrich, #post-body-content { display: none; }'
+            echo '<style>#postdivrich { display: none; }'
                 . '#submitdiv .misc-pub-visibility { display: none; }'
                 . '.inline-edit-row .inline-edit-status,'
                 . '.inline-edit-row .inline-edit-password-input { display: none; }</style>';
@@ -660,6 +996,9 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             // the opening message gets typed instead
             if (get_post_status($ticket_id) === 'auto-draft') {
 
+                // the padding lives on the thread wrapper, so this needs its own
+                echo '<div class="kpts-opening-field">';
+
                 // the label
                 printf(
                     '<p><label for="kpts_opening_message"><strong>%s</strong></label></p>',
@@ -676,6 +1015,8 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                     '<p class="description">%s</p>',
                     esc_html__('This becomes the first post in the conversation.', 'kp-support')
                 );
+
+                echo '</div>';
 
                 return;
             }
@@ -830,11 +1171,51 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
                 echo '</select></p>';
             }
 
-            // the portal link, so they can jump straight over
+            // the actions that sit side by side above the save
+            $can_take = ($assignee !== get_current_user_id() && current_user_can('kpts_assign_tickets') && get_post_status($ticket_id) !== 'auto-draft');
+            $can_close = (! Access::ticketIsClosed($ticket_id) && get_post_status($ticket_id) !== 'auto-draft');
+
+            // only worth a row if there's something in it
+            if ($can_take || $can_close) {
+
+                // open it up
+                echo '<p class="kpts-details-actions">';
+
+                // the button that hands it to them
+                if ($can_take) {
+                    printf(
+                        '<a href="%1$s" class="button">%2$s</a>',
+                        esc_url(self::takeUrl($ticket_id)),
+                        esc_html__('Take This Ticket', 'kp-support')
+                    );
+                }
+
+                // and the one that closes it out
+                if ($can_close) {
+                    printf(
+                        '<a href="%1$s" class="button">%2$s</a>',
+                        esc_url(self::closeUrl($ticket_id)),
+                        esc_html__('Close Ticket', 'kp-support')
+                    );
+                }
+
+                // close it up
+                echo '</p>';
+            }
+
+            // a brand new ticket gets published, an existing one gets updated
+            if (get_post_status($ticket_id) === 'auto-draft') {
+                printf(
+                    '<p><input type="submit" name="publish" class="button button-primary button-large" value="%s" /></p>',
+                    esc_attr__('Create Ticket', 'kp-support')
+                );
+                return;
+            }
+
+            // and the save for everything else
             printf(
-                '<p><a href="%1$s" class="button" target="_blank" rel="noopener">%2$s</a></p>',
-                esc_url(Portal::ticketUrl($ticket_id)),
-                esc_html__('Open in Portal', 'kp-support')
+                '<p><input type="submit" name="save" class="button button-primary button-large" value="%s" /></p>',
+                esc_attr__('Update Ticket', 'kp-support')
             );
         }
 
@@ -993,6 +1374,100 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             if (get_post_meta($post_id, Ticket::META_LAST_ACTIVITY, true) === '') {
                 Ticket::touch($post_id);
             }
+        }
+
+        /**
+         * Build the url that hands a ticket to whoever clicks it.
+         *
+         * @since  1.0.49
+         * @access public
+         * @param  int $ticket_id The ticket id.
+         * @return string The nonced url.
+         */
+        public static function takeUrl(int $ticket_id): string
+        {
+
+            // nonced and tied to the ticket
+            return wp_nonce_url(
+                admin_url('admin-post.php?action=kpts_take_ticket&ticket=' . $ticket_id),
+                'kpts_take_ticket_' . $ticket_id
+            );
+        }
+
+        /**
+         * Hand a ticket to whoever clicked the button.
+         *
+         * @since  1.0.49
+         * @access public
+         * @return void
+         */
+        public function takeTicket(): void
+        {
+
+            // which ticket
+            $ticket_id = isset($_GET['ticket']) ? absint(wp_unslash($_GET['ticket'])) : 0;
+
+            // the nonce is tied to this specific ticket
+            check_admin_referer('kpts_take_ticket_' . $ticket_id);
+
+            // they have to be able to edit it, and to assign it
+            if (! current_user_can('edit_kpts_ticket', $ticket_id) || ! current_user_can('kpts_assign_tickets')) {
+                wp_die(esc_html__('You are not allowed to do that.', 'kp-support'));
+            }
+
+            // hand it over
+            Ticket::setAssignee($ticket_id, get_current_user_id());
+
+            // and back to wherever they came from
+            wp_safe_redirect(wp_get_referer() ?: (string) get_edit_post_link($ticket_id, 'raw'));
+            exit;
+        }
+
+        /**
+         * Build the url that closes a ticket out.
+         *
+         * @since  1.0.49
+         * @access public
+         * @param  int $ticket_id The ticket id.
+         * @return string The nonced url.
+         */
+        public static function closeUrl(int $ticket_id): string
+        {
+
+            // nonced and tied to the ticket
+            return wp_nonce_url(
+                admin_url('admin-post.php?action=kpts_close_ticket&ticket=' . $ticket_id),
+                'kpts_close_ticket_' . $ticket_id
+            );
+        }
+
+        /**
+         * Drop a ticket into the closed status.
+         *
+         * @since  1.0.49
+         * @access public
+         * @return void
+         */
+        public function closeTicket(): void
+        {
+
+            // which ticket
+            $ticket_id = isset($_GET['ticket']) ? absint(wp_unslash($_GET['ticket'])) : 0;
+
+            // the nonce is tied to this specific ticket
+            check_admin_referer('kpts_close_ticket_' . $ticket_id);
+
+            // they have to be able to edit it
+            if (! current_user_can('edit_kpts_ticket', $ticket_id)) {
+                wp_die(esc_html__('You are not allowed to do that.', 'kp-support'));
+            }
+
+            // close it out
+            Ticket::setStatusBySlug($ticket_id, 'closed');
+
+            // and back to wherever they came from
+            wp_safe_redirect(wp_get_referer() ?: (string) get_edit_post_link($ticket_id, 'raw'));
+            exit;
         }
 
         /**

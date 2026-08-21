@@ -129,8 +129,7 @@ $kpts_allow_files = (bool) Plugin::opt('allow_attachments', true);
         <?php if (! $kpts_online && $kpts_chat_id < 1) : ?>
             <form class="kpts-chat-offline-form" novalidate>
 
-                <p class="kpts-chat-offline-message"><?php echo esc_html($kpts_offline_message); ?></p>
-
+                <p class="kpts-chat-offline-intro"><?php echo esc_html($kpts_offline_message); ?></p>
 
                 <?php if (! $kpts_locked) : ?>
                     <div class="kpts-chat-name-row">

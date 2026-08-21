@@ -632,7 +632,7 @@
         var first = form.querySelector('.kpts-chat-' + prefix + '-first');
         var last = form.querySelector('.kpts-chat-' + prefix + '-last');
         var email = form.querySelector('.kpts-chat-' + prefix + '-email');
-        var message = form.querySelector('.kpts-chat-' + prefix + '-message');
+        var message = form.querySelector('.kpts-chat-' + prefix + '-message, .kpts-chat-' + prefix + '-body');
 
         // and hand back what's in them, falling back to what we were given
         return {

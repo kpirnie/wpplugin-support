@@ -41,6 +41,38 @@
     width: 130px;
 }
 
+.column-kpts_actions {
+    width: 90px;
+}
+
+.kpts-row-action {
+    text-decoration: none;
+}
+
+.kpts-row-action .dashicons {
+    width: 32px;
+    height: 32px;
+    font-size: 32px;
+    line-height: 32px;
+}
+
+.kpts-row-take {
+    color: #00a32a;
+}
+
+.kpts-row-take:hover,
+.kpts-row-take:focus {
+    color: #007017;
+}
+
+.kpts-row-action + .kpts-row-action {
+    margin-left: 6px;
+}
+
+#kpts_details .kpts-details-actions .button + .button {
+    margin-left: 6px;
+}
+
 /* the conversation metabox reuses the portal styles, so give it the same shell */
 #kpts_conversation .inside {
     padding: 0;
@@ -69,6 +101,10 @@
 
 #kpts_conversation .kpts-reply-form textarea {
     width: 100%;
+}
+
+#kpts_conversation .kpts-opening-field {
+    padding: 16px;
 }
 
 /* the details box off to the side */
