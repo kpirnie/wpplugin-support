@@ -4,7 +4,7 @@ Tags: support, helpdesk, ticket system, live chat, customer service
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.46
+Stable tag: 1.0.48
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -120,6 +120,10 @@ Every variable a template is handed is prefixed with `kpts_`, and each file docu
 The class names in the markup and the CSS custom properties on the `.kpts-portal` wrapper are the supported styling surface. Keep the `kpts-` classes on the elements the scripts bind to - the reply form, the file input, the internal note toggle and the management selects - or the chat stops working.
 
 == Changelog ==
+
+= 1.0.48 =
+* Added: the update details modal now pulls its description and changelog straight out of the readme that shipped with the release
+* Fixed: an available update notice no longer lingers on the plugins screen after the update has already been installed
 
 = 1.0.46 =
 * Added: a pre-chat form, so a chat starts with a name, email address and opening message rather than opening straight away

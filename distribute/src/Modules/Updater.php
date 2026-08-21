@@ -72,6 +72,22 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
         private const FAIL_SECS = 3600;
 
         /**
+         * Where the cached readme lives.
+         *
+         * @since 1.0.47
+         * @var string
+         */
+        private const README_TRANSIENT = 'kpts_gh_readme';
+
+        /**
+         * The raw content base for the repo.
+         *
+         * @since 1.0.47
+         * @var string
+         */
+        private const RAW_BASE = 'https://raw.githubusercontent.com/' . self::GH_REPO . '/';
+
+        /**
          * Hook this module into WordPress.
          *
          * @since  1.0.21
@@ -81,8 +97,9 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
         public function register(): void
         {
 
-            // wire ourselves into the update pipeline
+            // wire ourselves into the update pipeline, on both the write and the read
             add_filter('pre_set_site_transient_update_plugins', array($this, 'injectUpdate'));
+            add_filter('site_transient_update_plugins', array($this, 'injectUpdate'));
             add_filter('plugins_api', array($this, 'pluginInfo'), 10, 3);
             add_action('upgrader_process_complete', array($this, 'purgeCache'), 10, 2);
             add_filter('upgrader_source_selection', array($this, 'fixSourceDir'), 10, 4);
@@ -136,6 +153,78 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
         }
 
         /**
+         * Pull the readme.txt that shipped with a tag, cached either way.
+         *
+         * @since  1.0.47
+         * @access private
+         * @param  string $tag The release tag to read from.
+         * @return string The raw readme, or an empty string if we couldn't get it.
+         */
+        private function fetchReadme(string $tag): string
+        {
+
+            // hand back whatever we've already got, so long as it's for this tag
+            $cached = get_transient(self::README_TRANSIENT);
+            if (is_array($cached) && ($cached['tag'] ?? '') === $tag) {
+                return (string) ($cached['body'] ?? '');
+            }
+
+            // go grab it straight off the tag
+            $response = wp_remote_get(
+                self::RAW_BASE . $tag . '/source/readme.txt',
+                array(
+                    'timeout' => 10,
+                    'headers' => array(
+                        'User-Agent' => 'WordPress/' . get_bloginfo('version'),
+                    ),
+                )
+            );
+
+            // if that went sideways, remember it for a bit so we're not hammering them
+            if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) {
+                set_transient(self::README_TRANSIENT, array('tag' => $tag, 'body' => ''), self::FAIL_SECS);
+                return '';
+            }
+
+            // hold on to it and hand it back
+            $body = (string) wp_remote_retrieve_body($response);
+            set_transient(self::README_TRANSIENT, array('tag' => $tag, 'body' => $body), self::CACHE_SECS);
+
+            return $body;
+        }
+
+        /**
+         * Carve a single == Section == out of a readme.txt.
+         *
+         * @since  1.0.47
+         * @access private
+         * @param  string $readme The raw readme contents.
+         * @param  string $name   The section name, without the equals signs.
+         * @return string The section body, or an empty string if it isn't there.
+         */
+        private function readmeSection(string $readme, string $name): string
+        {
+
+            // nothing in, nothing out
+            if (empty($readme)) {
+                return '';
+            }
+
+            // normalize the line endings so our anchors behave
+            $readme = str_replace("\r\n", "\n", $readme);
+
+            // everything from our header to the next one, or the end of the file
+            $pattern = '/^==\s*' . preg_quote($name, '/') . '\s*==\s*$(.*?)(?=^==\s|\z)/ms';
+
+            // pull it out if it's actually in there
+            if (! preg_match($pattern, $readme, $matches)) {
+                return '';
+            }
+
+            return trim((string) $matches[1]);
+        }
+
+        /**
          * Find the release zip, falling back to the auto generated zipball.
          *
          * @since  1.0.21
@@ -182,11 +271,6 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
             // tags come through as v1.0.21, we want 1.0.21
             $remote_version = ltrim((string) $release->tag_name, 'v');
 
-            // only bother if it's actually newer than what's running
-            if (! version_compare($remote_version, KP_SUPPORT_VERSION, '>')) {
-                return $transient;
-            }
-
             // build out what WordPress expects to see
             $update                = new \stdClass();
             $update->slug          = self::SLUG;
@@ -209,7 +293,24 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
             // tell WordPress what folder name to expect inside the zip
             $update->new_files = self::SLUG;
 
-            // and in it goes
+            // make sure the buckets are actually there
+            if (! isset($transient->response)) {
+                $transient->response = array();
+            }
+            if (! isset($transient->no_update)) {
+                $transient->no_update = array();
+            }
+
+            // nothing newer out there, so drop any stale offer and list ourselves as current
+            if (! version_compare($remote_version, KP_SUPPORT_VERSION, '>')) {
+                unset($transient->response[KP_SUPPORT_BASENAME]);
+                $update->new_version = KP_SUPPORT_VERSION;
+                $transient->no_update[KP_SUPPORT_BASENAME] = $update;
+                return $transient;
+            }
+
+            // there is, so in it goes
+            unset($transient->no_update[KP_SUPPORT_BASENAME]);
             $transient->response[KP_SUPPORT_BASENAME] = $update;
 
             return $transient;
@@ -239,6 +340,13 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
                 return $result;
             }
 
+            // the readme that shipped with this tag
+            $readme = $this->fetchReadme((string) $release->tag_name);
+
+            // the two sections we actually want
+            $description = $this->markdownToHtml($this->readmeSection($readme, 'Description'));
+            $changelog   = $this->markdownToHtml($this->readmeSection($readme, 'Changelog'));
+
             // the release notes, or a pointer at GitHub if there aren't any
             $body = ! empty($release->body) ? $this->markdownToHtml((string) $release->body) : '';
             if ($body === '') {
@@ -248,6 +356,10 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
                     esc_html__('See the GitHub releases for the full notes.', 'kp-support')
                 );
             }
+
+            // and fall back to them for whichever section came up empty
+            $description = ($description !== '') ? $description : $body;
+            $changelog   = ($changelog !== '') ? $changelog : $body;
 
             // build out the info object
             $info                = new \stdClass();
@@ -266,8 +378,8 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
             $info->requires_php  = '8.2';
             $info->last_updated  = $release->published_at ?? '';
             $info->sections      = array(
-                'description' => $body,
-                'changelog'   => $body,
+                'description' => $description,
+                'changelog'   => $changelog,
             );
             $info->download_link = $this->zipUrl($release);
 
@@ -296,8 +408,12 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
                 return;
             }
 
-            // clear it out
+            // clear them out
             delete_transient(self::TRANSIENT);
+            delete_transient(self::README_TRANSIENT);
+
+            // and force a fresh check so the notice doesn't linger
+            delete_site_transient('update_plugins');
         }
 
         /**
@@ -371,18 +487,10 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
             $md = preg_replace('/^## (.+)$/m', '<h2>$1</h2>', $md);
             $md = preg_replace('/^# (.+)$/m', '<h1>$1</h1>', $md);
 
-            // bold and italic
-            $md = preg_replace('/\*\*\*(.+?)\*\*\*/s', '<strong><em>$1</em></strong>', $md);
-            $md = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $md);
-            $md = preg_replace('/\*(.+?)\*/s', '<em>$1</em>', $md);
+            // readme.txt style headings
+            $md = preg_replace('/^=\s*(.+?)\s*=$/m', '<h4>$1</h4>', $md);
 
-            // inline code
-            $md = preg_replace('/`([^`]+)`/', '<code>$1</code>', $md);
-
-            // links
-            $md = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2" target="_blank">$1</a>', $md);
-
-            // unordered lists
+            // unordered lists, before the emphasis pass so bullets aren't read as italics
             $md = preg_replace_callback('/(?:^[-*] .+\n?)+/m', function (array $match): string {
                 $items = preg_replace('/^[-*] (.+)$/m', '<li>$1</li>', trim($match[0]));
                 return '<ul>' . $items . '</ul>';
@@ -393,6 +501,17 @@ if (! class_exists('\KP\Support\Modules\Updater')) {
                 $items = preg_replace('/^\d+\. (.+)$/m', '<li>$1</li>', trim($match[0]));
                 return '<ol>' . $items . '</ol>';
             }, $md);
+
+            // bold and italic
+            $md = preg_replace('/\*\*\*(.+?)\*\*\*/s', '<strong><em>$1</em></strong>', $md);
+            $md = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $md);
+            $md = preg_replace('/(?<![\w*])\*([^*\n]+)\*(?!\*)/', '<em>$1</em>', $md);
+
+            // inline code
+            $md = preg_replace('/`([^`]+)`/', '<code>$1</code>', $md);
+
+            // links
+            $md = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2" target="_blank">$1</a>', $md);
 
             // horizontal rules
             $md = preg_replace('/^[-*]{3,}$/m', '<hr>', $md);
