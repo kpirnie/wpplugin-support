@@ -773,6 +773,7 @@ if (! class_exists('\KP\Support\Settings\Settings')) {
             );
 
             // whatever the last one did, if we've just come back from it
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, just the result flag on the redirect back
             $result = isset($_GET['kpts_test']) ? sanitize_key(wp_unslash($_GET['kpts_test'])) : '';
 
             // the messages we're willing to show

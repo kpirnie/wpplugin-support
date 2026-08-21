@@ -36,8 +36,11 @@ $kpts_is_agent = ! empty($kpts_is_agent);
 $kpts_agent_view = ! empty($kpts_agent_view);
 
 // what's currently filtered
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, public portal list filtering
 $kpts_current_status = isset($_GET['kpts_status']) ? absint(wp_unslash($_GET['kpts_status'])) : 0;
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, public portal list filtering
 $kpts_current_department = isset($_GET['kpts_department']) ? absint(wp_unslash($_GET['kpts_department'])) : 0;
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, public portal list filtering
 $kpts_current_search = isset($_GET['kpts_search']) ? sanitize_text_field(wp_unslash($_GET['kpts_search'])) : '';
 ?>
 <div class="kpts-portal kpts-portal-list">

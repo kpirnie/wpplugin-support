@@ -534,7 +534,8 @@ if (! class_exists('\KP\Support\Modules\ChatAjax')) {
             $this->enforceRateLimit();
 
             // pull the message, kses runs inside Chat::addMessage
-            $content = wp_unslash($_POST['content'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized with wp_kses in Chat::addMessage()
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput, WordPress.Security.NonceVerification.Missing -- sanitized with wp_kses in Chat::addMessage(), and the nonce is checked above
+            $content = wp_unslash($_POST['content'] ?? '');
 
             // take whatever files came along with it
             $attachments = Attachments::processUploads('kpts_files', $user_id);

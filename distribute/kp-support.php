@@ -9,7 +9,7 @@
  * Plugin Name:       KP Support
  * Plugin URI:        https://kevinpirnie.com/
  * Description:       A full-featured support ticket system with AJAX chat, threaded replies, departments, priorities, attachments, and a front-end customer portal.
- * Version:           1.0.59
+ * Version:           1.1.0
  * Requires at least: 6.8
  * Requires PHP:      8.2
  * Author:            Kevin Pirnie

@@ -137,7 +137,8 @@ if (! class_exists('\KP\Support\Modules\Ajax')) {
             }
 
             // pull the reply itself, kses runs inside Replies::add
-            $content = wp_unslash($_POST['content'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized with wp_kses in Replies::add()
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput, WordPress.Security.NonceVerification.Missing -- sanitized with wp_kses in Replies::add(), and verifyRequest() runs check_ajax_referer above
+            $content = wp_unslash($_POST['content'] ?? '');
             $parent = isset($_POST['parent']) ? absint(wp_unslash($_POST['parent'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
             $internal = ! empty($_POST['internal']) && Access::canReplyInternal($ticket_id); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verifyRequest() runs check_ajax_referer above
 

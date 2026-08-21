@@ -303,9 +303,8 @@ if (! class_exists('\KP\Support\Modules\Portal')) {
             }
 
             // work out which view we're on, the query string wins over the attribute
-            $view = isset($_GET['kpts_view']) // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, public portal routing
-                ? sanitize_key(wp_unslash($_GET['kpts_view']))
-                : '';
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, public portal routing
+            $view = isset($_GET['kpts_view']) ? sanitize_key(wp_unslash($_GET['kpts_view'])) : '';
 
             // and route it
             return match ($view) {

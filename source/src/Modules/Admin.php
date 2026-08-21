@@ -449,10 +449,11 @@ if (! class_exists('\KP\Support\Modules\Admin')) {
             global $wpdb;
 
             // everybody who actually appears on a ticket, so the list stays short
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- a distinct id list for a list table filter, no core api covers it
             $ids = $wpdb->get_col($wpdb->prepare(
                 "SELECT DISTINCT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value > 0",
                 $meta_key
-            )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- a distinct id list for a list table filter, no core api covers it
+            ));
 
             // nothing to filter on
             if (empty($ids)) {

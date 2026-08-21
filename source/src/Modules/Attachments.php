@@ -277,6 +277,7 @@ if (! class_exists('\KP\Support\Modules\Attachments')) {
             }
 
             // nothing was sent up
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- callers verify the nonce before any upload is processed
             if (empty($_FILES[$field]) || ! isset($_FILES[$field]['name'])) {
                 return array();
             }
@@ -337,7 +338,8 @@ if (! class_exists('\KP\Support\Modules\Attachments')) {
         {
 
             // grab the raw structure
-            $raw = $_FILES[$field]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- each member is validated in storeFile()
+            $raw = $_FILES[$field]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput, WordPress.Security.NonceVerification.Missing -- each member is validated in storeFile(), and callers verify the nonce first
+
 
             // a single file comes through flat
             if (! is_array($raw['name'])) {
@@ -582,7 +584,8 @@ if (! class_exists('\KP\Support\Modules\Attachments')) {
             }
 
             // clean up what came in, the key is ours so it's strictly alphanumeric
-            $key = preg_replace('/[^A-Za-z0-9]/', '', wp_unslash($_GET['kpts_file'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, stripped to alphanumerics
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- read only, stripped to alphanumerics on the next line
+            $key = preg_replace('/[^A-Za-z0-9]/', '', wp_unslash($_GET['kpts_file']));
             $ticket_id = isset($_GET['kpts_ticket']) ? absint(wp_unslash($_GET['kpts_ticket'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
             $chat_id = isset($_GET['kpts_chat']) ? absint(wp_unslash($_GET['kpts_chat'])) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, access is gated by capability checks below
 
